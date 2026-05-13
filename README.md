@@ -32,7 +32,7 @@ A full-stack web application for studying songs through four different lenses: *
 
 ### Prerequisites
 
-- Node.js 18+ and npm 9+
+- Node.js 24+ and npm 11+
 - MongoDB Atlas account (or local MongoDB)
 - OpenAI API key
 - Tavily API key

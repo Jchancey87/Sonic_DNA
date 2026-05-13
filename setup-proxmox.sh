@@ -41,9 +41,9 @@ echo ""
 # ============================================================================
 # PHASE 2: Install Node.js
 # ============================================================================
-echo -e "${YELLOW}[2/10] Installing Node.js 18 LTS...${NC}"
+echo -e "${YELLOW}[2/10] Installing Node.js 24 LTS...${NC}"
 if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt install -y nodejs
     echo -e "${GREEN}✓ Node.js installed: $(node --version)${NC}"
 else

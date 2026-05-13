@@ -5,8 +5,8 @@ This guide will walk you through setting up and running the Sonic DNA Audit App 
 ## Prerequisites
 
 Before starting, make sure you have:
-- **Node.js** 18+ ([download here](https://nodejs.org/))
-- **npm** 9+ (comes with Node.js)
+- **Node.js** 24+ ([download here](https://nodejs.org/))
+- **npm** 11+ (comes with Node.js)
 - **MongoDB** account (free tier available at [mongodb.com](https://www.mongodb.com/cloud/atlas))
 - **OpenAI API Key** ([get one here](https://platform.openai.com/api-keys))
 - **Tavily API Key** ([get one here](https://tavily.com/api))

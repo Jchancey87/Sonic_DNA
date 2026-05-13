@@ -250,7 +250,7 @@ Homma Research/
 ## 🚀 How to Run
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 24+
 - MongoDB Atlas account
 - OpenAI API key
 - Tavily API key

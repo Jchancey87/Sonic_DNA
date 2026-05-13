@@ -6,7 +6,7 @@ This guide walks you through deploying the Sonic DNA Audit App on a **Proxmox LX
 
 **Target Architecture:**
 - LXC Container (Ubuntu 22.04 LTS recommended)
-- Node.js 18+ (backend)
+- Node.js 24+ (backend)
 - React (frontend, built)
 - MongoDB (local or remote)
 - Nginx (reverse proxy)
@@ -88,18 +88,18 @@ apt install -y curl wget git build-essential
 
 ## Phase 2: Install Node.js & npm
 
-### Step 4: Install Node.js 18 LTS
+### Step 4: Install Node.js 24 LTS
 
 ```bash
 # Add NodeSource repository
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
 # Install Node.js
 apt install -y nodejs
 
 # Verify installation
-node --version    # Should be v18.x.x
-npm --version     # Should be 9.x.x
+node --version    # Should be v24.x.x
+npm --version     # Should be 11.x.x
 ```
 
 ### Step 5: Create App User (Optional but Recommended)
@@ -924,7 +924,7 @@ ufw status numbered
 ## Summary: What You've Built
 
 ✅ Proxmox LXC container (Ubuntu 22.04)  
-✅ Node.js 18 installed  
+✅ Node.js 24 installed  
 ✅ MongoDB running locally  
 ✅ Sonic DNA Audit App deployed  
 ✅ Nginx reverse proxy  
