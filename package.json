@@ -12,7 +12,7 @@
     "install-all": "npm install && npm --prefix server install && npm --prefix client install"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^9.2.1"
   },
   "engines": {
     "node": ">=24.0.0",

@@ -391,7 +391,7 @@ The app is fully implemented and ready to use. Follow these steps:
 
 ## Version Info
 - Node.js: 24+
-- React: 18.2.0
-- Express: 4.18.2
+- React: 19.2.6
+- Express: 5.2.1
 - MongoDB: Latest
 - Built: May 2026
