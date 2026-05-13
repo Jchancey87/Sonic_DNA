@@ -1,0 +1,21 @@
+{
+  "name": "sonic-dna-audit",
+  "version": "0.1.0",
+  "description": "Song audit app for studying music through rhythm, texture, harmony, and arrangement lenses",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix server run dev\" \"npm --prefix client start\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client start",
+    "build": "npm --prefix client build",
+    "build:server": "echo 'No build needed for server'",
+    "install-all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
