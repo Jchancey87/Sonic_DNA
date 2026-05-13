@@ -86,7 +86,7 @@ npm run dev
 
 This will start:
 - Backend server on `http://localhost:5000`
-- Frontend client on `http://localhost:3000`
+- Frontend client on `http://localhost:3050`
 
 ### Option B: Run Separately (for debugging)
 
@@ -102,7 +102,7 @@ npm run client
 
 ## Step 5: Access the App
 
-Open your browser and go to: **http://localhost:3000**
+Open your browser and go to: **http://localhost:3050**
 
 You should see the Sonic DNA Audit login page.
 
@@ -207,7 +207,7 @@ taskkill /PID <PID> /F
 lsof -ti:5000 | xargs kill -9
 ```
 
-### "React app won't load on localhost:3000"
+### "React app won't load on localhost:3050"
 
 **Check:**
 - Backend is running (`http://localhost:5000/health` should show `{"status":"ok"}`)
@@ -261,7 +261,7 @@ If you run into issues:
 ```
 User → Browser (React)
            ↓
-      http://localhost:3000
+      http://localhost:3050
            ↓
       Frontend Routes
       - Login/Register

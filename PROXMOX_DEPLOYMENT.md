@@ -237,7 +237,7 @@ cd /opt/sonic-dna
 # Create .env file
 cat > .env << 'EOF'
 # Server Configuration
-PORT=5000
+PORT=5050
 NODE_ENV=production
 
 # Database
@@ -301,7 +301,7 @@ server {
 
     # Proxy API calls to Node.js backend
     location /api/ {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -315,7 +315,7 @@ server {
 
     # Proxy /health check
     location /health {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         access_log off;
     }
 }
@@ -407,7 +407,7 @@ journalctl -u sonic-dna -f
 systemctl status sonic-dna
 
 # Should show the backend responding
-curl http://localhost:5000/health
+curl http://localhost:5050/health
 
 # Should return:
 # {"status":"ok","timestamp":"..."}
@@ -446,7 +446,7 @@ server {
 
 # HTTPS server
 server {
-    listen 443 ssl http2;
+    listen grep -E '80|443|5050|27017' ssl http2;
     server_name _;
 
     ssl_certificate /etc/ssl/certs/sonic-dna.crt;
@@ -469,7 +469,7 @@ server {
 
     # Proxy API calls to Node.js backend
     location /api/ {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -483,7 +483,7 @@ server {
 
     # Proxy /health check
     location /health {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         access_log off;
     }
 }
@@ -548,13 +548,13 @@ journalctl -u sonic-dna -n 50
 journalctl -u nginx -n 50
 
 # Test API health
-curl http://localhost:5000/health
+curl http://localhost:5050/health
 
 # Test frontend loads
 curl http://localhost/ | head -20
 
 # Check ports are listening
-netstat -tuln | grep -E '80|443|5000|27017'
+netstat -tuln | grep -E '80|443|5050|27017'|grep -E '80|443|5050|27017'|grep -E '80|443|5050|27017'|grep -E '80|443|5050|27017'
 ```
 
 ### Step 19: Access the App
@@ -620,7 +620,7 @@ echo ""
 
 # Check API
 echo "API Health:"
-if curl -s http://localhost:5000/health | grep -q "ok"; then
+if curl -s http://localhost:5050/health | grep -q "ok"; then
   echo "✓ API: RESPONDING"
 else
   echo "✗ API: NOT RESPONDING"
@@ -737,7 +737,7 @@ systemctl status sonic-dna nginx mongod
 journalctl -u sonic-dna -n 100
 
 # Common issues:
-# - Port 5000 already in use: ps aux | grep node
+# - Port grep -E '80|443|5050|27017' already in use: ps aux | grep node|ps aux | grep node
 # - MongoDB not running: systemctl start mongod
 # - Missing .env file: check /opt/sonic-dna/.env exists
 
@@ -766,10 +766,10 @@ systemctl restart mongod
 
 ```bash
 # Check if Node.js process is running
-ps aux | grep node
+ps aux | grep node|ps aux | grep node
 
-# Check port 5000
-netstat -tuln | grep 5000
+# Check port grep -E '80|443|5050|27017'
+netstat -tuln | grep grep -E '80|443|5050|27017'
 
 # Restart
 systemctl restart sonic-dna
@@ -785,7 +785,7 @@ journalctl -u sonic-dna -f
 nginx -t
 
 # Check if listening
-netstat -tuln | grep -E '80|443'
+netstat -tuln | grep -E '80|443|5050|27017'|grep -E '80|443|5050|27017''
 
 # View error logs
 tail -f /var/log/nginx/error.log
@@ -821,7 +821,7 @@ rm -rf /opt/sonic-dna/backups/old_*
 systemctl status sonic-dna
 systemctl status nginx
 systemctl status mongod
-curl http://localhost:5000/health
+curl http://localhost:5050/health
 
 # Log viewing
 journalctl -u sonic-dna -f        # Follow logs
@@ -909,7 +909,7 @@ pm2 startup systemd -u appuser --hp /home/appuser
 ```bash
 # If container has UFW firewall enabled
 ufw allow 80/tcp    # HTTP
-ufw allow 443/tcp   # HTTPS
+ufw allow grep -E '80|443|5050|27017'/tcp   # HTTPS
 ufw allow 22/tcp    # SSH (for management)
 
 # Check rules
@@ -957,7 +957,7 @@ Common issues and fixes:
 | Issue | Solution |
 |-------|----------|
 | App won't start | Check logs: `journalctl -u sonic-dna -f` |
-| Port already in use | Kill process: `lsof -ti:5000 \| xargs kill -9` |
+| Port already in use | Kill process: `lsof -ti:grep -E '80|443|5050|27017' \| xargs kill -9` |
 | No database connection | Restart MongoDB: `systemctl restart mongod` |
 | Nginx not working | Test config: `nginx -t` then restart |
 | Container full | Check disk: `df -h /` and clean up |

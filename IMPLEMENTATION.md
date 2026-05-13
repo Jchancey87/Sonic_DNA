@@ -266,7 +266,7 @@ npm run install-all
 npm run dev
 ```
 
-Opens on `http://localhost:3000` (frontend) and `http://localhost:5000` (backend)
+Opens on `http://localhost:3050` (frontend) and `http://localhost:5050` (backend)
 
 ---
 

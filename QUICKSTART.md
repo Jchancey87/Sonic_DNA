@@ -9,13 +9,13 @@ npm run install-all
 
 Create `.env` file in root with your API keys:
 ```env
-PORT=5000
+PORT=5050
 NODE_ENV=development
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/sonic_dna
 JWT_SECRET=any-random-secret-key
 OPENAI_API_KEY=sk-your-openai-key
 TAVILY_API_KEY=your-tavily-key
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5050
 ```
 
 ## 2. Start the App
@@ -24,7 +24,7 @@ REACT_APP_API_URL=http://localhost:5000
 npm run dev
 ```
 
-Open **http://localhost:3000**
+Open **http://localhost:3050**
 
 ## 3. First Run
 

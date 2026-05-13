@@ -56,13 +56,13 @@ You now have a **fully functional full-stack web application** for studying song
 In the root directory (`c:\Users\jchancey\Documents\Homma Research\.env`):
 
 ```env
-PORT=5000
+PORT=5050
 NODE_ENV=development
 MONGODB_URI=mongodb+srv://your_user:your_password@cluster.mongodb.net/sonic_dna
 JWT_SECRET=change-this-to-any-random-string-12345
 OPENAI_API_KEY=sk-your-openai-key
 TAVILY_API_KEY=your-tavily-key
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5050
 ```
 
 ### 3. Install Dependencies
@@ -83,13 +83,13 @@ npm run dev
 You'll see output:
 ```
 ✓ MongoDB connected
-✓ Server running on http://localhost:5000
-✓ Frontend ready at http://localhost:3000
+✓ Server running on http://localhost:5050
+✓ Frontend ready at http://localhost:3050
 ```
 
 ### 5. Test It
 
-1. Open http://localhost:3000
+1. Open http://localhost:3050
 2. Register a test account
 3. Import a YouTube song (try a Radiohead or Beach Boys track)
 4. Select 1-2 lenses
@@ -174,13 +174,13 @@ Homma Research/
 ```
 User Browser (React)
         ↓
-   http://localhost:3000
+   http://localhost:3050
         ↓
    [Login] [Dashboard] [Import] [Audit]
         ↓
    API Calls (Axios)
         ↓
-   http://localhost:5000 (Express)
+   http://localhost:5050 (Express)
         ↓
    [Auth Routes] [Song Routes] [Audit Routes] [Technique Routes]
         ↓
@@ -265,9 +265,9 @@ Over 2-3 weeks:
 - Check rate limits
 - App still works without research data
 
-**"Port 5000 already in use"**
+**"Port 5050 already in use"**
 - Change PORT in .env to 5001
-- Or kill existing process on port 5000
+- Or kill existing process on port 5050
 
 ---
 
@@ -351,7 +351,7 @@ If you get stuck:
 2. Look at terminal output for errors
 3. Check browser console (F12) for frontend errors
 4. Verify all .env values are correct
-5. Make sure ports 3000 and 5000 are available
+5. Make sure ports 3050 and 5050 are available
 
 ---
 
@@ -363,7 +363,7 @@ The app is fully implemented and ready to use. Follow these steps:
 2. ✅ Create .env file (2 min)
 3. ✅ Run `npm run install-all` (5 min)
 4. ✅ Run `npm run dev` (1 min)
-5. ✅ Open http://localhost:3000 (now)
+5. ✅ Open http://localhost:3050 (now)
 6. ✅ Register and import first song (5 min)
 
 **Total time to first audit: ~20 minutes**

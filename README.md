@@ -51,7 +51,7 @@ Create a `.env` file in the root directory (copy from `.env.example`):
 
 ```
 # Server
-PORT=5000
+PORT=5050
 NODE_ENV=development
 
 # Database
@@ -66,7 +66,7 @@ TAVILY_API_KEY=your-tavily-api-key
 YOUTUBE_API_KEY=your-youtube-api-key (optional for oembed)
 
 # Client
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5050
 ```
 
 **Getting your API keys:**
@@ -82,7 +82,7 @@ REACT_APP_API_URL=http://localhost:5000
 npm run dev
 ```
 
-This runs both the backend (port 5000) and frontend (port 3000) concurrently.
+This runs both the backend (port 5050) and frontend (port 3050) concurrently.
 
 Alternatively, run them separately:
 ```bash
@@ -92,9 +92,9 @@ npm run client    # Terminal 2
 
 ### 4. Access the App
 
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:5000
-- **Health Check**: http://localhost:5000/health
+- **Frontend**: http://localhost:3050
+- **API**: http://localhost:5050
+- **Health Check**: http://localhost:5050/health
 
 ## Usage Workflow
 
@@ -237,7 +237,7 @@ Currently "guided" mode uses the same form with hints. Implement step-by-step UI
 
 **Port already in use**
 - Change PORT in .env
-- Or kill process: `lsof -ti:5000 | xargs kill -9`
+- Or kill process: `lsof -ti:5050 | xargs kill -9`
 
 ## Future Enhancements
 
