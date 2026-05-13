@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 // Using OpenAI GPT-4
 async function callOpenAI(prompt) {
   if (!process.env.OPENAI_API_KEY) {

@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { IAIModelService } from '../ports/IAIModelService.js';
 
 /**
