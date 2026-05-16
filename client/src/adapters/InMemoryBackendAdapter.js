@@ -1,10 +1,8 @@
 import { IBackendService } from '../ports/IBackendService.js';
 
 /**
- * InMemoryBackendAdapter - Mock implementation of IBackendService
- * 
- * Used for isolated UI testing and Storybook.
- * Stores all data in memory (volatile).
+ * InMemoryBackendAdapter - Mock implementation of IBackendService.
+ * Used for isolated UI testing and Storybook. Stores all data in memory.
  */
 export class InMemoryBackendAdapter extends IBackendService {
   constructor() {
@@ -15,98 +13,252 @@ export class InMemoryBackendAdapter extends IBackendService {
     this.currentUser = null;
   }
 
-  // Auth
+  // ── Auth ──────────────────────────────────────────────────────────────────
   async login(email, password) {
-    this.currentUser = { id: 'user-1', email, name: 'Test User' };
+    this.currentUser = { id: 'user-1', email, displayName: 'Test User', name: 'Test User' };
     return { token: 'mock-token', user: this.currentUser };
   }
 
   async register(email, password, name) {
-    this.currentUser = { id: 'user-1', email, name };
+    this.currentUser = { id: 'user-1', email, displayName: name, name };
     return { token: 'mock-token', user: this.currentUser };
   }
 
-  // Songs
+  // ── Songs ─────────────────────────────────────────────────────────────────
   async getSongs(filters = {}) {
-    return this.songs;
+    return this.songs.filter((s) => !s.deletedAt);
   }
 
   async getSong(id) {
-    return this.songs.find(s => s._id === id) || null;
+    return this.songs.find((s) => s._id === id && !s.deletedAt) || null;
   }
 
   async importSong(youtubeUrl) {
+    const sourceId = `mock-id-${Date.now()}`;
+    const existing = this.songs.find((s) => s.sourceId === sourceId && !s.deletedAt);
+    if (existing) {
+      const err = new Error('already_imported');
+      err.code = 'already_imported';
+      err.songId = existing._id;
+      throw err;
+    }
     const song = {
       _id: `song-${Date.now()}`,
       title: 'Mock Song',
+      artistName: 'Mock Artist',
       artist: 'Mock Artist',
+      sourceType: 'youtube',
+      sourceId,
+      youtubeId: sourceId,
+      originalUrl: youtubeUrl,
       youtubeUrl,
-      youtubeId: 'mock-id',
-      thumbnail: 'https://via.placeholder.com/150',
+      thumbnailUrl: null,
+      thumbnail: null,
+      researchStatus: 'skipped',
+      researchSummary: null,
+      deletedAt: null,
     };
     this.songs.push(song);
-    return song;
+    return { song };
+  }
+
+  async getSongDeletePreview(id) {
+    const auditCount = this.audits.filter((a) => a.songId === id && !a.deletedAt).length;
+    const techniqueCount = this.techniques.filter((t) => {
+      const audit = this.audits.find((a) => a._id === t.auditId);
+      return audit?.songId === id && !t.deletedAt;
+    }).length;
+    return { auditCount, techniqueCount };
   }
 
   async deleteSong(id) {
-    this.songs = this.songs.filter(s => s._id !== id);
+    const now = new Date().toISOString();
+    const songIdx = this.songs.findIndex((s) => s._id === id);
+    if (songIdx === -1) return false;
+    this.songs[songIdx].deletedAt = now;
+    // Cascade
+    this.audits.filter((a) => a.songId === id).forEach((a) => {
+      a.deletedAt = now;
+      this.techniques.filter((t) => t.auditId === a._id).forEach((t) => { t.deletedAt = now; });
+    });
     return true;
   }
 
-  // Audits
+  // ── Audits ────────────────────────────────────────────────────────────────
   async getAudits() {
-    return this.audits;
+    return this.audits.filter((a) => !a.deletedAt);
   }
 
-  async generateTemplate(songId, lenses) {
-    return {
+  /**
+   * Single-step creation: server generates template. In mock, we generate it client-side.
+   */
+  async createAudit({ songId, lenses, lensSelection, workflowType = 'quick' }) {
+    const resolvedLenses = lenses || lensSelection || [];
+    const templateQuestions = {
       title: 'Mock Audit',
-      lenses: lenses.reduce((acc, lens) => {
-        acc[lens] = { description: `Mock ${lens}`, questions: ['Q1?', 'Q2?'] };
+      lenses: resolvedLenses.reduce((acc, lens) => {
+        acc[lens] = { description: `Study the ${lens}`, questions: ['Q1?', 'Q2?', 'Q3?'] };
         return acc;
-      }, {})
+      }, {}),
+      workflow_guidance: 'Work through each lens systematically.',
     };
-  }
 
-  async createAudit(auditData) {
-    const audit = { ...auditData, _id: `audit-${Date.now()}`, createdAt: new Date() };
+    const audit = {
+      _id: `audit-${Date.now()}`,
+      songId,
+      lensSelection: resolvedLenses,
+      workflowType,
+      templateQuestions,
+      templateVersion: 'mock-v1',
+      modelUsed: null,
+      responses: {},
+      bookmarks: [],
+      techniques: [],
+      guidedSteps: [],
+      status: 'draft',
+      completedAt: null,
+      deletedAt: null,
+      createdAt: new Date().toISOString(),
+    };
     this.audits.push(audit);
-    return audit;
+    return { audit };
   }
 
   async getAuditsForSong(songId) {
-    return this.audits.filter(a => a.songId === songId);
+    return this.audits.filter((a) => a.songId === songId && !a.deletedAt);
   }
 
   async getAudit(id) {
-    return this.audits.find(a => a._id === id) || null;
+    return this.audits.find((a) => a._id === id && !a.deletedAt) || null;
   }
 
   async updateAudit(id, updates) {
-    const index = this.audits.findIndex(a => a._id === id);
-    if (index === -1) throw new Error('Not found');
-    this.audits[index] = { ...this.audits[index], ...updates };
-    return this.audits[index];
+    const idx = this.audits.findIndex((a) => a._id === id);
+    if (idx === -1) throw new Error('Not found');
+    this.audits[idx] = { ...this.audits[idx], ...updates };
+    return this.audits[idx];
+  }
+
+  async getAuditDeletePreview(id) {
+    const techniqueCount = this.techniques.filter((t) => t.auditId === id && !t.deletedAt).length;
+    return { techniqueCount };
   }
 
   async deleteAudit(id) {
-    this.audits = this.audits.filter(a => a._id !== id);
+    const now = new Date().toISOString();
+    const idx = this.audits.findIndex((a) => a._id === id);
+    if (idx === -1) return false;
+    this.audits[idx].deletedAt = now;
+    this.techniques.filter((t) => t.auditId === id).forEach((t) => { t.deletedAt = now; });
     return true;
   }
 
-  // Techniques
+  // ── Bookmarks ─────────────────────────────────────────────────────────────
+  async addBookmark(auditId, bookmark) {
+    const audit = await this.getAudit(auditId);
+    if (!audit) throw new Error('Not found');
+    const newBookmark = {
+      _id: `bm-${Date.now()}`,
+      timestampSeconds: bookmark.timestampSeconds ?? bookmark.timestamp ?? 0,
+      label: bookmark.label || '',
+      note: bookmark.note || '',
+      lens: bookmark.lens || null,
+      createdAt: new Date().toISOString(),
+    };
+    audit.bookmarks = [...(audit.bookmarks || []), newBookmark]
+      .sort((a, b) => a.timestampSeconds - b.timestampSeconds);
+    return audit;
+  }
+
+  async updateBookmark(auditId, bookmarkId, updates) {
+    const audit = await this.getAudit(auditId);
+    if (!audit) throw new Error('Not found');
+    audit.bookmarks = (audit.bookmarks || []).map((b) =>
+      b._id === bookmarkId ? { ...b, ...updates } : b
+    );
+    return audit;
+  }
+
+  // ── Guided steps ──────────────────────────────────────────────────────────
+  async advanceStep(auditId) {
+    const audit = await this.getAudit(auditId);
+    const steps = audit?.guidedSteps || [];
+    const idx = steps.findIndex((s) => s.status === 'active');
+    if (idx !== -1) {
+      steps[idx].status = 'complete';
+      if (idx + 1 < steps.length) steps[idx + 1].status = 'active';
+    }
+    return this.updateAudit(auditId, { guidedSteps: steps });
+  }
+
+  async goBackStep(auditId) {
+    const audit = await this.getAudit(auditId);
+    const steps = audit?.guidedSteps || [];
+    const idx = steps.findIndex((s) => s.status === 'active');
+    if (idx > 0) {
+      steps[idx].status = 'pending';
+      steps[idx - 1].status = 'active';
+    }
+    return this.updateAudit(auditId, { guidedSteps: steps });
+  }
+
+  async skipStep(auditId) {
+    const audit = await this.getAudit(auditId);
+    const steps = audit?.guidedSteps || [];
+    const idx = steps.findIndex((s) => s.status === 'active');
+    if (idx !== -1) {
+      steps[idx].status = 'skipped';
+      if (idx + 1 < steps.length) steps[idx + 1].status = 'active';
+    }
+    return this.updateAudit(auditId, { guidedSteps: steps });
+  }
+
+  // ── Techniques ────────────────────────────────────────────────────────────
   async getTechniques(filters = {}) {
-    return { techniques: this.techniques, grouped: {} };
+    let techniques = this.techniques.filter((t) => !t.deletedAt);
+    if (filters.lens || filters.category) {
+      techniques = techniques.filter((t) => t.lens === (filters.lens || filters.category));
+    }
+    if (filters.q || filters.search) {
+      const s = (filters.q || filters.search).toLowerCase();
+      techniques = techniques.filter(
+        (t) =>
+          (t.description || '').toLowerCase().includes(s) ||
+          (t.techniqueName || '').toLowerCase().includes(s) ||
+          (t.notes || '').toLowerCase().includes(s)
+      );
+    }
+    const grouped = {};
+    techniques.forEach((t) => {
+      const key = t.lens || 'other';
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(t);
+    });
+    return { techniques, grouped };
   }
 
   async addTechnique(techniqueData) {
-    const tech = { ...techniqueData, _id: `tech-${Date.now()}` };
+    const tech = {
+      _id: `tech-${Date.now()}`,
+      deletedAt: null,
+      createdAt: new Date().toISOString(),
+      ...techniqueData,
+      lens: techniqueData.lens || techniqueData.category,
+    };
     this.techniques.push(tech);
     return tech;
   }
 
+  async updateTechnique(id, updates) {
+    const idx = this.techniques.findIndex((t) => t._id === id);
+    if (idx === -1) throw new Error('Not found');
+    this.techniques[idx] = { ...this.techniques[idx], ...updates };
+    return this.techniques[idx];
+  }
+
   async deleteTechnique(id) {
-    this.techniques = this.techniques.filter(t => t._id !== id);
+    const idx = this.techniques.findIndex((t) => t._id === id);
+    if (idx !== -1) this.techniques[idx].deletedAt = new Date().toISOString();
     return true;
   }
 }

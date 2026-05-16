@@ -151,7 +151,7 @@ if [ ! -f "$ENV_FILE" ]; then
     
     cat > "$ENV_FILE" << EOF
 # Server Configuration
-PORT=5000
+PORT=5050
 NODE_ENV=production
 
 # Database
@@ -204,7 +204,7 @@ server {
 
     # Proxy API calls to Node.js backend
     location /api/ {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -218,7 +218,7 @@ server {
 
     # Health check endpoint
     location /health {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:5050;
         access_log off;
     }
 }
@@ -335,7 +335,7 @@ echo -e "  Status:        ${GREEN}systemctl status sonic-dna${NC}"
 echo -e "  View Logs:     ${GREEN}journalctl -u sonic-dna -f${NC}"
 echo -e "  Stop App:      ${GREEN}systemctl stop sonic-dna${NC}"
 echo -e "  Restart App:   ${GREEN}systemctl restart sonic-dna${NC}"
-echo -e "  Test API:      ${GREEN}curl http://localhost:5000/health${NC}"
+echo -e "  Test API:      ${GREEN}curl http://localhost:5050/health${NC}"
 echo ""
 
 echo -e "${BLUE}========================================${NC}"

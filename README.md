@@ -131,49 +131,34 @@ Create an account or log in with existing credentials.
 ```
 sonic-dna-audit/
 ├── server/
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Song.js
-│   │   ├── Audit.js
-│   │   └── TechniqueEntry.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── songs.js
-│   │   ├── audits.js
-│   │   └── techniques.js
-│   ├── services/
-│   │   ├── tavilySearch.js
-│   │   └── auditGenerator.js
+│   ├── adapters/           # Infrastructure Layer (Mongoose, OpenAI, Tavily)
+│   │   ├── MongooseRepository.js
+│   │   ├── OpenAIAdapter.js
+│   │   └── TavilyAdapter.js
+│   ├── ports/              # Interface definitions (Service contracts)
+│   ├── services/           # Domain Layer (Business Logic)
+│   │   ├── authService.js
+│   │   ├── songService.js
+│   │   ├── auditService.js
+│   │   └── techniqueService.js
+│   ├── models/             # Mongoose Models
+│   ├── routes/             # Factory functions for Express routers
 │   ├── middleware/
-│   │   └── auth.js
-│   ├── server.js
+│   ├── server.js           # DI Container and Entry Point
 │   └── package.json
 ├── client/
 │   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Login.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── ImportSong.jsx
-│   │   │   ├── AuditCreate.jsx
-│   │   │   ├── AuditForm.jsx
-│   │   │   ├── AuditDetail.jsx
-│   │   │   └── TechniqueNotebook.jsx
+│   │   ├── ports/          # Frontend service interfaces
+│   │   ├── adapters/       # Implementation (HttpBackend, InMemory)
+│   │   ├── context/        # BackendContext for DI
+│   │   ├── pages/          # React Components (UI Layer)
 │   │   ├── components/
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx
-│   │   ├── utils/
-│   │   │   └── api.js
-│   │   ├── styles/
-│   │   │   └── global.js
 │   │   ├── App.jsx
 │   │   └── index.js
-│   ├── public/
-│   │   └── index.html
 │   └── package.json
 ├── .env.example
-├── .gitignore
-├── package.json
-└── README.md
+├── README.md
+└── setup-proxmox.sh
 ```
 
 ## API Endpoints
@@ -189,20 +174,20 @@ sonic-dna-audit/
 - `DELETE /api/songs/:id` - Delete song
 
 ### Audits
-- `POST /audits/generate-template` - Generate customized audit template
-- `POST /audits` - Create/save new audit
-- `GET /audits/:id` - Get audit details
-- `GET /audits/song/:songId` - Get all audits for a song
-- `GET /audits` - Get all user's audits
-- `PATCH /audits/:id` - Update audit
-- `DELETE /audits/:id` - Delete audit
+- `POST /api/audits/generate-template` - Generate customized audit template
+- `POST /api/audits` - Create/save new audit
+- `GET /api/audits/:id` - Get audit details
+- `GET /api/audits/song/:songId` - Get all audits for a song
+- `GET /api/audits` - Get all user's audits
+- `PATCH /api/audits/:id` - Update audit
+- `DELETE /api/audits/:id` - Delete audit
 
 ### Techniques
-- `GET /techniques` - Get all techniques (with filters)
-- `GET /techniques/category/:category` - Get techniques by category
-- `POST /techniques` - Add new technique entry
-- `PATCH /techniques/:id` - Update technique
-- `DELETE /techniques/:id` - Delete technique
+- `GET /api/techniques` - Get all techniques (with filters)
+- `GET /api/techniques/category/:category` - Get techniques by category
+- `POST /api/techniques` - Add new technique entry
+- `PATCH /api/techniques/:id` - Update technique
+- `DELETE /api/techniques/:id` - Delete technique
 
 ## Customization & Extension
 
@@ -228,7 +213,7 @@ Currently "guided" mode uses the same form with hints. Implement step-by-step UI
 **"OpenAI API error"**
 - Verify API key is valid
 - Check account has API credits
-- Ensure model name is correct (claude-3-5-sonnet-20241022)
+- Ensure model name is correct (gpt-4-turbo)
 
 **"Tavily search failed"**
 - Verify API key is valid

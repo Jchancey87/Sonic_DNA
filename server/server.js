@@ -38,11 +38,12 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sonic_dna')
+mongoose
+  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sonic_dna')
   .then(() => console.log('✓ MongoDB connected'))
-  .catch(err => console.error('✗ MongoDB connection error:', err));
+  .catch((err) => console.error('✗ MongoDB connection error:', err));
 
-// Bootstrap Dependencies
+// ── Bootstrap Dependencies ────────────────────────────────────────────────────
 const aiAdapter = new OpenAIAdapter();
 const searchAdapter = new TavilyAdapter();
 
@@ -57,22 +58,22 @@ const auditService = new AuditService(auditRepository, techniqueRepository, song
 const techniqueService = new TechniqueService(techniqueRepository);
 const templateComposer = new TemplateComposer(aiAdapter);
 
-// Routes
-app.use('/api/auth', createAuthRoutes(authService));
-app.use('/api/songs', authMiddleware, createSongRoutes(songService));
-app.use('/api/audits', authMiddleware, createAuditRoutes(auditService, templateComposer));
+// ── Routes (all under /api/) ──────────────────────────────────────────────────
+app.use('/api/auth',       createAuthRoutes(authService));
+app.use('/api/songs',      authMiddleware, createSongRoutes(songService, auditRepository, techniqueRepository));
+app.use('/api/audits',     authMiddleware, createAuditRoutes(auditService, templateComposer));
 app.use('/api/techniques', authMiddleware, createTechniqueRoutes(techniqueService));
 
-// Health check
+// ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
+// ── Global error handler ──────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('Unhandled error:', err);
   res.status(err.status || 500).json({
-    error: err.message || 'Internal server error'
+    error: err.message || 'Internal server error',
   });
 });
 
@@ -80,4 +81,3 @@ const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`✓ Server running on http://localhost:${PORT}`);
 });
-

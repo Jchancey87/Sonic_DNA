@@ -2,45 +2,101 @@ import mongoose from 'mongoose';
 
 const songSchema = new mongoose.Schema(
   {
-    youtubeId: {
+    // Source identification
+    sourceType: {
+      type: String,
+      enum: ['youtube'],
+      default: 'youtube',
+      required: true,
+    },
+    sourceId: {
       type: String,
       required: true,
     },
+    // Keep youtubeId as alias pointing to sourceId for backward compat
+    youtubeId: {
+      type: String,
+    },
+    originalUrl: {
+      type: String,
+    },
+    // Keep youtubeUrl as alias for backward compat
+    youtubeUrl: {
+      type: String,
+    },
+
+    // Metadata
     title: {
       type: String,
       required: true,
     },
+    artistName: {
+      type: String,
+    },
+    // Keep artist as alias for backward compat
     artist: {
       type: String,
-      required: true,
     },
-    duration: {
-      type: Number, // in seconds
+    channelTitle: {
+      type: String,
     },
+    thumbnailUrl: {
+      type: String,
+    },
+    // Keep thumbnail as alias for backward compat
     thumbnail: {
       type: String,
     },
-    youtubeUrl: {
+    durationSeconds: {
+      type: Number,
+    },
+    publishedAt: {
+      type: Date,
+    },
+
+    // Import / research status
+    metadataFetchStatus: {
       type: String,
+      enum: ['pending', 'success', 'failed'],
+      default: 'pending',
+    },
+    researchStatus: {
+      type: String,
+      enum: ['pending', 'success', 'failed', 'skipped'],
+      default: 'pending',
     },
     researchSummary: {
-      type: mongoose.Schema.Types.Mixed, // Tavily research data
+      type: mongoose.Schema.Types.Mixed,
       default: null,
     },
+    researchSources: {
+      type: [String],
+      default: [],
+    },
+    importErrors: {
+      type: [String],
+      default: [],
+    },
+
+    // Ownership
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    createdAt: {
+
+    // Soft delete
+    deletedAt: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-// Compound index: user can't import same song twice
-songSchema.index({ userId: 1, youtubeId: 1 }, { unique: true });
+// Primary deduplication index: one record per (user, source type, source ID)
+songSchema.index({ userId: 1, sourceType: 1, sourceId: 1 }, { unique: true });
+// Fast lookups for active (non-deleted) songs
+songSchema.index({ userId: 1, deletedAt: 1, createdAt: -1 });
 
 export default mongoose.model('Song', songSchema);

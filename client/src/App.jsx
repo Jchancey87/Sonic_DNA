@@ -43,7 +43,7 @@ const AppContent = () => {
           )}
           {isAuthenticated && (
             <li className="user-info">
-              <span>{user?.email}</span>
+              <span>{user?.displayName || user?.name || user?.email}</span>
               <button onClick={logout} className="secondary">
                 Logout
               </button>
@@ -81,7 +81,7 @@ const AppContent = () => {
             }
           />
           <Route
-            path="/audit/form/:templateId"
+            path="/audit/form/:auditId"
             element={
               <PrivateRoute>
                 <AuditForm />

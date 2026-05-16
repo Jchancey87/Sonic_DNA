@@ -1,6 +1,25 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+const preferencesSchema = new mongoose.Schema(
+  {
+    defaultWorkflow: {
+      type: String,
+      enum: ['quick', 'guided'],
+      default: 'quick',
+    },
+    preferredLenses: {
+      type: [String],
+      default: [],
+    },
+    timezone: {
+      type: String,
+      default: 'UTC',
+    },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -14,13 +33,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Display name shown in UI
+    displayName: {
+      type: String,
+      trim: true,
+    },
+    // Legacy field kept for backwards compat during transition
     name: {
       type: String,
       trim: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    preferences: {
+      type: preferencesSchema,
+      default: () => ({}),
     },
   },
   { timestamps: true }

@@ -25,12 +25,16 @@ const ImportSong = () => {
       const response = await backend.importSong(youtubeUrl);
       setSuccess('Song imported successfully!');
       setYoutubeUrl('');
-
-      setTimeout(() => {
-        navigate(`/audit/create/${response.song._id}`);
-      }, 1000);
+      setTimeout(() => navigate(`/audit/create/${response.song._id}`), 1000);
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Failed to import song');
+      const data = err.response?.data;
+      // 409: song already imported — redirect to existing song
+      if (data?.error === 'already_imported' && data?.songId) {
+        setSuccess("You've already imported this song — taking you there now.");
+        setTimeout(() => navigate(`/audit/create/${data.songId}`), 1200);
+      } else {
+        setError(data?.error || err.message || 'Failed to import song');
+      }
     } finally {
       setLoading(false);
     }

@@ -2,111 +2,151 @@ import axios from 'axios';
 import { IBackendService } from '../ports/IBackendService.js';
 
 /**
- * HttpBackendAdapter - Production implementation of IBackendService
- * 
- * Communicates with the real Express backend using Axios.
+ * HttpBackendAdapter - Production implementation of IBackendService.
+ * Communicates with the Express backend via Axios.
  */
 export class HttpBackendAdapter extends IBackendService {
   constructor(baseURL) {
     super();
     this.api = axios.create({
-      baseURL: baseURL || 'http://localhost:5050/api',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      baseURL: baseURL || import.meta.env?.VITE_API_URL || 'http://localhost:5050/api',
+      headers: { 'Content-Type': 'application/json' },
     });
 
-    // Add token to requests
+    // Attach JWT on every request
     this.api.interceptors.request.use((config) => {
       const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
   }
 
-  // Auth
+  // ── Auth ──────────────────────────────────────────────────────────────────
   async login(email, password) {
-    const response = await this.api.post('/auth/login', { email, password });
-    return response.data;
+    const res = await this.api.post('/auth/login', { email, password });
+    return res.data;
   }
 
   async register(email, password, name) {
-    const response = await this.api.post('/auth/register', { email, password, name });
-    return response.data;
+    const res = await this.api.post('/auth/register', { email, password, name });
+    return res.data;
   }
 
-  // Songs
+  // ── Songs ─────────────────────────────────────────────────────────────────
   async getSongs(filters = {}) {
-    const response = await this.api.get('/songs', { params: filters });
-    return response.data;
+    const res = await this.api.get('/songs', { params: filters });
+    return res.data;
   }
 
   async getSong(id) {
-    const response = await this.api.get(`/songs/${id}`);
-    return response.data;
+    const res = await this.api.get(`/songs/${id}`);
+    return res.data;
   }
 
   async importSong(youtubeUrl) {
-    const response = await this.api.post('/songs/import', { youtubeUrl });
-    return response.data;
+    const res = await this.api.post('/songs/import', { youtubeUrl });
+    return res.data;
+  }
+
+  async getSongDeletePreview(id) {
+    const res = await this.api.get(`/songs/${id}/delete-preview`);
+    return res.data; // { auditCount, techniqueCount }
   }
 
   async deleteSong(id) {
-    const response = await this.api.delete(`/songs/${id}`);
-    return response.data;
+    const res = await this.api.delete(`/songs/${id}`);
+    return res.data;
   }
 
-  // Audits
+  // ── Audits ────────────────────────────────────────────────────────────────
   async getAudits() {
-    const response = await this.api.get('/audits');
-    return response.data;
+    const res = await this.api.get('/audits');
+    return res.data;
   }
 
-  async generateTemplate(songId, lenses, workflowType) {
-    const response = await this.api.post('/audits/generate-template', { songId, lenses, workflowType });
-    return response.data;
-  }
-
-  async createAudit(auditData) {
-    const response = await this.api.post('/audits', auditData);
-    return response.data;
+  /**
+   * Create an audit — single-step (generates + stores template server-side).
+   * @param {{ songId, lenses, workflowType }} data
+   */
+  async createAudit(data) {
+    const res = await this.api.post('/audits', data);
+    return res.data; // { audit: { _id, templateQuestions, ... } }
   }
 
   async getAuditsForSong(songId) {
-    const response = await this.api.get(`/audits/song/${songId}`);
-    return response.data;
+    const res = await this.api.get(`/audits/song/${songId}`);
+    return res.data;
   }
 
   async getAudit(id) {
-    const response = await this.api.get(`/audits/${id}`);
-    return response.data;
+    const res = await this.api.get(`/audits/${id}`);
+    return res.data;
   }
 
   async updateAudit(id, updates) {
-    const response = await this.api.patch(`/audits/${id}`, updates);
-    return response.data;
+    const res = await this.api.patch(`/audits/${id}`, updates);
+    return res.data;
+  }
+
+  async getAuditDeletePreview(id) {
+    const res = await this.api.get(`/audits/${id}/delete-preview`);
+    return res.data; // { techniqueCount }
   }
 
   async deleteAudit(id) {
-    const response = await this.api.delete(`/audits/${id}`);
-    return response.data;
+    const res = await this.api.delete(`/audits/${id}`);
+    return res.data;
   }
 
-  // Techniques
+  // ── Audit bookmarks ───────────────────────────────────────────────────────
+  async addBookmark(auditId, bookmark) {
+    const res = await this.api.post(`/audits/${auditId}/bookmarks`, bookmark);
+    return res.data;
+  }
+
+  async updateBookmark(auditId, bookmarkId, updates) {
+    const res = await this.api.patch(`/audits/${auditId}/bookmarks/${bookmarkId}`, updates);
+    return res.data;
+  }
+
+  // ── Guided steps ──────────────────────────────────────────────────────────
+  async advanceStep(auditId) {
+    const res = await this.api.post(`/audits/${auditId}/steps/advance`);
+    return res.data;
+  }
+
+  async goBackStep(auditId) {
+    const res = await this.api.post(`/audits/${auditId}/steps/back`);
+    return res.data;
+  }
+
+  async skipStep(auditId) {
+    const res = await this.api.post(`/audits/${auditId}/steps/skip`);
+    return res.data;
+  }
+
+  // ── Techniques ────────────────────────────────────────────────────────────
+  /**
+   * Supported filters: q, lens, category, artist, songId, auditId,
+   *   tags (CSV), sortBy, order, page, limit
+   */
   async getTechniques(filters = {}) {
-    const response = await this.api.get('/techniques', { params: filters });
-    return response.data;
+    const res = await this.api.get('/techniques', { params: filters });
+    return res.data; // { techniques, grouped }
   }
 
   async addTechnique(techniqueData) {
-    const response = await this.api.post('/techniques', techniqueData);
-    return response.data;
+    const res = await this.api.post('/techniques', techniqueData);
+    return res.data;
+  }
+
+  async updateTechnique(id, updates) {
+    const res = await this.api.patch(`/techniques/${id}`, updates);
+    return res.data;
   }
 
   async deleteTechnique(id) {
-    const response = await this.api.delete(`/techniques/${id}`);
-    return response.data;
+    const res = await this.api.delete(`/techniques/${id}`);
+    return res.data;
   }
 }

@@ -34,7 +34,7 @@ Create a file named `.env` in the root directory with your API keys:
 
 ```env
 # Server Configuration
-PORT=5000
+PORT=5050
 NODE_ENV=development
 
 # Database
@@ -52,7 +52,7 @@ OPENAI_API_KEY=sk-proj-your-actual-key-here
 TAVILY_API_KEY=tvly-your-actual-key-here
 
 # Frontend Configuration
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5050
 ```
 
 ### Getting Your API Keys
@@ -85,7 +85,7 @@ npm run dev
 ```
 
 This will start:
-- Backend server on `http://localhost:5000`
+- Backend server on `http://localhost:5050`
 - Frontend client on `http://localhost:3050`
 
 ### Option B: Run Separately (for debugging)
@@ -190,28 +190,28 @@ npm run install-all
 
 **Fallback**: Research summary will be empty, but audit still works
 
-### "Port 5000 already in use"
+### "Port 5050 already in use"
 
 **Solution A**: Change PORT in `.env`:
 ```env
-PORT=5001
+PORT=5051
 ```
 
-**Solution B**: Kill the process using port 5000:
+**Solution B**: Kill the process using port 5050:
 ```bash
 # On Windows:
-netstat -ano | findstr :5000
+netstat -ano | findstr :5050
 taskkill /PID <PID> /F
 
 # On Mac/Linux:
-lsof -ti:5000 | xargs kill -9
+lsof -ti:5050 | xargs kill -9
 ```
 
 ### "React app won't load on localhost:3050"
 
 **Check:**
-- Backend is running (`http://localhost:5000/health` should show `{"status":"ok"}`)
-- `REACT_APP_API_URL` is set to `http://localhost:5000`
+- Backend is running (`http://localhost:5050/health` should show `{"status":"ok"}`)
+- `REACT_APP_API_URL` is set to `http://localhost:5050`
 
 **Solution**: Restart the React dev server
 ```bash
@@ -261,30 +261,30 @@ If you run into issues:
 ```
 User → Browser (React)
            ↓
-      http://localhost:3050
-           ↓
-      Frontend Routes
-      - Login/Register
-      - Dashboard (song library)
-      - Import Song
-      - Create Audit
-      - Fill Audit Form
-      - View Technique Notebook
-           ↓
-           ↓ API Calls (Axios)
-           ↓
-      http://localhost:5000
-           ↓
-      Express Server
-      - Auth routes (JWT)
-      - Song routes (CRUD + YouTube import)
-      - Audit routes (generate templates, save audits)
-      - Technique routes (log and retrieve techniques)
-           ↓
-      External APIs:
-      - OpenAI (generate audit templates)
-      - Tavily (research songs)
-      - YouTube (video embedding)
+       http://localhost:3050
+            ↓
+       Frontend Routes
+       - Login/Register
+       - Dashboard (song library)
+       - Import Song
+       - Create Audit
+       - Fill Audit Form
+       - View Technique Notebook
+            ↓
+            ↓ API Calls (Axios)
+            ↓
+       http://localhost:5050
+            ↓
+       Express Server (Hexagonal Architecture)
+       - Auth routes (JWT)
+       - Song routes (CRUD + YouTube import)
+       - Audit routes (generate templates, save audits)
+       - Technique routes (log and retrieve techniques)
+            ↓
+       External APIs (Adapters):
+       - OpenAI (generate audit templates)
+       - Tavily (research songs)
+       - YouTube (video embedding)
            ↓
            ↓ Database Queries
            ↓

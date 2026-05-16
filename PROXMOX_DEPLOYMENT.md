@@ -446,7 +446,7 @@ server {
 
 # HTTPS server
 server {
-    listen grep -E '80|443|5050|27017' ssl http2;
+    listen 443 ssl http2;
     server_name _;
 
     ssl_certificate /etc/ssl/certs/sonic-dna.crt;

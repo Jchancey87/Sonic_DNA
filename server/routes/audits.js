@@ -1,121 +1,102 @@
 import express from 'express';
 
+/**
+ * Audit routes — single-step creation (Issue 4 clean cutover).
+ *
+ * POST /api/audits
+ *   Generates + stores the template inline, returns the full audit object.
+ *   The old /generate-template endpoint has been removed.
+ *
+ * New endpoints:
+ *   GET  /api/audits/:id/delete-preview  → { techniqueCount }
+ *   PATCH /api/audits/:id/bookmarks/:bookmarkId  → update a single bookmark
+ *   POST /api/audits/:id/steps/advance   → advance guided step
+ *   POST /api/audits/:id/steps/back      → go back one guided step
+ *   POST /api/audits/:id/steps/skip      → skip current guided step
+ */
+
 export default function createAuditRoutes(auditService, templateComposer) {
   const router = express.Router();
 
-  // Generate audit template
-  router.post('/generate-template', async (req, res) => {
-    try {
-      const { songId, lenses, workflowType } = req.body;
-      const userId = req.userId;
-
-      if (!songId || !lenses || lenses.length === 0) {
-        return res.status(400).json({ error: 'songId and lenses required' });
-      }
-
-      // Verify song ownership
-      const song = await auditService.songRepository.findOne({ _id: songId, userId });
-      if (!song) {
-        return res.status(404).json({ error: 'Song not found' });
-      }
-
-      // Generate customized template using deep module
-      const template = await templateComposer.generateTemplate(
-        song.title,
-        song.artist,
-        lenses,
-        song.researchSummary?.summary || ''
-      );
-
-      res.json({
-        template,
-        song: {
-          _id: song._id,
-          title: song.title,
-          artist: song.artist,
-          youtubeId: song.youtubeId,
-        },
-        workflowType: workflowType || 'quick',
-      });
-    } catch (error) {
-      console.error('Generate template error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // Create/save audit
+  // ── Create audit (single-step: generate template + save) ──────────────────
   router.post('/', async (req, res) => {
     try {
-      const { songId, lensSelection, responses, bookmarks, techniques, workflowType } = req.body;
+      const { songId, lenses, lensSelection, workflowType = 'quick' } = req.body;
       const userId = req.userId;
 
-      if (!songId || !lensSelection) {
-        return res.status(400).json({ error: 'songId and lensSelection required' });
+      const resolvedLenses = lenses || lensSelection;
+
+      if (!songId || !resolvedLenses || !Array.isArray(resolvedLenses) || resolvedLenses.length === 0) {
+        return res.status(400).json({ error: 'songId and lenses (array) are required' });
+      }
+
+      // Generate template (with fallback if AI fails)
+      let templateQuestions = null;
+      let templateVersion = 'fallback-v1';
+      let modelUsed = null;
+      const promptVersion = 'v1';
+
+      if (templateComposer) {
+        // Fetch song for context
+        let song = null;
+        try {
+          song = await auditService.songRepository?.findOne({ _id: songId, userId, deletedAt: null });
+        } catch (_) {}
+
+        try {
+          templateQuestions = await templateComposer.generateTemplate(
+            song?.title || 'Unknown',
+            song?.artistName || song?.artist || 'Unknown',
+            resolvedLenses,
+            song?.researchSummary?.summary || ''
+          );
+          templateVersion = 'ai-v1';
+          modelUsed = 'gpt-4o';
+        } catch (err) {
+          console.warn('Template generation failed, using fallback:', err.message);
+          // fallback already returns a deterministic template from templateComposer
+          templateQuestions = templateComposer._buildFallbackTemplate?.(
+            song?.title || 'Unknown',
+            song?.artistName || song?.artist || 'Unknown',
+            resolvedLenses
+          ) || null;
+        }
       }
 
       const audit = await auditService.createAudit({
         songId,
         userId,
-        lensSelection: Array.isArray(lensSelection) ? lensSelection : [lensSelection],
-        responses: responses || {},
-        bookmarks: bookmarks || [],
-        techniques: techniques || [],
-        workflowType: workflowType || 'quick'
+        lensSelection: resolvedLenses,
+        workflowType,
+        templateQuestions,
+        templateVersion,
+        modelUsed,
+        promptVersion,
+        responses: {},
       });
 
-      res.status(201).json({
-        audit: {
-          _id: audit._id,
-          songId: audit.songId,
-          lensSelection: audit.lensSelection,
-          workflowType: audit.workflowType,
-          createdAt: audit.createdAt,
-        }
-      });
+      res.status(201).json({ audit });
     } catch (error) {
       console.error('Create audit error:', error);
-      res.status(500).json({ error: error.message });
+      res.status(error.message === 'Song not found' ? 404 : 500).json({ error: error.message });
     }
   });
 
-  // Get audit by ID
-  router.get('/:id', async (req, res) => {
+  // ── Get delete preview ────────────────────────────────────────────────────
+  router.get('/:id/delete-preview', async (req, res) => {
     try {
-      const userId = req.userId;
-      const audit = await auditService.getAudit(req.params.id, userId);
-
-      if (!audit) {
-        return res.status(404).json({ error: 'Audit not found' });
-      }
-
-      res.json(audit);
+      const preview = await auditService.getDeletePreview(req.params.id, req.userId);
+      res.json(preview);
     } catch (error) {
-      console.error('Get audit error:', error);
+      if (error.message === 'Audit not found') return res.status(404).json({ error: error.message });
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Get all audits for a song
-  router.get('/song/:songId', async (req, res) => {
-    try {
-      const userId = req.userId;
-      const { songId } = req.params;
-
-      const audits = await auditService.getAuditsForSong(songId, userId);
-
-      res.json(audits);
-    } catch (error) {
-      console.error('Get audits error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // Get all audits for user
+  // ── Get all user audits ───────────────────────────────────────────────────
   router.get('/', async (req, res) => {
     try {
-      const userId = req.userId;
-      const audits = await auditService.getUserAudits(userId);
-
+      const audits = await auditService.getUserAudits(req.userId);
       res.json(audits);
     } catch (error) {
       console.error('Get user audits error:', error);
@@ -123,44 +104,102 @@ export default function createAuditRoutes(auditService, templateComposer) {
     }
   });
 
-  // Update audit
-  router.patch('/:id', async (req, res) => {
+  // ── Get audits for a song ─────────────────────────────────────────────────
+  // NOTE: this must be registered before /:id to avoid route collision
+  router.get('/song/:songId', async (req, res) => {
     try {
-      const userId = req.userId;
-      const { responses, bookmarks, techniques } = req.body;
+      const audits = await auditService.getAuditsForSong(req.params.songId, req.userId);
+      res.json(audits);
+    } catch (error) {
+      console.error('Get audits for song error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-      let audit;
-      if (responses) {
-        audit = await auditService.updateResponses(req.params.id, userId, responses);
-      }
-      
-      // Note: addBookmark and logTechnique are also available in service
-      // For now, we'll keep it simple and just return the audit if updated
-      if (!audit) {
-        audit = await auditService.getAudit(req.params.id, userId);
-      }
-
-      if (!audit) {
-        return res.status(404).json({ error: 'Audit not found' });
-      }
-
+  // ── Get audit by ID ───────────────────────────────────────────────────────
+  router.get('/:id', async (req, res) => {
+    try {
+      const audit = await auditService.getAudit(req.params.id, req.userId);
+      if (!audit) return res.status(404).json({ error: 'Audit not found' });
       res.json(audit);
     } catch (error) {
+      console.error('Get audit error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ── Update audit (responses, status, bookmarks, title, etc.) ─────────────
+  router.patch('/:id', async (req, res) => {
+    try {
+      const audit = await auditService.updateAudit(req.params.id, req.userId, req.body);
+      res.json(audit);
+    } catch (error) {
+      if (error.message === 'Audit not found') return res.status(404).json({ error: error.message });
       console.error('Update audit error:', error);
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Delete audit
+  // ── Add bookmark ──────────────────────────────────────────────────────────
+  router.post('/:id/bookmarks', async (req, res) => {
+    try {
+      const audit = await auditService.addBookmark(req.params.id, req.userId, req.body);
+      res.json(audit);
+    } catch (error) {
+      if (error.message === 'Audit not found') return res.status(404).json({ error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ── Update a single bookmark ──────────────────────────────────────────────
+  router.patch('/:id/bookmarks/:bookmarkId', async (req, res) => {
+    try {
+      const audit = await auditService.updateBookmark(
+        req.params.id,
+        req.userId,
+        req.params.bookmarkId,
+        req.body
+      );
+      res.json(audit);
+    } catch (error) {
+      if (error.message === 'Audit not found') return res.status(404).json({ error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ── Guided step management ────────────────────────────────────────────────
+  router.post('/:id/steps/advance', async (req, res) => {
+    try {
+      const audit = await auditService.advanceStep(req.params.id, req.userId);
+      res.json(audit);
+    } catch (error) {
+      res.status(error.message.includes('not found') ? 404 : 400).json({ error: error.message });
+    }
+  });
+
+  router.post('/:id/steps/back', async (req, res) => {
+    try {
+      const audit = await auditService.goBackStep(req.params.id, req.userId);
+      res.json(audit);
+    } catch (error) {
+      res.status(error.message.includes('not found') ? 404 : 400).json({ error: error.message });
+    }
+  });
+
+  router.post('/:id/steps/skip', async (req, res) => {
+    try {
+      const audit = await auditService.skipStep(req.params.id, req.userId);
+      res.json(audit);
+    } catch (error) {
+      res.status(error.message.includes('not found') ? 404 : 400).json({ error: error.message });
+    }
+  });
+
+  // ── Soft-delete audit ─────────────────────────────────────────────────────
   router.delete('/:id', async (req, res) => {
     try {
-      const userId = req.userId;
-      const result = await auditService.deleteAudit(req.params.id, userId);
-
-      if (!result) {
-        return res.status(404).json({ error: 'Audit not found' });
-      }
-
+      const result = await auditService.deleteAudit(req.params.id, req.userId);
+      if (!result) return res.status(404).json({ error: 'Audit not found' });
       res.json({ message: 'Audit deleted' });
     } catch (error) {
       console.error('Delete audit error:', error);
@@ -170,5 +209,3 @@ export default function createAuditRoutes(auditService, templateComposer) {
 
   return router;
 }
-
-

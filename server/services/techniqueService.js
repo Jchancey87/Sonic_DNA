@@ -1,105 +1,186 @@
+/**
+ * TechniqueService - Business logic for technique notebook.
+ *
+ * Key changes:
+ * - Uses 'lens' instead of 'category' (schema rename).
+ * - Full filter query builder: q (full-text), lens, artist, songId, auditId,
+ *   tags (CSV), sortBy, order, page, limit.
+ * - All queries filter deletedAt: null.
+ * - Soft-delete on deleteTechnique().
+ */
+
+const VALID_LENSES = ['rhythm', 'texture', 'harmony', 'arrangement'];
+const VALID_NEXT_ACTIONS = ['study', 'practice', 'transcribe', 'apply', 'revisit', null];
+
 export class TechniqueService {
   constructor(techniqueRepository) {
     this.techniqueRepository = techniqueRepository;
   }
 
+  // ─── Read ─────────────────────────────────────────────────────────────────
+
   async getUserTechniques(userId, filters = {}) {
-    const { category, search, artist } = filters;
-    let query = { userId };
+    const {
+      q,
+      lens,
+      category,   // backward-compat alias for lens
+      artist,
+      songId,
+      auditId,
+      tags,
+      sortBy = 'createdAt',
+      order = 'desc',
+      page = 1,
+      limit,
+    } = filters;
 
-    if (category && ['rhythm', 'texture', 'harmony', 'arrangement'].includes(category)) {
-      query.category = category;
+    const resolvedLens = lens || category;
+    const query = { userId, deletedAt: null };
+
+    if (resolvedLens && VALID_LENSES.includes(resolvedLens)) {
+      query.lens = resolvedLens;
     }
-
     if (artist) {
       query.artist = { $regex: artist, $options: 'i' };
     }
+    if (songId) {
+      query.songId = songId;
+    }
+    if (auditId) {
+      query.auditId = auditId;
+    }
+    if (tags) {
+      const tagList = String(tags).split(',').map((t) => t.trim()).filter(Boolean);
+      if (tagList.length > 0) query.tags = { $in: tagList };
+    }
 
-    if (search) {
+    // Full-text search via MongoDB $text index (techniqueName + description + notes)
+    if (q) {
+      query.$text = { $search: q };
+    }
+
+    // Legacy fallback: if no text index, use regex on description
+    if (filters.search && !q) {
       query.$or = [
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } },
-        { notes: { $regex: search, $options: 'i' } }
+        { description: { $regex: filters.search, $options: 'i' } },
+        { techniqueName: { $regex: filters.search, $options: 'i' } },
+        { tags: { $in: [new RegExp(filters.search, 'i')] } },
+        { notes: { $regex: filters.search, $options: 'i' } },
       ];
     }
 
-    const techniques = await this.techniqueRepository.find(query, { sort: { createdAt: -1 } });
-    
-    // Group by category for easier display
+    const validSortFields = ['createdAt', 'techniqueName', 'lens', 'artist'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const sortDir = order === 'asc' ? 1 : -1;
+
+    const queryOptions = { sort: { [sortField]: sortDir } };
+    if (limit) {
+      queryOptions.limit = Number(limit);
+      queryOptions.skip = (Number(page) - 1) * Number(limit);
+    }
+
+    const techniques = await this.techniqueRepository.find(query, queryOptions);
+
+    // Group by lens for notebook display
     const grouped = {};
     techniques.forEach((tech) => {
-      if (!grouped[tech.category]) {
-        grouped[tech.category] = [];
-      }
-      grouped[tech.category].push(tech);
+      const key = tech.lens || tech.category || 'other';
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(tech);
     });
 
     return { techniques, grouped };
   }
 
-  async getTechniquesByCategory(userId, category) {
-    if (!['rhythm', 'texture', 'harmony', 'arrangement'].includes(category)) {
-      throw new Error('Invalid category');
-    }
-
-    return await this.techniqueRepository.find(
-      { userId, category },
+  async getTechniquesByLens(userId, lens) {
+    if (!VALID_LENSES.includes(lens)) throw new Error('Invalid lens');
+    return this.techniqueRepository.find(
+      { userId, lens, deletedAt: null },
       { sort: { createdAt: -1 } }
     );
   }
 
+  // Keep backward-compat method name
+  async getTechniquesByCategory(userId, category) {
+    return this.getTechniquesByLens(userId, category);
+  }
+
+  // ─── Create ───────────────────────────────────────────────────────────────
+
   async addTechnique(data) {
-    const { userId, songId, auditId, artist, description, category, sourceTimestamp, tags, notes } = data;
-
-    if (!description || !category) {
-      throw new Error('description and category required');
-    }
-
-    if (!['rhythm', 'texture', 'harmony', 'arrangement'].includes(category)) {
-      throw new Error('Invalid category');
-    }
-
-    const techniqueData = {
+    const {
       userId,
       songId,
       auditId,
       artist,
+      techniqueName,
       description,
-      category,
-      sourceTimestamp,
-      tags: tags || [],
-      notes,
-    };
-
-    return await this.techniqueRepository.create(techniqueData);
-  }
-
-  async updateTechnique(techniqueId, userId, updates) {
-    const { description, category, tags, notes } = updates;
-
-    // Verify ownership
-    const existing = await this.techniqueRepository.findById(techniqueId);
-    if (!existing || existing.userId.toString() !== userId.toString()) {
-      throw new Error('Technique not found');
-    }
-
-    return await this.techniqueRepository.updateById(techniqueId, {
-      description,
-      category,
+      lens,
+      category,     // backward-compat alias
+      exampleTimestamp,
+      sourceTimestamp, // backward-compat alias
       tags,
       notes,
-      updatedAt: new Date()
+      confidence,
+      nextAction,
+    } = data;
+
+    const resolvedLens = lens || category;
+
+    if (!description) throw new Error('description is required');
+    if (!resolvedLens) throw new Error('lens is required');
+    if (!VALID_LENSES.includes(resolvedLens)) throw new Error('Invalid lens');
+    if (confidence !== undefined && (confidence < 1 || confidence > 5)) {
+      throw new Error('confidence must be between 1 and 5');
+    }
+    if (nextAction && !VALID_NEXT_ACTIONS.includes(nextAction)) {
+      throw new Error('Invalid nextAction value');
+    }
+
+    return this.techniqueRepository.create({
+      userId,
+      songId,
+      auditId,
+      artist,
+      techniqueName: techniqueName || '',
+      description,
+      lens: resolvedLens,
+      exampleTimestamp: exampleTimestamp ?? sourceTimestamp,
+      tags: tags || [],
+      notes,
+      confidence,
+      nextAction: nextAction || null,
+      deletedAt: null,
     });
   }
 
-  async deleteTechnique(techniqueId, userId) {
-    // Verify ownership
+  // ─── Update ───────────────────────────────────────────────────────────────
+
+  async updateTechnique(techniqueId, userId, updates) {
     const existing = await this.techniqueRepository.findById(techniqueId);
-    if (!existing || existing.userId.toString() !== userId.toString()) {
+    if (!existing || existing.deletedAt || existing.userId.toString() !== userId.toString()) {
       throw new Error('Technique not found');
     }
 
-    await this.techniqueRepository.deleteById(techniqueId);
+    const allowed = ['techniqueName', 'description', 'lens', 'artist', 'tags', 'notes', 'confidence', 'nextAction', 'exampleTimestamp'];
+    const sanitized = { updatedAt: new Date() };
+    for (const key of allowed) {
+      if (updates[key] !== undefined) sanitized[key] = updates[key];
+    }
+    // backward compat: accept 'category' as 'lens'
+    if (updates.category && !updates.lens) sanitized.lens = updates.category;
+
+    return this.techniqueRepository.updateById(techniqueId, sanitized);
+  }
+
+  // ─── Delete (soft) ────────────────────────────────────────────────────────
+
+  async deleteTechnique(techniqueId, userId) {
+    const existing = await this.techniqueRepository.findById(techniqueId);
+    if (!existing || existing.deletedAt || existing.userId.toString() !== userId.toString()) {
+      throw new Error('Technique not found');
+    }
+    await this.techniqueRepository.updateById(techniqueId, { deletedAt: new Date() });
     return true;
   }
 }

@@ -1,10 +1,32 @@
 import express from 'express';
 import axios from 'axios';
 
-export default function createSongRoutes(songService) {
+/**
+ * Extract a canonical 11-character YouTube video ID from any URL format:
+ * - youtube.com/watch?v=ID
+ * - youtu.be/ID
+ * - youtube.com/embed/ID
+ * - youtube.com/shorts/ID
+ * Strips trailing noise (?t=, &list=, etc.)
+ */
+function extractYouTubeId(url) {
+  const patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /\/embed\/([a-zA-Z0-9_-]{11})/,
+    /\/shorts\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export default function createSongRoutes(songService, auditRepository, techniqueRepository) {
   const router = express.Router();
 
-  // Import song from YouTube URL
+  // ── Import song from YouTube URL ─────────────────────────────────────────
   router.post('/import', async (req, res) => {
     try {
       const { youtubeUrl } = req.body;
@@ -14,80 +36,98 @@ export default function createSongRoutes(songService) {
         return res.status(400).json({ error: 'YouTube URL required' });
       }
 
-      // Extract video ID
-      const youtubeIdMatch = youtubeUrl.match(
-        /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.{11})/
-      );
-
-      if (!youtubeIdMatch) {
-        return res.status(400).json({ error: 'Invalid YouTube URL' });
+      const sourceId = extractYouTubeId(youtubeUrl);
+      if (!sourceId) {
+        return res.status(400).json({ error: 'Invalid YouTube URL — could not extract video ID' });
       }
 
-      const youtubeId = youtubeIdMatch[1];
-
-      // Fetch video metadata from YouTube API (OEmbed)
+      // Fetch video metadata via YouTube oEmbed (no API key required)
       let title = 'Unknown Song';
-      let artist = 'Unknown Artist';
-      let thumbnail = null;
+      let channelTitle = '';
+      let thumbnailUrl = null;
 
       try {
-        const oembed = await axios.get(
-          `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${youtubeId}&format=json`
+        const oembedRes = await axios.get(
+          `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${sourceId}&format=json`
         );
-        title = oembed.data.title || title;
-        thumbnail = oembed.data.thumbnail_url || null;
+        title = oembedRes.data.title || title;
+        channelTitle = oembedRes.data.author_name || '';
+        thumbnailUrl = oembedRes.data.thumbnail_url || null;
       } catch (err) {
-        console.warn('Could not fetch YouTube metadata:', err.message);
+        console.warn('Could not fetch YouTube oEmbed metadata:', err.message);
       }
 
-      // Extract artist and title if possible
-      if (title && title.includes('-')) {
-        const parts = title.split('-');
-        artist = parts[0].trim();
-        title = parts.slice(1).join('-').trim();
+      // Heuristic artist extraction from "Artist - Title" format
+      let artistName = channelTitle || 'Unknown Artist';
+      if (title.includes(' - ')) {
+        const parts = title.split(' - ');
+        artistName = parts[0].trim();
+        title = parts.slice(1).join(' - ').trim();
       }
 
-      // Fetch research via injected search service if available
+      // Fetch research via search service
       let research = null;
       if (songService.searchService) {
-        research = await songService.searchService.searchSongInfo(title, artist);
+        try {
+          research = await songService.searchService.searchSongInfo(title, artistName);
+        } catch (err) {
+          console.warn('Research fetch failed:', err.message);
+        }
       }
 
-      // Call service to import
-      const song = await songService.importSong({
-        youtubeId,
-        youtubeUrl,
-        title,
-        artist,
-        thumbnail,
-        userId
-      }, research);
+      const song = await songService.importSong(
+        {
+          sourceType: 'youtube',
+          sourceId,
+          originalUrl: youtubeUrl,
+          youtubeId: sourceId,         // backward compat
+          youtubeUrl,                  // backward compat
+          title,
+          artistName,
+          artist: artistName,          // backward compat
+          channelTitle,
+          thumbnailUrl,
+          thumbnail: thumbnailUrl,     // backward compat
+          userId,
+        },
+        research
+      );
 
-      res.status(201).json({
-        song: {
-          _id: song._id,
-          title: song.title,
-          artist: song.artist,
-          youtubeId: song.youtubeId,
-          youtubeUrl: song.youtubeUrl,
-          thumbnail: song.thumbnail,
-          researchSummary: song.researchSummary,
-        }
-      });
+      res.status(201).json({ song: _sanitizeSong(song) });
     } catch (error) {
+      if (error.code === 'already_imported') {
+        return res.status(409).json({
+          error: 'already_imported',
+          message: 'You have already imported this song',
+          songId: error.songId,
+        });
+      }
       console.error('Import error:', error);
       res.status(400).json({ error: error.message });
     }
   });
 
-  // Get all songs for user
+  // ── Get delete preview ───────────────────────────────────────────────────
+  router.get('/:id/delete-preview', async (req, res) => {
+    try {
+      const preview = await songService.getDeletePreview(
+        req.params.id,
+        req.userId,
+        auditRepository,
+        techniqueRepository
+      );
+      res.json(preview);
+    } catch (error) {
+      if (error.message === 'Song not found') return res.status(404).json({ error: error.message });
+      console.error('Delete preview error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ── Get all songs for user ────────────────────────────────────────────────
   router.get('/', async (req, res) => {
     try {
-      const userId = req.userId;
-      const filters = req.query;
-
-      const songs = await songService.getUserSongs(userId, filters);
-
+      const songs = await songService.getUserSongs(req.userId, req.query);
       res.json(songs);
     } catch (error) {
       console.error('Get songs error:', error);
@@ -95,34 +135,28 @@ export default function createSongRoutes(songService) {
     }
   });
 
-  // Get song by ID
+  // ── Get song by ID ────────────────────────────────────────────────────────
   router.get('/:id', async (req, res) => {
     try {
-      const userId = req.userId;
-      const song = await songService.getSong(req.params.id, userId);
-
-      if (!song) {
-        return res.status(404).json({ error: 'Song not found' });
-      }
-
-      res.json(song);
+      const song = await songService.getSong(req.params.id, req.userId);
+      if (!song) return res.status(404).json({ error: 'Song not found' });
+      res.json(_sanitizeSong(song));
     } catch (error) {
       console.error('Get song error:', error);
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Delete song
+  // ── Soft-delete song (cascade) ────────────────────────────────────────────
   router.delete('/:id', async (req, res) => {
     try {
-      const userId = req.userId;
-      // Note: auditRepository should be injected in server.js bootstrap if we want cascade
-      const result = await songService.deleteSong(req.params.id, userId, songService.auditRepository);
-
-      if (!result) {
-        return res.status(404).json({ error: 'Song not found' });
-      }
-
+      const result = await songService.deleteSong(
+        req.params.id,
+        req.userId,
+        auditRepository,
+        techniqueRepository
+      );
+      if (!result) return res.status(404).json({ error: 'Song not found' });
       res.json({ message: 'Song deleted' });
     } catch (error) {
       console.error('Delete song error:', error);
@@ -133,4 +167,27 @@ export default function createSongRoutes(songService) {
   return router;
 }
 
-
+// Return a clean, consistent song shape to the client
+function _sanitizeSong(song) {
+  return {
+    _id: song._id,
+    title: song.title,
+    artistName: song.artistName || song.artist,
+    artist: song.artistName || song.artist,    // backward compat
+    channelTitle: song.channelTitle,
+    youtubeId: song.sourceId || song.youtubeId,
+    sourceId: song.sourceId || song.youtubeId,
+    sourceType: song.sourceType,
+    originalUrl: song.originalUrl || song.youtubeUrl,
+    youtubeUrl: song.originalUrl || song.youtubeUrl,  // backward compat
+    thumbnailUrl: song.thumbnailUrl || song.thumbnail,
+    thumbnail: song.thumbnailUrl || song.thumbnail,    // backward compat
+    durationSeconds: song.durationSeconds,
+    publishedAt: song.publishedAt,
+    researchSummary: song.researchSummary,
+    researchStatus: song.researchStatus,
+    metadataFetchStatus: song.metadataFetchStatus,
+    createdAt: song.createdAt,
+    updatedAt: song.updatedAt,
+  };
+}

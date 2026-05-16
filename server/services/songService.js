@@ -1,169 +1,205 @@
 /**
- * SongService - Deep module for song management
- * 
- * Owns the business logic for:
- * - Validating song imports
- * - Searching songs
- * - Filtering by user
- * 
- * The repository (production or test) is injected as a dependency.
- * This decouples business logic from MongoDB, making tests fast.
- * 
- * Tests inject InMemoryRepository for instant, isolated tests.
- * Production injects MongooseRepository for real database access.
+ * SongService - Business logic for song management.
+ *
+ * Key changes in this version:
+ * - importSong() uses sourceType + sourceId for canonical deduplication.
+ * - deleteSong() is now a soft-delete with cascade to audits + techniques.
+ * - getDeletePreview() returns affected record counts before destructive actions.
+ * - All find queries filter out soft-deleted records.
  */
 
 export class SongService {
   constructor(songRepository, searchService) {
-    if (!songRepository) {
-      throw new Error('SongService requires a song repository');
-    }
+    if (!songRepository) throw new Error('SongService requires a song repository');
     this.songRepository = songRepository;
     this.searchService = searchService;
   }
 
+  // ─── Import ───────────────────────────────────────────────────────────────
+
   /**
-   * Import a song from YouTube
-   * @param {Object} songData - { title, artist, youtubeId, youtubeUrl, thumbnail, userId }
-   * @param {Object} research - Research summary from search service
-   * @returns {Promise<Object>} Created song document
-   * @throws {Error} if song already imported or creation fails
+   * Import a song from a supported source (currently: YouTube).
+   *
+   * @param {Object} songData
+   *   sourceType, sourceId, originalUrl, title, artistName, channelTitle,
+   *   thumbnailUrl, durationSeconds, publishedAt, userId
+   * @param {Object|null} research  Research result from search service
+   * @returns {Promise<Object>} Created or found song document
+   * @throws {Error} with code 'already_imported' if duplicate detected
    */
   async importSong(songData, research) {
-    const { title, artist, youtubeId, youtubeUrl, userId } = songData;
+    const {
+      sourceType = 'youtube',
+      sourceId,
+      originalUrl,
+      title,
+      artistName,
+      channelTitle,
+      thumbnailUrl,
+      durationSeconds,
+      publishedAt,
+      userId,
+      // Backward-compat aliases
+      youtubeId,
+      youtubeUrl,
+      artist,
+      thumbnail,
+    } = songData;
 
-    // Validate required fields
-    if (!title || !artist || !youtubeId || !youtubeUrl || !userId) {
-      throw new Error('Missing required fields: title, artist, youtubeId, youtubeUrl, userId');
+    const resolvedSourceId = sourceId || youtubeId;
+    const resolvedArtist = artistName || artist || 'Unknown Artist';
+    const resolvedThumbnail = thumbnailUrl || thumbnail;
+    const resolvedUrl = originalUrl || youtubeUrl;
+
+    if (!title || !resolvedSourceId || !userId) {
+      throw new Error('Missing required fields: title, sourceId (or youtubeId), userId');
     }
 
-    // Check if already imported
+    // Canonical deduplication check
     const existing = await this.songRepository.findOne({
       userId,
-      youtubeId,
+      sourceType,
+      sourceId: resolvedSourceId,
+      deletedAt: null,
     });
 
     if (existing) {
-      throw new Error('You have already imported this song');
+      const err = new Error('You have already imported this song');
+      err.code = 'already_imported';
+      err.songId = existing._id;
+      throw err;
     }
 
-    // Create song with research
+    const researchStatus = research ? 'success' : 'skipped';
+
     const song = await this.songRepository.create({
-      ...songData,
-      researchSummary: research || { query: `${title} by ${artist}`, summary: '' },
-      importedAt: new Date(),
+      sourceType,
+      sourceId: resolvedSourceId,
+      youtubeId: resolvedSourceId,   // alias for backward compat
+      originalUrl: resolvedUrl,
+      youtubeUrl: resolvedUrl,        // alias for backward compat
+      title,
+      artistName: resolvedArtist,
+      artist: resolvedArtist,         // alias for backward compat
+      channelTitle: channelTitle || '',
+      thumbnailUrl: resolvedThumbnail,
+      thumbnail: resolvedThumbnail,   // alias for backward compat
+      durationSeconds,
+      publishedAt,
+      metadataFetchStatus: 'success',
+      researchStatus,
+      researchSummary: research || { query: `${title} by ${resolvedArtist}`, summary: '' },
+      importErrors: [],
+      userId,
+      deletedAt: null,
     });
 
     return song;
   }
 
-  /**
-   * Get all songs for a user
-   * @param {string} userId - User ID
-   * @param {Object} filters - { artist?: string, search?: string }
-   * @returns {Promise<Array>} Array of songs
-   */
+  // ─── Read ─────────────────────────────────────────────────────────────────
+
   async getUserSongs(userId, filters = {}) {
-    const query = { userId };
+    const query = { userId, deletedAt: null };
 
     if (filters.artist) {
-      query.artist = filters.artist;
+      query.artistName = filters.artist;
     }
 
-    const songs = await this.songRepository.find(query, {
-      sort: { importedAt: -1 },
-    });
+    const songs = await this.songRepository.find(query, { sort: { createdAt: -1 } });
 
-    // Client-side search if needed (for title/research)
     if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      return songs.filter((song) => {
-        const titleMatch = song.title.toLowerCase().includes(searchLower);
-        const artistMatch = song.artist.toLowerCase().includes(searchLower);
-        const researchMatch =
-          song.researchSummary?.summary?.toLowerCase()?.includes(searchLower) || false;
-
-        return titleMatch || artistMatch || researchMatch;
-      });
+      const s = filters.search.toLowerCase();
+      return songs.filter((song) =>
+        (song.title || '').toLowerCase().includes(s) ||
+        (song.artistName || song.artist || '').toLowerCase().includes(s) ||
+        (song.researchSummary?.summary || '').toLowerCase().includes(s)
+      );
     }
 
     return songs;
   }
 
-  /**
-   * Get a song by ID (verify ownership)
-   * @param {string} songId - Song ID
-   * @param {string} userId - User ID
-   * @returns {Promise<Object>} Song or null
-   */
   async getSong(songId, userId) {
     const song = await this.songRepository.findById(songId);
-
-    // Verify ownership
-    if (song && song.userId !== userId) {
-      return null; // Silently return null to avoid information leakage
-    }
-
+    if (!song || song.deletedAt) return null;
+    if (song.userId.toString() !== userId.toString()) return null;
     return song;
   }
 
+  // ─── Delete preview ───────────────────────────────────────────────────────
+
   /**
-   * Delete a song (cascade delete audits)
-   * @param {string} songId - Song ID
-   * @param {string} userId - User ID
-   * @param {Object} auditRepository - For cascade delete
-   * @returns {Promise<boolean>} true if deleted
+   * Return counts of records that would be affected by deleting a song.
    */
-  async deleteSong(songId, userId, auditRepository) {
+  async getDeletePreview(songId, userId, auditRepository, techniqueRepository) {
     const song = await this.getSong(songId, userId);
+    if (!song) throw new Error('Song not found');
 
-    if (!song) {
-      return false;
-    }
+    let auditCount = 0;
+    let techniqueCount = 0;
 
-    // Cascade delete all audits for this song
     if (auditRepository) {
-      await auditRepository.deleteMany({ songId });
+      const audits = await auditRepository.find({ songId, deletedAt: null });
+      auditCount = audits.length;
+
+      if (techniqueRepository) {
+        const auditIds = audits.map((a) => a._id);
+        for (const auditId of auditIds) {
+          techniqueCount += await techniqueRepository.count({ auditId, deletedAt: null });
+        }
+      }
     }
 
-    await this.songRepository.deleteById(songId);
+    return { auditCount, techniqueCount };
+  }
+
+  // ─── Delete (soft) ────────────────────────────────────────────────────────
+
+  /**
+   * Soft-delete a song and cascade to its audits + linked technique entries.
+   */
+  async deleteSong(songId, userId, auditRepository, techniqueRepository) {
+    const song = await this.getSong(songId, userId);
+    if (!song) return false;
+
+    const now = new Date();
+
+    if (auditRepository) {
+      const audits = await auditRepository.find({ songId, deletedAt: null });
+      for (const audit of audits) {
+        // Cascade to techniques
+        if (techniqueRepository) {
+          const techniques = await techniqueRepository.find({ auditId: audit._id, deletedAt: null });
+          for (const t of techniques) {
+            await techniqueRepository.updateById(t._id, { deletedAt: now });
+          }
+        }
+        await auditRepository.updateById(audit._id, { deletedAt: now });
+      }
+    }
+
+    await this.songRepository.updateById(songId, { deletedAt: now });
     return true;
   }
 
-  /**
-   * Get song statistics for user
-   * @param {string} userId - User ID
-   * @returns {Promise<Object>} { totalSongs, totalAudits, artistCount }
-   */
-  async getStats(userId) {
-    const songs = await this.songRepository.find({ userId });
+  // ─── Research update ──────────────────────────────────────────────────────
 
-    const artists = new Set(songs.map((s) => s.artist));
-
-    return {
-      totalSongs: songs.length,
-      artistCount: artists.size,
-      artists: Array.from(artists),
-    };
-  }
-
-  /**
-   * Update song research
-   * @param {string} songId - Song ID
-   * @param {string} userId - User ID
-   * @param {Object} research - New research data
-   * @returns {Promise<Object>} Updated song
-   */
   async updateResearch(songId, userId, research) {
     const song = await this.getSong(songId, userId);
-
-    if (!song) {
-      throw new Error('Song not found');
-    }
-
+    if (!song) throw new Error('Song not found');
     return this.songRepository.updateById(songId, {
       researchSummary: research,
+      researchStatus: 'success',
       updatedAt: new Date(),
     });
+  }
+
+  // ─── Stats ────────────────────────────────────────────────────────────────
+
+  async getStats(userId) {
+    const songs = await this.songRepository.find({ userId, deletedAt: null });
+    const artists = new Set(songs.map((s) => s.artistName || s.artist));
+    return { totalSongs: songs.length, artistCount: artists.size, artists: Array.from(artists) };
   }
 }

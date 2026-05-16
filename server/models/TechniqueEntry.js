@@ -15,34 +15,73 @@ const techniqueEntrySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Audit',
     },
-    artist: {
+
+    // Name / label for the technique (short, memorable)
+    techniqueName: {
       type: String,
+      trim: true,
     },
+    // Detailed description / notes
     description: {
       type: String,
       required: true,
     },
-    category: {
+    // Which lens this technique relates to
+    lens: {
       type: String,
       enum: ['rhythm', 'texture', 'harmony', 'arrangement'],
       required: true,
     },
-    sourceTimestamp: {
-      type: Number, // seconds into the song where this was noted
+
+    artist: {
+      type: String,
     },
-    tags: [String],
-    notes: String,
-    createdAt: {
+    tags: {
+      type: [String],
+      default: [],
+    },
+    notes: {
+      type: String,
+    },
+
+    // Where in the song this was observed (seconds)
+    exampleTimestamp: {
+      type: Number,
+    },
+
+    // How confident/certain is this observation? 1–5 scale
+    confidence: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+
+    // What do you want to do next with this technique?
+    nextAction: {
+      type: String,
+      enum: ['study', 'practice', 'transcribe', 'apply', 'revisit', null],
+      default: null,
+    },
+
+    // Soft delete
+    deletedAt: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-// Index for fast queries
-techniqueEntrySchema.index({ userId: 1, category: 1 });
-techniqueEntrySchema.index({ userId: 1, createdAt: -1 });
+// Text index for full-text search across key fields
+techniqueEntrySchema.index({
+  techniqueName: 'text',
+  description: 'text',
+  notes: 'text',
+});
+
+// Fast queries by lens, artist, tag, date
+techniqueEntrySchema.index({ userId: 1, lens: 1, deletedAt: 1 });
+techniqueEntrySchema.index({ userId: 1, deletedAt: 1, createdAt: -1 });
 techniqueEntrySchema.index({ userId: 1, tags: 1 });
 
 export default mongoose.model('TechniqueEntry', techniqueEntrySchema);
