@@ -1,0 +1,30 @@
+/**
+ * IBackendService - Frontend Port for backend communication
+ * 
+ * Defines the contract for all backend operations.
+ * Allows the UI to be tested in isolation using an InMemoryBackendAdapter.
+ */
+export class IBackendService {
+  // Auth
+  async login(email, password) { throw new Error('Not implemented'); }
+  async register(email, password, name) { throw new Error('Not implemented'); }
+  
+  // Songs
+  async getSongs(filters) { throw new Error('Not implemented'); }
+  async getSong(id) { throw new Error('Not implemented'); }
+  async importSong(youtubeUrl) { throw new Error('Not implemented'); }
+  async deleteSong(id) { throw new Error('Not implemented'); }
+  
+  // Audits
+  async getAudits() { throw new Error('Not implemented'); }
+  async generateTemplate(songId, lenses, workflowType) { throw new Error('Not implemented'); }
+  async createAudit(auditData) { throw new Error('Not implemented'); }
+  async getAuditsForSong(songId) { throw new Error('Not implemented'); }
+  async getAudit(id) { throw new Error('Not implemented'); }
+  async updateAudit(id, updates) { throw new Error('Not implemented'); }
+  async deleteAudit(id) { throw new Error('Not implemented'); }
+  
+  // Techniques
+  async getTechniques(filters) { throw new Error('Not implemented'); }
+  async addTechnique(techniqueData) { throw new Error('Not implemented'); }
+}

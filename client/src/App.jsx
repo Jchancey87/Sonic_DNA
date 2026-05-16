@@ -110,14 +110,19 @@ const AppContent = () => {
   );
 };
 
+import { BackendProvider } from './context/BackendContext';
+
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <BackendProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </BackendProvider>
     </BrowserRouter>
   );
 }
+
 
 export default App;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { songAPI, auditAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const Dashboard = () => {
+  const backend = useBackend();
   const [songs, setSongs] = useState([]);
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,13 +18,13 @@ const Dashboard = () => {
     try {
       setLoading(true);
       const [songsRes, auditsRes] = await Promise.all([
-        songAPI.getAll(search ? { search } : {}),
-        auditAPI.getAll(),
+        backend.getSongs(search ? { search } : {}),
+        backend.getAudits(),
       ]);
-      setSongs(songsRes.data);
-      setAudits(auditsRes.data);
+      setSongs(songsRes);
+      setAudits(auditsRes);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to load data');
+      setError(err.message || 'Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -32,14 +33,15 @@ const Dashboard = () => {
   const deleteSong = async (songId) => {
     if (window.confirm('Delete this song and all its audits?')) {
       try {
-        await songAPI.delete(songId);
+        await backend.deleteSong(songId);
         setSongs(songs.filter((s) => s._id !== songId));
-        setAudits(audits.filter((a) => a.songId._id !== songId));
+        setAudits(audits.filter((a) => a.songId?._id !== songId));
       } catch (err) {
         setError('Failed to delete song');
       }
     }
   };
+
 
   const songAuditCount = (songId) => audits.filter((a) => a.songId._id === songId).length;
 
