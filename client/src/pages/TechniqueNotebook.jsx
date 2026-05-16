@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { techniqueAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const TechniqueNotebook = () => {
   const [techniques, setTechniques] = useState([]);
@@ -8,6 +8,7 @@ const TechniqueNotebook = () => {
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const backend = useBackend();
 
   useEffect(() => {
     loadTechniques();
@@ -15,9 +16,9 @@ const TechniqueNotebook = () => {
 
   const loadTechniques = async () => {
     try {
-      const response = await techniqueAPI.getAll();
-      setTechniques(response.data.techniques);
-      setGrouped(response.data.grouped);
+      const response = await backend.getTechniques();
+      setTechniques(response.techniques);
+      setGrouped(response.grouped);
     } catch (err) {
       setError('Failed to load techniques');
     } finally {
@@ -28,7 +29,7 @@ const TechniqueNotebook = () => {
   const deleteTechnique = async (id) => {
     if (window.confirm('Delete this technique?')) {
       try {
-        await techniqueAPI.delete(id);
+        await backend.deleteTechnique(id);
         loadTechniques();
       } catch (err) {
         setError('Failed to delete technique');

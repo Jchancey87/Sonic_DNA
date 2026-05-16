@@ -27,4 +27,5 @@ export class IBackendService {
   // Techniques
   async getTechniques(filters) { throw new Error('Not implemented'); }
   async addTechnique(techniqueData) { throw new Error('Not implemented'); }
+  async deleteTechnique(id) { throw new Error('Not implemented'); }
 }

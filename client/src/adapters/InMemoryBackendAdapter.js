@@ -104,4 +104,9 @@ export class InMemoryBackendAdapter extends IBackendService {
     this.techniques.push(tech);
     return tech;
   }
+
+  async deleteTechnique(id) {
+    this.techniques = this.techniques.filter(t => t._id !== id);
+    return true;
+  }
 }

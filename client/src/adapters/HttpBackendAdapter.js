@@ -104,4 +104,9 @@ export class HttpBackendAdapter extends IBackendService {
     const response = await this.api.post('/techniques', techniqueData);
     return response.data;
   }
+
+  async deleteTechnique(id) {
+    const response = await this.api.delete(`/techniques/${id}`);
+    return response.data;
+  }
 }

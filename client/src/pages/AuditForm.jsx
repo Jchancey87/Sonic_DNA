@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auditAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 import AudioPlayer from '../components/AudioPlayer';
 
 const AuditForm = () => {
   const { songId } = useParams();
   const navigate = useNavigate();
+  const backend = useBackend();
 
   const [template, setTemplate] = useState(null);
   const [song, setSong] = useState(null);
@@ -39,7 +40,8 @@ const AuditForm = () => {
   const handleResponseChange = (key, value) => {
     setResponses((prev) => ({ ...prev, [key]: value }));
   };
-Bookmark = (bookmark) => {
+
+  const addBookmark = (bookmark) => {
     setBookmarks((prev) => [...prev, bookmark]);
     setSuccess(`Bookmarked at ${formatTime(bookmark.timestamp)}`);
     setTimeout(() => setSuccess(''), 2000);
@@ -60,8 +62,7 @@ Bookmark = (bookmark) => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`; setTimeout(() => setSuccess(''), 3000);
-    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const removeTechnique = (id) => {
@@ -77,20 +78,20 @@ Bookmark = (bookmark) => {
     setSavingAudit(true);
     try {
       const lensSelection = template?.lenses ? Object.keys(template.lenses) : [];
-      await auditAPI.create(
+      await backend.createAudit({
         songId,
         lensSelection,
         responses,
         bookmarks,
-        techniques.map(({ id, ...rest }) => rest) // Remove the temporary ID
-      );
+        techniques: techniques.map(({ id, ...rest }) => rest) // Remove the temporary ID
+      });
 
       setSuccess('Audit saved successfully!');
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save audit');
+      setError(err.response?.data?.error || err.message || 'Failed to save audit');
     } finally {
       setSavingAudit(false);
     }
@@ -104,7 +105,7 @@ Bookmark = (bookmark) => {
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div
+      <div className="card">
 
         {/* Audio Player */}
         {song.youtubeId && (
@@ -112,7 +113,7 @@ Bookmark = (bookmark) => {
             youtubeId={song.youtubeId}
             onBookmark={addBookmark}
           />
-        )} className="card">
+        )}
         <h1>{template.title}</h1>
         <p className="card-subtitle">{song.artist}</p>
 

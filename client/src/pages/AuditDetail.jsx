@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { auditAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const AuditDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const backend = useBackend();
   const [audit, setAudit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -15,8 +16,8 @@ const AuditDetail = () => {
 
   const loadAudit = async () => {
     try {
-      const response = await auditAPI.getById(id);
-      setAudit(response.data);
+      const response = await backend.getAudit(id);
+      setAudit(response);
     } catch (err) {
       setError('Failed to load audit');
     } finally {
@@ -27,11 +28,12 @@ const AuditDetail = () => {
   const deleteAudit = async () => {
     if (window.confirm('Delete this audit?')) {
       try {
-        await auditAPI.delete(id);
+        await backend.deleteAudit(id);
         navigate('/dashboard');
       } catch (err) {
         setError('Failed to delete audit');
       }
+
     }
   };
 

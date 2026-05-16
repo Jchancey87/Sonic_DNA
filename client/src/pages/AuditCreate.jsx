@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { songAPI, auditAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const AuditCreate = () => {
   const { songId } = useParams();
   const navigate = useNavigate();
+  const backend = useBackend();
   const [song, setSong] = useState(null);
   const [selectedLenses, setSelectedLenses] = useState([]);
   const [workflowType, setWorkflowType] = useState('quick');
@@ -18,8 +19,8 @@ const AuditCreate = () => {
 
   const loadSong = async () => {
     try {
-      const response = await songAPI.getById(songId);
-      setSong(response.data);
+      const response = await backend.getSong(songId);
+      setSong(response);
     } catch (err) {
       setError('Failed to load song');
     } finally {
@@ -41,9 +42,9 @@ const AuditCreate = () => {
 
     setGeneratingTemplate(true);
     try {
-      const response = await auditAPI.generateTemplate(songId, selectedLenses, workflowType);
+      const response = await backend.generateTemplate(songId, selectedLenses, workflowType);
       // Store template in session/state and navigate
-      sessionStorage.setItem('auditTemplate', JSON.stringify(response.data));
+      sessionStorage.setItem('auditTemplate', JSON.stringify(response));
       navigate(`/audit/form/${songId}`);
     } catch (err) {
       setError('Failed to generate audit template');

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const backend = useBackend();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,15 +21,15 @@ const Login = () => {
 
     try {
       if (isLogin) {
-        const response = await authAPI.login(email, password);
-        login(response.data.user, response.data.token);
+        const response = await backend.login(email, password);
+        login(response.user, response.token);
       } else {
-        const response = await authAPI.register(email, password, name);
-        login(response.data.user, response.data.token);
+        const response = await backend.register(email, password, name);
+        login(response.user, response.token);
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Authentication failed');
+      setError(err.response?.data?.error || err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }

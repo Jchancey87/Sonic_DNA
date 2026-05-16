@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { songAPI } from '../utils/api';
+import { useBackend } from '../context/BackendContext';
 
 const ImportSong = () => {
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -8,6 +8,7 @@ const ImportSong = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const backend = useBackend();
 
   const handleImport = async (e) => {
     e.preventDefault();
@@ -21,15 +22,15 @@ const ImportSong = () => {
 
     setLoading(true);
     try {
-      const response = await songAPI.import(youtubeUrl);
+      const response = await backend.importSong(youtubeUrl);
       setSuccess('Song imported successfully!');
       setYoutubeUrl('');
 
       setTimeout(() => {
-        navigate(`/audit/create/${response.data.song._id}`);
+        navigate(`/audit/create/${response.song._id}`);
       }, 1000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to import song');
+      setError(err.response?.data?.error || err.message || 'Failed to import song');
     } finally {
       setLoading(false);
     }
