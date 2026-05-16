@@ -6,7 +6,7 @@ const BackendContext = createContext(null);
 export const BackendProvider = ({ children, adapter }) => {
   // Use provided adapter or fall back to default production adapter
   const backend = useMemo(() => {
-    return adapter || new HttpBackendAdapter(process.env.REACT_APP_API_URL);
+    return adapter || new HttpBackendAdapter(import.meta.env.VITE_API_URL);
   }, [adapter]);
 
   return (

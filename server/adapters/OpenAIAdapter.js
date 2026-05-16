@@ -19,8 +19,8 @@ export class OpenAIAdapter extends IAIModelService {
   constructor(apiKey = process.env.OPENAI_API_KEY) {
     super();
     this.apiKey = apiKey;
-    this.apiUrl = 'https://api.openai.com/v1/chat/completions';
-    this.model = 'gpt-4-turbo';
+    this.apiUrl = process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions';
+    this.model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
   }
 
   async generateTemplate(prompt) {

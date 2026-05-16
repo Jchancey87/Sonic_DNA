@@ -2,6 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Adapters & Repositories
 import { OpenAIAdapter } from './adapters/OpenAIAdapter.js';
@@ -29,7 +34,7 @@ import createTechniqueRoutes from './routes/techniques.js';
 
 import { authMiddleware } from './middleware/auth.js';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 

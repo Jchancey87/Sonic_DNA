@@ -43,18 +43,22 @@ export default function createAuditRoutes(auditService, templateComposer) {
           song = await auditService.songRepository?.findOne({ _id: songId, userId, deletedAt: null });
         } catch (_) {}
 
+        const researchSummary = song?.researchSummary?.summary || '';
+        console.log(`[Audit Create] Song: "${song?.title}" | Research available: ${researchSummary ? 'YES' : 'NO (empty)'}`);
+
         try {
+          console.log('[Audit Create] Calling AI to generate template...');
           templateQuestions = await templateComposer.generateTemplate(
             song?.title || 'Unknown',
             song?.artistName || song?.artist || 'Unknown',
             resolvedLenses,
-            song?.researchSummary?.summary || ''
+            researchSummary
           );
           templateVersion = 'ai-v1';
-          modelUsed = 'gpt-4o';
+          modelUsed = process.env.OPENAI_MODEL || 'gpt-4-turbo';
+          console.log(`[Audit Create] ✓ AI template generated successfully using model: ${modelUsed}`);
         } catch (err) {
-          console.warn('Template generation failed, using fallback:', err.message);
-          // fallback already returns a deterministic template from templateComposer
+          console.warn(`[Audit Create] ✗ AI template generation failed (${err.message}), using FALLBACK generic template`);
           templateQuestions = templateComposer._buildFallbackTemplate?.(
             song?.title || 'Unknown',
             song?.artistName || song?.artist || 'Unknown',

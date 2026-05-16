@@ -94,8 +94,12 @@ const songSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Primary deduplication index: one record per (user, source type, source ID)
-songSchema.index({ userId: 1, sourceType: 1, sourceId: 1 }, { unique: true });
+// Primary deduplication index: one active record per (user, source type, source ID)
+// partialFilterExpression means soft-deleted songs are excluded from uniqueness enforcement
+songSchema.index(
+  { userId: 1, sourceType: 1, sourceId: 1 },
+  { unique: true, partialFilterExpression: { deletedAt: null } }
+);
 // Fast lookups for active (non-deleted) songs
 songSchema.index({ userId: 1, deletedAt: 1, createdAt: -1 });
 

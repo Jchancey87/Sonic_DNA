@@ -25,9 +25,11 @@ export class TavilyAdapter extends ISearchService {
   }
 
   async searchSongInfo(title, artist) {
-    if (!this.apiKey) {
+    if (!this.apiKey || this.apiKey === 'your-tavily-api-key') {
+      console.warn('[Tavily] ✗ No API key configured — skipping song research. Set TAVILY_API_KEY in .env');
       return this._noApiKeyResponse(title, artist);
     }
+    console.log(`[Tavily] Searching for: "${title}" by ${artist}`);
 
     try {
       // Try multiple search queries to gather comprehensive info
@@ -45,12 +47,16 @@ export class TavilyAdapter extends ISearchService {
           const response = await axios.post(
             this.apiUrl,
             {
-              api_key: this.apiKey,
               query: query,
-              topic: 'music',
               max_results: 5,
             },
-            { timeout: 10000 }
+            {
+              timeout: 10000,
+              headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json',
+              },
+            }
           );
 
           if (response.data.results) {
