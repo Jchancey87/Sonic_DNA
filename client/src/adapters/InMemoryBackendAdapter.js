@@ -15,13 +15,39 @@ export class InMemoryBackendAdapter extends IBackendService {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   async login(email, password) {
-    this.currentUser = { id: 'user-1', email, displayName: 'Test User', name: 'Test User' };
+    this.currentUser = {
+      id: 'user-1',
+      email,
+      displayName: 'Test User',
+      name: 'Test User',
+      preferences: { defaultWorkflow: 'quick', preferredLenses: [], timezone: 'UTC' }
+    };
     return { token: 'mock-token', user: this.currentUser };
   }
 
   async register(email, password, name) {
-    this.currentUser = { id: 'user-1', email, displayName: name, name };
+    this.currentUser = {
+      id: 'user-1',
+      email,
+      displayName: name,
+      name,
+      preferences: { defaultWorkflow: 'quick', preferredLenses: [], timezone: 'UTC' }
+    };
     return { token: 'mock-token', user: this.currentUser };
+  }
+
+  async getUserProfile() {
+    if (!this.currentUser) throw new Error('Not authenticated');
+    return this.currentUser;
+  }
+
+  async updatePreferences(preferences) {
+    if (!this.currentUser) throw new Error('Not authenticated');
+    this.currentUser.preferences = {
+      ...this.currentUser.preferences,
+      ...preferences
+    };
+    return this.currentUser.preferences;
   }
 
   // ── Songs ─────────────────────────────────────────────────────────────────

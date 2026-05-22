@@ -4,8 +4,10 @@ import { useAudio } from '../context/AudioContext';
 import EmptyState from '../components/EmptyState';
 
 const TechniqueNotebook = () => {
+  const [activeTab, setActiveTab] = useState('library');
   const [techniques, setTechniques] = useState([]);
   const [grouped, setGrouped] = useState({});
+  const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
@@ -14,13 +16,43 @@ const TechniqueNotebook = () => {
   const [filterLens, setFilterLens] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt');
   const [order, setOrder] = useState('desc');
-  
+
+  // Saving states per technique ID
+  const [savingStates, setSavingStates] = useState({});
+  const [savedStates, setSavedStates] = useState({});
+
+  // Quick Log form states
+  const [newTechName, setNewTechName] = useState('');
+  const [newLens, setNewLens] = useState('rhythm');
+  const [newConfidence, setNewConfidence] = useState(3);
+  const [newNextAction, setNewNextAction] = useState('');
+  const [newArtist, setNewArtist] = useState('');
+  const [newSongId, setNewSongId] = useState('');
+  const [newTimestamp, setNewTimestamp] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newNotes, setNewNotes] = useState('');
+  const [newTags, setNewTags] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+  const [formError, setFormError] = useState('');
+
   const backend = useBackend();
-  const { seekTo, activeSong } = useAudio();
+  const { seekTo, activeSong, loadSong, play } = useAudio();
 
   useEffect(() => {
     loadTechniques();
   }, [searchTerm, filterLens, sortBy, order]);
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const res = await backend.getSongs();
+        setSongs(res || []);
+      } catch (err) {
+        console.error('Failed to load songs:', err);
+      }
+    };
+    fetchSongs();
+  }, [backend]);
 
   const loadTechniques = async () => {
     try {
@@ -32,8 +64,8 @@ const TechniqueNotebook = () => {
         order
       };
       const response = await backend.getTechniques(filters);
-      setTechniques(response.techniques);
-      setGrouped(response.grouped);
+      setTechniques(response.techniques || []);
+      setGrouped(response.grouped || {});
     } catch (err) {
       setError('Failed to load techniques');
     } finally {
@@ -52,6 +84,39 @@ const TechniqueNotebook = () => {
     }
   };
 
+  const handleUpdateTechnique = async (id, updates) => {
+    setSavingStates(prev => ({ ...prev, [id]: true }));
+    try {
+      // Local optimistic update
+      setTechniques(prev => 
+        prev.map(t => t._id === id ? { ...t, ...updates } : t)
+      );
+
+      await backend.updateTechnique(id, updates);
+
+      // Reload in background to ensure accurate counts/grouped lists
+      const filters = {
+        q: searchTerm,
+        lens: filterLens === 'all' ? undefined : filterLens,
+        sortBy,
+        order
+      };
+      const response = await backend.getTechniques(filters);
+      setTechniques(response.techniques || []);
+      setGrouped(response.grouped || {});
+
+      setSavingStates(prev => ({ ...prev, [id]: false }));
+      setSavedStates(prev => ({ ...prev, [id]: true }));
+      setTimeout(() => {
+        setSavedStates(prev => ({ ...prev, [id]: false }));
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to update technique:', err);
+      setError('Failed to update technique');
+      setSavingStates(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
   const formatTimestamp = (seconds) => {
     if (!seconds && seconds !== 0) return '';
     const s = Math.floor(seconds);
@@ -60,10 +125,378 @@ const TechniqueNotebook = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (loading && techniques.length === 0) return <div className="loading">LOADING TECHNIQUE REGISTRIES...</div>;
+  const parseTimestamp = (str) => {
+    if (!str) return undefined;
+    if (typeof str === 'number') return str;
+    const parts = str.split(':');
+    if (parts.length === 2) {
+      const minutes = parseInt(parts[0], 10) || 0;
+      const seconds = parseInt(parts[1], 10) || 0;
+      return minutes * 60 + seconds;
+    }
+    return parseInt(str, 10) || undefined;
+  };
+
+  const getLensColor = (lens) => {
+    const l = (lens || '').toLowerCase();
+    if (l === 'rhythm') return '#f97316';
+    if (l === 'texture') return '#14b8a6';
+    if (l === 'harmony') return '#8b5cf6';
+    if (l === 'arrangement') return '#ec4899';
+    return 'rgba(255, 255, 255, 0.08)';
+  };
+
+  const handleLoadAndSeek = async (tech) => {
+    const songId = tech.songId?._id || tech.songId;
+    if (!songId) return;
+
+    try {
+      if (activeSong && activeSong._id === songId) {
+        seekTo(tech.exampleTimestamp || 0);
+        play();
+      } else {
+        const fullSong = await backend.getSong(songId);
+        if (fullSong) {
+          loadSong(fullSong);
+          setTimeout(() => {
+            seekTo(tech.exampleTimestamp || 0);
+            play();
+          }, 800);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading and seeking song:', err);
+    }
+  };
+
+  const handleQuickLogSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
+
+    if (!newTechName.trim()) {
+      setFormError('Technique Name is required');
+      return;
+    }
+    if (!newDescription.trim()) {
+      setFormError('Description is required');
+      return;
+    }
+
+    try {
+      const tagsArray = newTags
+        ? newTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        : [];
+      
+      const parsedTime = parseTimestamp(newTimestamp);
+
+      // Auto-extract artist if not manually input but song is chosen
+      let artistVal = newArtist;
+      if (newSongId) {
+        const selectedSong = songs.find(s => s._id === newSongId);
+        if (selectedSong && !artistVal) {
+          artistVal = selectedSong.artist;
+        }
+      }
+
+      const payload = {
+        techniqueName: newTechName,
+        lens: newLens,
+        confidence: newConfidence,
+        nextAction: newNextAction || undefined,
+        artist: artistVal || undefined,
+        songId: newSongId || undefined,
+        exampleTimestamp: parsedTime,
+        description: newDescription,
+        notes: newNotes || undefined,
+        tags: tagsArray
+      };
+
+      await backend.addTechnique(payload);
+      
+      setFormSuccess('Technique successfully logged to your notebook!');
+      
+      // Reset form
+      setNewTechName('');
+      setNewLens('rhythm');
+      setNewConfidence(3);
+      setNewNextAction('');
+      setNewArtist('');
+      setNewSongId('');
+      setNewTimestamp('');
+      setNewDescription('');
+      setNewNotes('');
+      setNewTags('');
+
+      // Refresh list
+      loadTechniques();
+    } catch (err) {
+      setFormError(err.message || 'Failed to add technique to notebook');
+    }
+  };
+
+  // Reusable Technique Card
+  const TechniqueCard = ({ tech }) => {
+    const [localNotes, setLocalNotes] = useState(tech.notes || '');
+
+    useEffect(() => {
+      setLocalNotes(tech.notes || '');
+    }, [tech.notes]);
+
+    const handleNotesBlur = () => {
+      if (localNotes !== (tech.notes || '')) {
+        handleUpdateTechnique(tech._id, { notes: localNotes });
+      }
+    };
+
+    // Determine artist/song display label
+    let songDisplay = '';
+    if (tech.songId && typeof tech.songId === 'object') {
+      songDisplay = `${tech.songId.title} - ${tech.songId.artist}`;
+    } else {
+      const matchingSong = songs.find(s => s._id === tech.songId);
+      if (matchingSong) {
+        songDisplay = `${matchingSong.title} - ${matchingSong.artist}`;
+      } else if (tech.artist) {
+        songDisplay = tech.artist;
+      }
+    }
+
+    const hasTimestamp = tech.exampleTimestamp !== undefined && tech.exampleTimestamp !== null;
+    const isSaving = savingStates[tech._id];
+    const isSaved = savedStates[tech._id];
+
+    return (
+      <div 
+        className="panel" 
+        style={{ 
+          margin: 0, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          background: '#151518', 
+          borderLeft: `4px solid ${getLensColor(tech.lens)}`,
+          borderColor: 'rgba(255,255,255,0.08)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          position: 'relative'
+        }}
+      >
+        {/* Card Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+          <div style={{ flex: 1, marginRight: '8px' }}>
+            <h3 style={{ margin: 0, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {tech.techniqueName || 'Untitled Technique'}
+              {isSaving && (
+                <span style={{ fontSize: '9px', color: '#f59e0b', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}>
+                  ● SAVING...
+                </span>
+              )}
+              {isSaved && (
+                <span style={{ fontSize: '9px', color: '#10b981', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}>
+                  ✔ SAVED
+                </span>
+              )}
+            </h3>
+            <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+              <span 
+                className="badge primary" 
+                style={{ 
+                  textTransform: 'uppercase', 
+                  borderColor: getLensColor(tech.lens), 
+                  color: getLensColor(tech.lens), 
+                  background: `${getLensColor(tech.lens)}15`,
+                  fontSize: '9px'
+                }}
+              >
+                {tech.lens}
+              </span>
+              {tech.tags?.map(tag => (
+                <span 
+                  key={tag} 
+                  style={{ 
+                    fontSize: '9px', 
+                    fontFamily: 'Roboto Mono',
+                    color: 'rgba(255,255,255,0.5)', 
+                    background: 'rgba(255, 255, 255, 0.04)', 
+                    padding: '1px 5px', 
+                    borderRadius: '1px',
+                    border: '1px solid rgba(255, 255, 255, 0.08)'
+                  }}
+                >
+                  #{tag.toUpperCase()}
+                </span>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={() => deleteTechnique(tech._id)}
+            className="danger"
+            style={{ padding: '4px 6px', fontSize: '9px', border: 'none', background: 'transparent' }}
+            title="Remove from notebook"
+          >
+            🗑️
+          </button>
+        </div>
+
+        {/* Confidence & Next Action Controls */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          background: '#0c0c0e', 
+          padding: '6px 10px', 
+          borderRadius: '2px', 
+          marginBottom: '10px',
+          border: '1px solid rgba(255,255,255,0.03)',
+          flexWrap: 'wrap',
+          gap: '8px'
+        }}>
+          {/* Clickable Confidence Stars */}
+          <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginRight: '6px', fontFamily: 'Roboto Mono' }}>CONFIDENCE:</span>
+            {[1, 2, 3, 4, 5].map((i) => {
+              const isFilled = i <= (tech.confidence || 0);
+              return (
+                <span 
+                  key={i}
+                  onClick={() => handleUpdateTechnique(tech._id, { confidence: i })}
+                  style={{
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    color: isFilled ? '#d08f60' : 'rgba(255,255,255,0.2)',
+                    marginRight: '2px',
+                    userSelect: 'none'
+                  }}
+                  title={`Rate ${i}/5`}
+                >
+                  ★
+                </span>
+              );
+            })}
+          </div>
+
+          {/* Next Action Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono' }}>ACTION:</span>
+            <select
+              value={tech.nextAction || ''}
+              onChange={(e) => handleUpdateTechnique(tech._id, { nextAction: e.target.value || null })}
+              style={{
+                background: '#151518',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'rgba(255,255,255,0.8)',
+                padding: '2px 6px',
+                fontSize: '10px',
+                fontFamily: 'Roboto Mono',
+                width: 'auto',
+                height: '22px',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">NO ACTION</option>
+              <option value="study">STUDY</option>
+              <option value="practice">PRACTICE</option>
+              <option value="transcribe">TRANSCRIBE</option>
+              <option value="apply">APPLY</option>
+              <option value="revisit">REVISIT</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p style={{ 
+          fontSize: '12px', 
+          lineHeight: '1.5', 
+          color: 'rgba(255, 255, 255, 0.75)', 
+          margin: '0 0 10px 0',
+          wordBreak: 'break-word'
+        }}>
+          {tech.description}
+        </p>
+
+        {/* Associated Song Load & Seek */}
+        {songDisplay && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            background: 'rgba(0,0,0,0.2)', 
+            padding: '6px 10px', 
+            borderRadius: '2px', 
+            border: '1px solid rgba(255,255,255,0.04)',
+            fontSize: '11px',
+            fontFamily: 'Roboto Mono',
+            marginBottom: '10px'
+          }}>
+            <span style={{ 
+              color: 'rgba(255,255,255,0.5)', 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap',
+              maxWidth: '65%'
+            }} title={songDisplay}>
+              🎵 {songDisplay}
+            </span>
+            {hasTimestamp && (
+              <button
+                onClick={() => handleLoadAndSeek(tech)}
+                style={{
+                  padding: '2px 8px',
+                  fontSize: '9px',
+                  background: 'rgba(208, 143, 96, 0.1)',
+                  borderColor: 'rgba(208, 143, 96, 0.3)',
+                  color: '#d08f60',
+                  borderRadius: '2px',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                ▶ LOAD & SEEK ({formatTimestamp(tech.exampleTimestamp)})
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Inline Practice Notes */}
+        <div style={{ marginTop: 'auto' }}>
+          <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginBottom: '4px', display: 'block' }}>
+            PRACTICE LOG / ATTEMPTS
+          </label>
+          <textarea
+            value={localNotes}
+            onChange={(e) => setLocalNotes(e.target.value)}
+            onBlur={handleNotesBlur}
+            placeholder="Type notes or practice experiments here. Click away to auto-save..."
+            style={{
+              width: '100%',
+              minHeight: '50px',
+              fontSize: '11px',
+              background: '#0a0a0c',
+              borderColor: 'rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.85)',
+              padding: '6px 8px',
+              borderRadius: '2px',
+              fontFamily: 'inherit',
+              lineHeight: '1.4'
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Grouping for Practice Kanban Board lanes
+  const lanes = [
+    { id: 'unassigned', title: '📋 BACKLOG / UNASSIGNED', items: techniques.filter(t => !t.nextAction) },
+    { id: 'study', title: '📚 STUDY', items: techniques.filter(t => t.nextAction === 'study') },
+    { id: 'practice', title: '🏋️ PRACTICE', items: techniques.filter(t => t.nextAction === 'practice') },
+    { id: 'transcribe', title: '✍️ TRANSCRIBE', items: techniques.filter(t => t.nextAction === 'transcribe') },
+    { id: 'apply', title: '🚀 APPLY', items: techniques.filter(t => t.nextAction === 'apply') },
+    { id: 'revisit', title: '🔄 REVISIT', items: techniques.filter(t => t.nextAction === 'revisit') }
+  ];
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <div style={{ maxWidth: activeTab === 'practice' ? '100%' : '1200px', margin: '0 auto', transition: 'max-width 0.2s ease' }}>
+      
+      {/* Header Panel */}
       <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
         <h1>📚 Technique Notebook</h1>
         <p className="card-subtitle" style={{ margin: 0 }}>
@@ -72,51 +505,8 @@ const TechniqueNotebook = () => {
 
         {error && <div className="error">{error}</div>}
 
-        {/* Filters & Search */}
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '30px', flexWrap: 'wrap', marginTop: '20px' }}>
-          <div style={{ flex: 2, minWidth: '300px' }}>
-            <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Search</label>
-            <input
-              type="text"
-              placeholder="Filter by name, description, artist, or tags..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
-            />
-          </div>
-
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Lens</label>
-            <select
-              value={filterLens}
-              onChange={(e) => setFilterLens(e.target.value)}
-              style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
-            >
-              <option value="all">All Lenses</option>
-              <option value="rhythm">Rhythm</option>
-              <option value="texture">Texture</option>
-              <option value="harmony">Harmony</option>
-              <option value="arrangement">Arrangement</option>
-            </select>
-          </div>
-
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
-            >
-              <option value="createdAt">Date Added</option>
-              <option value="techniqueName">Name</option>
-              <option value="lens">Lens</option>
-              <option value="artist">Artist</option>
-            </select>
-          </div>
-        </div>
-
         {/* Lens Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginTop: '15px' }}>
           {['rhythm', 'texture', 'harmony', 'arrangement'].map((lens) => (
             <div 
               key={lens} 
@@ -125,10 +515,13 @@ const TechniqueNotebook = () => {
                 padding: '12px', 
                 borderRadius: '2px', 
                 textAlign: 'center', 
-                border: '1px solid rgba(255, 255, 255, 0.06)' 
+                borderLeft: `3px solid ${getLensColor(lens)}`,
+                borderRight: '1px solid rgba(255, 255, 255, 0.04)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.04)'
               }}
             >
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d08f60', fontFamily: 'Roboto Mono' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: getLensColor(lens), fontFamily: 'Roboto Mono' }}>
                 {grouped[lens]?.length || 0}
               </div>
               <div style={{ fontSize: '10px', fontWeight: 'bold', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Roboto Mono', marginTop: '2px' }}>
@@ -139,117 +532,355 @@ const TechniqueNotebook = () => {
         </div>
       </div>
 
-      {/* Techniques list */}
-      {techniques.length === 0 ? (
-        <EmptyState 
-          icon="📓"
-          title={searchTerm || filterLens !== 'all' ? "No matching techniques" : "Notebook is empty"}
-          description={searchTerm || filterLens !== 'all' ? "Try adjusting your filters or search terms." : "Start an audit on a song to discover and log techniques. Your notebook is where you collect the 'how' behind the music you study."}
-          ctaLabel={searchTerm || filterLens !== 'all' ? "Clear All Filters" : "Go to Library"}
-          onCtaClick={searchTerm || filterLens !== 'all' ? () => { setSearchTerm(''); setFilterLens('all'); } : null}
-          ctaLink={searchTerm || filterLens !== 'all' ? null : "/dashboard"}
-        />
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))', gap: '20px', marginTop: '20px' }}>
-          {techniques.map((tech) => (
-            <div key={tech._id} className="panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', background: '#151518', borderColor: 'rgba(255,255,255,0.08)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '13px' }}>{tech.techniqueName || 'Untitled Technique'}</h3>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-                    <span className="badge primary" style={{ textTransform: 'uppercase' }}>{tech.lens}</span>
-                    {tech.confidence && <span className="badge">CONFIDENCE: {tech.confidence}/5</span>}
-                    {tech.nextAction && <span className="badge warning" style={{ textTransform: 'uppercase' }}>{tech.nextAction}</span>}
-                  </div>
-                </div>
-                <button
-                  onClick={() => deleteTechnique(tech._id)}
-                  className="danger"
-                  style={{ padding: '4px 8px', fontSize: '10px' }}
-                  title="Remove from notebook"
-                >
-                  🗑️
-                </button>
-              </div>
+      {/* DAW-Style Tabs Selector */}
+      <div style={{ display: 'flex', gap: '5px', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '1px' }}>
+        <button 
+          onClick={() => setActiveTab('library')}
+          style={{
+            background: activeTab === 'library' ? '#1c1c22' : 'transparent',
+            color: activeTab === 'library' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            border: '1px solid',
+            borderColor: activeTab === 'library' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'library' ? '2px solid #d08f60' : '1px solid transparent',
+            borderRadius: '2px 2px 0 0',
+            padding: '10px 20px',
+            fontWeight: 'bold',
+          }}
+        >
+          🗂️ LIBRARY
+        </button>
+        <button 
+          onClick={() => setActiveTab('practice')}
+          style={{
+            background: activeTab === 'practice' ? '#1c1c22' : 'transparent',
+            color: activeTab === 'practice' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            border: '1px solid',
+            borderColor: activeTab === 'practice' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'practice' ? '2px solid #d08f60' : '1px solid transparent',
+            borderRadius: '2px 2px 0 0',
+            padding: '10px 20px',
+            fontWeight: 'bold',
+          }}
+        >
+          🏋️ PRACTICE ROOM
+        </button>
+        <button 
+          onClick={() => setActiveTab('quicklog')}
+          style={{
+            background: activeTab === 'quicklog' ? '#1c1c22' : 'transparent',
+            color: activeTab === 'quicklog' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            border: '1px solid',
+            borderColor: activeTab === 'quicklog' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'quicklog' ? '2px solid #d08f60' : '1px solid transparent',
+            borderRadius: '2px 2px 0 0',
+            padding: '10px 20px',
+            fontWeight: 'bold',
+          }}
+        >
+          ✍️ QUICK LOG
+        </button>
+      </div>
 
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <p style={{ fontSize: '12px', lineHeight: '1.6', color: 'rgba(255, 255, 255, 0.85)', marginBottom: '15px' }}>
-                  {tech.description}
-                </p>
-                
-                {(tech.artist || tech.exampleTimestamp !== undefined) && (
-                  <div style={{ 
-                    backgroundColor: '#0c0c0e', 
-                    padding: '8px 12px', 
-                    borderRadius: '2px', 
-                    fontSize: '11px',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    color: 'rgba(255,255,255,0.65)',
-                    fontFamily: 'Roboto Mono',
-                    marginTop: 'auto'
-                  }}>
-                    {tech.artist && <span>📍 <strong>SOURCE:</strong> {tech.artist}</span>}
-                    {tech.exampleTimestamp !== undefined && (
-                      <span 
-                        onClick={() => {
-                          if (activeSong) {
-                            seekTo(tech.exampleTimestamp);
-                          }
-                        }}
-                        style={{ 
-                          marginLeft: '10px',
-                          cursor: activeSong ? 'pointer' : 'not-allowed',
-                          color: activeSong ? '#d08f60' : 'rgba(255,255,255,0.4)',
-                          textDecoration: activeSong ? 'underline' : 'none'
-                        }}
-                        title={activeSong ? "Click to seek in player" : "Load active song to seek"}
-                      >
-                        ⏱️ <strong>TIMESTAMP:</strong> {formatTimestamp(tech.exampleTimestamp)}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {tech.notes && (
-                  <div style={{ 
-                    marginTop: '12px', 
-                    borderLeft: '3px solid rgba(255,255,255,0.12)', 
-                    paddingLeft: '12px', 
-                    fontSize: '11px', 
-                    color: 'rgba(255,255,255,0.45)', 
-                    fontStyle: 'italic' 
-                  }}>
-                    {tech.notes}
-                  </div>
-                )}
-
-                {tech.tags?.length > 0 && (
-                  <div style={{ marginTop: '12px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                    {tech.tags.map(tag => (
-                      <span 
-                        key={tag} 
-                        style={{ 
-                          fontSize: '10px', 
-                          fontFamily: 'Roboto Mono',
-                          color: '#d08f60', 
-                          background: 'rgba(208, 143, 96, 0.1)', 
-                          padding: '1px 6px', 
-                          borderRadius: '1px',
-                          border: '1px solid rgba(208, 143, 96, 0.25)'
-                        }}
-                      >
-                        #{tag.toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+      {/* Tabs Content */}
+      {activeTab === 'library' && (
+        <>
+          {/* Filters & Search */}
+          <div className="panel" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', background: '#111114' }}>
+            <div style={{ flex: 2, minWidth: '300px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Search Query</label>
+              <input
+                type="text"
+                placeholder="Filter by name, description, artist, or tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+              />
             </div>
-          ))}
+
+            <div style={{ flex: 1, minWidth: '150px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Filter Lens</label>
+              <select
+                value={filterLens}
+                onChange={(e) => setFilterLens(e.target.value)}
+                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+              >
+                <option value="all">All Lenses</option>
+                <option value="rhythm">Rhythm</option>
+                <option value="texture">Texture</option>
+                <option value="harmony">Harmony</option>
+                <option value="arrangement">Arrangement</option>
+              </select>
+            </div>
+
+            <div style={{ flex: 1, minWidth: '150px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Sort Field</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+              >
+                <option value="createdAt">Date Added</option>
+                <option value="techniqueName">Technique Name</option>
+                <option value="lens">Musical Lens</option>
+                <option value="artist">Artist/Source</option>
+                <option value="confidence">Confidence Rating</option>
+              </select>
+            </div>
+          </div>
+
+          {loading && techniques.length === 0 ? (
+            <div className="loading">LOADING LIBRARY REGISTRIES...</div>
+          ) : techniques.length === 0 ? (
+            <EmptyState 
+              icon="📓"
+              title={searchTerm || filterLens !== 'all' ? "No matching techniques" : "Notebook is empty"}
+              description={searchTerm || filterLens !== 'all' ? "Try adjusting your filters or search terms." : "Start an audit on a song to discover and log techniques. Your notebook is where you collect the 'how' behind the music you study."}
+              ctaLabel={searchTerm || filterLens !== 'all' ? "Clear All Filters" : "Go to Library"}
+              onCtaClick={searchTerm || filterLens !== 'all' ? () => { setSearchTerm(''); setFilterLens('all'); } : null}
+              ctaLink={searchTerm || filterLens !== 'all' ? null : "/dashboard"}
+            />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '20px' }}>
+              {techniques.map((tech) => (
+                <TechniqueCard key={tech._id} tech={tech} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {activeTab === 'practice' && (
+        <div>
+          {/* Interactive Kanban Board */}
+          <div style={{
+            display: 'flex',
+            gap: '15px',
+            overflowX: 'auto',
+            paddingBottom: '15px',
+            alignItems: 'stretch',
+            minHeight: '65vh'
+          }}>
+            {lanes.map(lane => (
+              <div 
+                key={lane.id} 
+                style={{
+                  flex: '0 0 340px',
+                  background: '#0a0a0c',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '3px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '12px'
+                }}
+              >
+                {/* Lane Header */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '12px',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)',
+                  paddingBottom: '6px'
+                }}>
+                  <h4 style={{ margin: 0, fontSize: '11px', color: '#d08f60', letterSpacing: '0.05em' }}>
+                    {lane.title}
+                  </h4>
+                  <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}>
+                    {lane.items.length}
+                  </span>
+                </div>
+
+                {/* Cards Container */}
+                <div style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  overflowY: 'auto',
+                  maxHeight: 'calc(100vh - 350px)'
+                }}>
+                  {lane.items.length === 0 ? (
+                    <div style={{
+                      padding: '30px 10px',
+                      textAlign: 'center',
+                      fontSize: '11px',
+                      color: 'rgba(255,255,255,0.25)',
+                      fontStyle: 'italic',
+                      border: '1px dashed rgba(255,255,255,0.05)',
+                      borderRadius: '2px'
+                    }}>
+                      No action items logged
+                    </div>
+                  ) : (
+                    lane.items.map(tech => (
+                      <TechniqueCard key={tech._id} tech={tech} />
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
+      {activeTab === 'quicklog' && (
+        <form onSubmit={handleQuickLogSubmit} className="panel" style={{ background: '#151518', maxWidth: '650px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '6px', marginBottom: '15px' }}>
+            ✍️ QUICK LOG NEW DISCOVERY
+          </h2>
+
+          {formSuccess && <div className="success">{formSuccess}</div>}
+          {formError && <div className="error">{formError}</div>}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Technique Name *</label>
+              <input
+                type="text"
+                placeholder="e.g. Polyrhythmic Chord Comping"
+                value={newTechName}
+                onChange={(e) => setNewTechName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Musical Lens</label>
+              <select value={newLens} onChange={(e) => setNewLens(e.target.value)}>
+                <option value="rhythm">Rhythm (Orange)</option>
+                <option value="harmony">Harmony (Violet)</option>
+                <option value="texture">Texture (Teal)</option>
+                <option value="arrangement">Arrangement (Rose)</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Initial Next Action</label>
+              <select value={newNextAction} onChange={(e) => setNewNextAction(e.target.value)}>
+                <option value="">NO ACTION (BACKLOG)</option>
+                <option value="study">STUDY</option>
+                <option value="practice">PRACTICE</option>
+                <option value="transcribe">TRANSCRIBE</option>
+                <option value="apply">APPLY</option>
+                <option value="revisit">REVISIT</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Confidence Rating</label>
+              <div style={{ display: 'flex', gap: '5px', marginTop: '5px' }}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    onClick={() => setNewConfidence(i)}
+                    style={{
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      color: i <= newConfidence ? '#d08f60' : 'rgba(255,255,255,0.2)',
+                      userSelect: 'none'
+                    }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Associated Song (Optional)</label>
+              <select value={newSongId} onChange={(e) => setNewSongId(e.target.value)}>
+                <option value="">None (Standalone Entry)</option>
+                {songs.map(song => (
+                  <option key={song._id} value={song._id}>
+                    {song.title} ({song.artist})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Artist / Source (Optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. Herbie Hancock"
+                value={newArtist}
+                onChange={(e) => setNewArtist(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Example Timestamp (Optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. 1:45 or 105"
+                value={newTimestamp}
+                onChange={(e) => setNewTimestamp(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Description *</label>
+              <textarea
+                placeholder="Analyze the mechanics of the technique. What makes it unique?"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                style={{ minHeight: '80px' }}
+                required
+              />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Initial Practice Notes (Optional)</label>
+              <textarea
+                placeholder="Log your initial setup, keyboard settings, or exercise patterns..."
+                value={newNotes}
+                onChange={(e) => setNewNotes(e.target.value)}
+                style={{ minHeight: '60px' }}
+              />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Tags (Comma separated, optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. jazz, voicings, piano"
+                value={newTags}
+                onChange={(e) => setNewTags(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => {
+                setFormSuccess('');
+                setFormError('');
+                setNewTechName('');
+                setNewLens('rhythm');
+                setNewConfidence(3);
+                setNewNextAction('');
+                setNewArtist('');
+                setNewSongId('');
+                setNewTimestamp('');
+                setNewDescription('');
+                setNewNotes('');
+                setNewTags('');
+              }}
+            >
+              Reset Form
+            </button>
+            <button type="submit" style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold' }}>
+              Log to Notebook
+            </button>
+          </div>
+        </form>
+      )}
+
     </div>
   );
 };
 
 export default TechniqueNotebook;
+

@@ -32,6 +32,16 @@ export class HttpBackendAdapter extends IBackendService {
     return res.data;
   }
 
+  async getUserProfile() {
+    const res = await this.api.get('/auth/me');
+    return res.data;
+  }
+
+  async updatePreferences(preferences) {
+    const res = await this.api.put('/auth/preferences', preferences);
+    return res.data;
+  }
+
   // ── Songs ─────────────────────────────────────────────────────────────────
   async getSongs(filters = {}) {
     const res = await this.api.get('/songs', { params: filters });

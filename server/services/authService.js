@@ -26,7 +26,7 @@ export class AuthService {
 
     return {
       token,
-      user: { id: user._id, email: user.email, name: user.name },
+      user: { id: user._id, email: user.email, name: user.name, preferences: user.preferences },
     };
   }
 
@@ -52,11 +52,38 @@ export class AuthService {
 
     return {
       token,
-      user: { id: user._id, email: user.email, name: user.name },
+      user: { id: user._id, email: user.email, name: user.name, preferences: user.preferences },
     };
   }
 
   generateToken(userId) {
     return jwt.sign({ userId }, this.secret, { expiresIn: '7d' });
+  }
+
+  async getProfile(userId) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      displayName: user.displayName,
+      preferences: user.preferences || { defaultWorkflow: 'quick', preferredLenses: [] }
+    };
+  }
+
+  async updatePreferences(userId, preferences) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedPrefs = {
+      ...user.preferences,
+      ...preferences
+    };
+    const updatedUser = await this.userRepository.updateById(userId, { preferences: updatedPrefs });
+    return updatedUser.preferences;
   }
 }

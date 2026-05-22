@@ -8,6 +8,8 @@ export class IBackendService {
   // Auth
   async login(email, password) { throw new Error('Not implemented'); }
   async register(email, password, name) { throw new Error('Not implemented'); }
+  async getUserProfile() { throw new Error('Not implemented'); }
+  async updatePreferences(preferences) { throw new Error('Not implemented'); }
   
   // Songs
   async getSongs(filters) { throw new Error('Not implemented'); }
@@ -33,5 +35,6 @@ export class IBackendService {
   // Techniques
   async getTechniques(filters) { throw new Error('Not implemented'); }
   async addTechnique(techniqueData) { throw new Error('Not implemented'); }
+  async updateTechnique(id, updates) { throw new Error('Not implemented'); }
   async deleteTechnique(id) { throw new Error('Not implemented'); }
 }

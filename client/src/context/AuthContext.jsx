@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
+import { useBackend } from './BackendContext';
 
 export const AuthContext = createContext(null);
 
@@ -10,6 +11,8 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(false);
+  
+  const backend = useBackend();
 
   const login = useCallback((userData, authToken) => {
     setUser(userData);
@@ -25,6 +28,42 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
   }, []);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (token) {
+        try {
+          const profile = await backend.getUserProfile();
+          setUser(profile);
+          localStorage.setItem('user', JSON.stringify(profile));
+        } catch (err) {
+          console.error('Failed to load user profile on start:', err);
+          if (err.response?.status === 401) {
+            logout();
+          }
+        }
+      }
+    };
+    fetchProfile();
+  }, [token, backend, logout]);
+
+  const updateUserPreferences = useCallback(async (preferences) => {
+    try {
+      const updatedPrefs = await backend.updatePreferences(preferences);
+      setUser(prev => {
+        const updatedUser = {
+          ...prev,
+          preferences: updatedPrefs
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      });
+      return updatedPrefs;
+    } catch (err) {
+      console.error('Failed to update user preferences:', err);
+      throw err;
+    }
+  }, [backend]);
+
   const value = {
     user,
     token,
@@ -32,6 +71,7 @@ export const AuthProvider = ({ children }) => {
     setLoading,
     login,
     logout,
+    updateUserPreferences,
     isAuthenticated: !!user,
   };
 

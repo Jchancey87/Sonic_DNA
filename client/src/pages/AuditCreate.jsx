@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBackend } from '../context/BackendContext';
+import { useAuth } from '../context/AuthContext';
 
 const LENS_META = {
   rhythm:      { emoji: '🥁', label: 'Rhythm',      desc: 'Groove, pocket, and timing' },
@@ -13,15 +14,27 @@ const AuditCreate = () => {
   const { songId } = useParams();
   const navigate = useNavigate();
   const backend = useBackend();
+  const { user } = useAuth();
 
   const [song, setSong] = useState(null);
-  const [selectedLenses, setSelectedLenses] = useState([]);
-  const [workflowType, setWorkflowType] = useState('quick');
+  const [selectedLenses, setSelectedLenses] = useState(() => user?.preferences?.preferredLenses || []);
+  const [workflowType, setWorkflowType] = useState(() => user?.preferences?.defaultWorkflow || 'quick');
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => { loadSong(); }, [songId]);
+
+  useEffect(() => {
+    if (user?.preferences) {
+      if (user.preferences.preferredLenses) {
+        setSelectedLenses(user.preferences.preferredLenses);
+      }
+      if (user.preferences.defaultWorkflow) {
+        setWorkflowType(user.preferences.defaultWorkflow);
+      }
+    }
+  }, [user]);
 
   const loadSong = async () => {
     try {

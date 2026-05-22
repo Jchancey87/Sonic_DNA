@@ -73,6 +73,38 @@ This log tracks architectural decisions, workflows, key configurations, and lear
 
 ---
 
+### 2026-05-22: Five Critical Bug Fixes — Audit Review, YouTube, Techniques, Research, Audio
+
+#### 1. Audit Review Flow (Issue 1)
+- **Problem**: `AuditDetail` page existed at `/audit/:id` but was never linked from the Dashboard. Audits showed only as a count badge with no navigation path into a completed audit.
+- **Fix**: Rewrote `Dashboard.jsx`. Each song card now has a collapsible **AUDIT HISTORY** section listing every audit with lens badges, status, date, workflow type, and a **Review →** button linking directly to `AuditDetail`.
+
+#### 2. YouTube Embedding Unavailable (Issue 2)
+- **Problem**: `AudioContext.jsx` used `playerVars: { controls: 0 }`. YouTube blocks many videos in this mode to protect attribution. The `origin` param was also missing, which YouTube requires for trusted embedding.
+- **Learning**: `controls: 0` triggers YouTube's anti-embedding restrictions. Always use `controls: 1` for reliable embeds. YouTube error codes `101` and `150` specifically mean "embedding not permitted by video owner."
+- **Fix**: Changed to `controls: 1`, added `origin: window.location.origin`. Added `onError` handler — on error 101/150 renders a friendly fallback with "Open in YouTube →" link instead of a broken player. Custom tape deck scrubber/controls still work via the player API alongside native controls.
+
+#### 3. Techniques Not Persisted to Notebook (Issue 3 — Critical)
+- **Problem**: "Add to Notebook" in `AuditForm` only updated local React state. Techniques were embedded in `audit.techniques[]` at save time. `TechniqueNotebook` reads the separate `TechniqueEntry` collection via `GET /api/techniques` — these two data paths never connected. `backend.addTechnique()` existed but was never called during the audit flow.
+- **Learning**: Data living in two separate collection paths (`audit.techniques[]` vs. `TechniqueEntry`) requires explicit wiring on both sides. The service layer (`AuditService.logTechnique`, `TechniqueService.addTechnique`) was correct — the gap was purely at the frontend call site.
+- **Fix**: Made `addTechnique()` async. On each "Save to Notebook" click it immediately calls `backend.addTechnique({ auditId, songId, artist, ... })` → `POST /api/techniques` → `TechniqueEntry` collection. Techniques appear in the Notebook without waiting for audit completion. The returned server document (with `_id`) populates the in-form display list so delete buttons work immediately.
+
+#### 4. Research Intelligence Quality (Issue 4)
+- **Problem (Tavily)**: Ran 3 separate queries per import and stored only a 500-char `snippet` string from the first result. Full source content, titles, and URLs were discarded after each call.
+- **Problem (AI context)**: `audits.js` passed `researchSummary.summary` (the weak 500-char snippet) to `templateComposer.generateTemplate()`. Full source content was sitting in MongoDB inside `researchSummary.results[]` but was never pulled for the AI prompt.
+- **Problem (UI)**: Research was only visible in the collapsible Inspector sidebar — not on the audit form where users actually need it while answering questions.
+- **Fix**:
+  - `TavilyAdapter`: Single query, `max_results: 6`. Returns structured `{ title, url, content, score }` objects capped at 600 chars of content each. Builds a 1500-char combined summary from the top 3 sources by score.
+  - `audits.js` route: Reads `researchSummary.results[]` from MongoDB and concatenates up to 1500 chars of real source content for the AI prompt — replacing the weak pre-computed snippet.
+  - `AuditForm.jsx`: Added a collapsible **📡 RESEARCH INTELLIGENCE** panel showing all stored sources with titles, text previews, and "Open ↗" links, directly on the audit form.
+
+#### 5. No Audio / YouTube Sound (Issue 5)
+- **Problem**: YouTube monitor container had `pointerEvents: none`. Browser autoplay policy requires a direct user gesture on the media element (the iframe) itself — clicking Play/Pause buttons elsewhere in the DOM does not satisfy this requirement for cross-origin iframes.
+- **Learning**: `pointerEvents: none` on an iframe's parent completely blocks all user interaction with the embedded content, including the initial gesture needed to unlock browser audio context. Media iframes must always remain interactive.
+- **Fix**: Removed `pointerEvents: none` from the monitor container — the player is now fully clickable. Monitor repositioned above the tape deck (`bottom: 155px`). Enlarged to `240×160px`. Added an animated "▶ Press Play in the Tape Deck or click the video monitor" instruction to the guided "Listen" step.
+
+---
+
 ## Standard Workflows & Commands
 
 ### Running Backend Tests
@@ -90,3 +122,25 @@ Check status:
 - Local Client: `http://localhost:3050/`
 - Network Client: `http://<your-local-ip>:3050/`
 - API Proxy Target: `http://localhost:5050`
+
+---
+
+### 2026-05-22: Interactive Technique Notebook Overhaul
+
+#### 1. 3-Tab Control Center Layout
+- **Goal**: Overhaul the layout to make it a central, highly actionable study workspace.
+- **Implementation**:
+  - Tab 1: **Library** - Grid showing all discovered techniques with search, lens filters, sorting, and inline edit controls.
+  - Tab 2: **Practice Room** - 6 Kanban-style lanes grouping techniques by `nextAction` status (`Backlog`, `Study`, `Practice`, `Transcribe`, `Apply`, `Revisit`). Cards automatically transition between lanes when status changes.
+  - Tab 3: **Quick Log** - Manual logger form to log discoveries on-the-fly, supporting automatic artist extraction from selected library songs, custom tags, and MM:SS or raw second timestamps.
+
+#### 2. Fully Interactive Console Cards
+- **Confidence Rating**: Clickable rating stars (1-5) that trigger instant optimistic local updates and backend patches.
+- **Action Selection**: Select nextAction inline with immediate lane reorganization.
+- **Auto-Saving Practice Notes**: Inline textarea updates local state and saves to database on blur (`onBlur` event) for low latency.
+- **Database Status Badges**: Inline `● SAVING...` and `✔ SAVED` labels notify the user of background database sync status.
+- **Color Accent borders**: Thick left borders color-coded according to the musical lens (Rhythm = orange, Harmony = violet, Texture = teal, Arrangement = rose).
+
+#### 3. Load & Seek Audio Player Integration
+- **Interaction**: Clicking `LOAD & SEEK` on a card loads the song in the global tape deck player (fetching full details from backend if inactive) and seeks directly to the precise timestamp, starting playback immediately.
+

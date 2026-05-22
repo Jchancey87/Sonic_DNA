@@ -11,6 +11,7 @@ import AuditForm from './pages/AuditForm';
 import AuditDetail from './pages/AuditDetail';
 import TechniqueNotebook from './pages/TechniqueNotebook';
 import Trash from './pages/Trash';
+import Settings from './pages/Settings';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -206,7 +207,8 @@ const AppContent = () => {
                   { path: '/dashboard', label: '🎛️ LIBRARY' },
                   { path: '/import', label: '▲ IMPORT SONG' },
                   { path: '/techniques', label: '📖 NOTEBOOK' },
-                  { path: '/trash', label: '🗑️ ARCHIVES' }
+                  { path: '/trash', label: '🗑️ ARCHIVES' },
+                  { path: '/settings', label: '⚙️ SETTINGS' }
                 ].map(item => {
                   const active = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
                   return (
@@ -249,6 +251,7 @@ const AppContent = () => {
               <Route path="/audit/:id" element={<PrivateRoute><AuditDetail /></PrivateRoute>} />
               <Route path="/techniques" element={<PrivateRoute><TechniqueNotebook /></PrivateRoute>} />
               <Route path="/trash" element={<PrivateRoute><Trash /></PrivateRoute>} />
+              <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
             </Routes>
           </main>
 

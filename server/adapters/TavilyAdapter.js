@@ -3,18 +3,13 @@ import { ISearchService } from '../ports/ISearchService.js';
 
 /**
  * TavilyAdapter - Production implementation of ISearchService
- * 
- * Calls the real Tavily API to research songs and artists.
- * This adapter handles:
- * - API authentication
- * - Multiple search queries (fallback if one fails)
- * - Response parsing
- * - Summary extraction
- * - Error handling and graceful degradation
- * 
- * Usage:
- *   const adapter = new TavilyAdapter();
- *   const research = await adapter.searchSongInfo('Song Name', 'Artist Name');
+ *
+ * Changes (Issue 4):
+ * - Single focused search query instead of 3 separate calls.
+ * - max_results capped at 6 (as per product spec).
+ * - Returns rich source objects { title, url, content, score } for UI display.
+ * - Builds a richer summary from actual content (up to 1500 chars combined)
+ *   rather than just the first result's snippet.
  */
 
 export class TavilyAdapter extends ISearchService {
@@ -29,119 +24,83 @@ export class TavilyAdapter extends ISearchService {
       console.warn('[Tavily] ✗ No API key configured — skipping song research. Set TAVILY_API_KEY in .env');
       return this._noApiKeyResponse(title, artist);
     }
-    console.log(`[Tavily] Searching for: "${title}" by ${artist}`);
+
+    const query = `${title} ${artist} song production analysis technique`;
+    console.log(`[Tavily] Searching (max 6 results): "${query}"`);
 
     try {
-      // Try multiple search queries to gather comprehensive info
-      const queries = [
-        `${title} ${artist} song analysis production`,
-        `${artist} music style technique`,
-        `${title} by ${artist}`,
-      ];
-
-      let allResults = [];
-      let bestResults = [];
-
-      for (const query of queries) {
-        try {
-          const response = await axios.post(
-            this.apiUrl,
-            {
-              query: query,
-              max_results: 5,
-            },
-            {
-              timeout: 10000,
-              headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-
-          if (response.data.results) {
-            allResults = allResults.concat(response.data.results);
-            if (bestResults.length === 0) {
-              bestResults = response.data.results.slice(0, 3);
-            }
-          }
-        } catch (queryErr) {
-          console.warn(`Tavily search for "${query}" failed:`, queryErr.message);
-          // Continue to next query
+      const response = await axios.post(
+        this.apiUrl,
+        {
+          query,
+          max_results: 6,
+          include_raw_content: false,
+        },
+        {
+          timeout: 12000,
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
         }
-      }
+      );
 
-      const summary = this._parseResearchSummary(bestResults);
+      const rawResults = response.data.results || [];
+      console.log(`[Tavily] ✓ Got ${rawResults.length} results`);
+
+      // Build structured source objects for UI display and AI context
+      const sources = rawResults.slice(0, 6).map((r) => ({
+        title: r.title || 'Untitled',
+        url: r.url || '',
+        content: (r.content || r.snippet || '').substring(0, 600),
+        score: r.score || 0,
+      }));
+
+      const summary = this._buildRichSummary(sources, title, artist);
 
       return {
-        query: `${title} by ${artist}`,
-        results: bestResults,
-        summary: summary,
+        query,
+        results: sources,
+        summary,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Tavily search error:', error.message);
+      console.error('[Tavily] Search error:', error.message);
       return {
-        query: `${title} by ${artist}`,
+        query,
         results: [],
-        summary: `Error fetching research: ${error.message}`,
+        summary: `Research fetch failed: ${error.message}`,
         timestamp: new Date().toISOString(),
       };
     }
   }
 
   /**
-   * Response when API key is not configured
+   * Build a rich multi-source summary for the AI template prompt.
+   * Concatenates meaningful content from up to 3 top sources (up to 1500 chars).
    * @private
    */
+  _buildRichSummary(sources, title, artist) {
+    if (!sources || sources.length === 0) return 'No research results found.';
+
+    // Take up to 3 best-scored sources
+    const top = [...sources].sort((a, b) => b.score - a.score).slice(0, 3);
+
+    const parts = top
+      .filter((s) => s.content && s.content.length > 30)
+      .map((s) => `[${s.title}]: ${s.content}`);
+
+    const combined = parts.join('\n\n');
+    return combined.substring(0, 1500) || sources[0]?.content || 'No research content available.';
+  }
+
+  /** @private */
   _noApiKeyResponse(title, artist) {
     return {
       query: `${title} by ${artist}`,
       results: [],
-      summary: 'No research data available. Configure Tavily API key to enable song research.',
+      summary: 'No research data available. Configure TAVILY_API_KEY in .env to enable song research.',
       timestamp: new Date().toISOString(),
     };
-  }
-
-  /**
-   * Parse and summarize research results
-   * Extract relevant keywords and build summary from top results
-   * @private
-   */
-  _parseResearchSummary(results) {
-    if (!results || results.length === 0) {
-      return 'No research results found.';
-    }
-
-    // Extract key information from top results
-    const keywords = ['arrangement', 'harmony', 'production', 'rhythm', 'texture', 'technique', 'style', 'era'];
-    const mentions = {};
-
-    results.forEach((result) => {
-      const content = (result.content || result.snippet || '').toLowerCase();
-      keywords.forEach((keyword) => {
-        if (content.includes(keyword)) {
-          mentions[keyword] = (mentions[keyword] || 0) + 1;
-        }
-      });
-    });
-
-    // Build summary from top results
-    const topMentions = Object.entries(mentions)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-      .map(([key]) => key);
-
-    let summary = '';
-    if (results[0]) {
-      summary = results[0].snippet || results[0].content || '';
-    }
-
-    if (topMentions.length > 0) {
-      summary += ` [Key topics: ${topMentions.join(', ')}]`;
-    }
-
-    // Truncate to reasonable length
-    return summary.substring(0, 500);
   }
 }

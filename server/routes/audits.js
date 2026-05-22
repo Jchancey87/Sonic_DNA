@@ -43,8 +43,18 @@ export default function createAuditRoutes(auditService, templateComposer) {
           song = await auditService.songRepository?.findOne({ _id: songId, userId, deletedAt: null });
         } catch (_) {}
 
-        const researchSummary = song?.researchSummary?.summary || '';
-        console.log(`[Audit Create] Song: "${song?.title}" | Research available: ${researchSummary ? 'YES' : 'NO (empty)'}`);
+        // Issue 4: build richer context from full source content, not just the pre-computed snippet
+        const researchData = song?.researchSummary;
+        const researchSources = researchData?.results || [];
+        // Combine content from up to 3 sources (up to 1500 chars) for the AI prompt
+        const richContext = researchSources.length > 0
+          ? researchSources
+              .slice(0, 3)
+              .map((s) => `[${s.title || 'Source'}]: ${s.content || ''}`)
+              .join('\n\n')
+              .substring(0, 1500)
+          : (researchData?.summary || '');
+        console.log(`[Audit Create] Song: "${song?.title}" | Research sources: ${researchSources.length} | Context chars: ${richContext.length}`);
 
         try {
           console.log('[Audit Create] Calling AI to generate template...');
@@ -52,7 +62,7 @@ export default function createAuditRoutes(auditService, templateComposer) {
             song?.title || 'Unknown',
             song?.artistName || song?.artist || 'Unknown',
             resolvedLenses,
-            researchSummary
+            richContext
           );
           templateVersion = 'ai-v1';
           modelUsed = process.env.OPENAI_MODEL || 'gpt-4-turbo';
