@@ -144,3 +144,35 @@ Check status:
 #### 3. Load & Seek Audio Player Integration
 - **Interaction**: Clicking `LOAD & SEEK` on a card loads the song in the global tape deck player (fetching full details from backend if inactive) and seeks directly to the precise timestamp, starting playback immediately.
 
+---
+
+### 2026-05-24: UI/UX Refinements, Branding Alignment, Dynamic Footer Sync, and Profile Mutations
+
+#### 1. Branding & Case Cleanup
+- **Banner Sync**: Aligned login page branding with top bar title to read `SONIC DNA // AUDIT SYSTEM` (previously `ACCESS PORT`).
+- **Forced ALL CAPS Overhaul**: Removed `text-transform: uppercase;` on headings, card titles, buttons, and form labels in `global.js` styles. Converted all in-page elements, placeholders, buttons, and labels to natural Title/Sentence Case.
+- **Active Sidebar Highlights**: Configured App.jsx navigation highlighting to retain active highlight on the Library menu item when visiting any subpath of `/audit/...`. Styled with a hard-edged left border (`borderLeft: '3px solid #d08f60'`) and removed emojis.
+
+#### 2. Dynamic Audio Footer & YouTube Sync
+- **Responsive Workspace**: Hidden the tape deck footer completely when no active song is loaded. Center workspace height dynamically adapts.
+- **YouTube Coordinate Shift**: Synced minimized (30px) and expanded (140px) states of the tape deck via global `AudioContext` to automatically shift the floating YouTube monitor bottom alignment (`155px` vs `45px`), ensuring it stays locked above the panel.
+- **Guidance Tooltips**: Added disabled hover tooltips to deck bookmark inputs explaining that a song audit must be active.
+
+#### 3. Simulated Signal Extraction (Import)
+- **Live Progress Sequence**: Replaced static loading state in `ImportSong.jsx` with an interactive simulated progress tracker that updates through five steps step-by-step (`✓`, `●`) during the backend import.
+
+#### 4. Practice Room Compact Cards
+- **Clutter Reduction**: Added `compact={true}` prop support on `TechniqueCard` components inside the Kanban lanes to hide tag lists and notes text areas.
+- **Workflow Header**: Added a descriptive instructions banner explaining actions and categories at the top.
+
+#### 5. Collapsible Archives & Bulk Purge
+- **Collapsible Accordions**: Replaced the tab layout in `Trash.jsx` with two collapsible sections ("Deleted Songs" and "Deleted Audits"), defaulting to open.
+- **Bulk Empty Action**: Added an "Empty Trash" button to execute simultaneous bulk song and audit purge requests from the database.
+- **Fallback Formats**: Configured song duration strings to fall back to `"--:--"` if values are invalid or zero.
+
+#### 6. Settings, Profile Mutations, & Backend Sync
+- **Profile Updates**: Replaced static user name with an editable text input syncing to `/api/auth/profile`.
+- **Modals & Filter Search**: Added Change Password and Delete Account modals in Settings, along with a timezone filter search input.
+- **Backend Endpoints**: Added PUT `/me/profile`, PUT `/me/change-password`, DELETE `/me/delete-account`, DELETE `/songs/trash/purge-all`, and DELETE `/audits/trash/purge-all` routes. Integrated document-saving middleware on Mongoose to trigger password hashing during password edits.
+
+

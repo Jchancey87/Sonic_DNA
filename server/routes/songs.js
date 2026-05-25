@@ -146,6 +146,20 @@ export default function createSongRoutes(songService, auditRepository, technique
     }
   });
 
+  // ── Purge all soft-deleted songs (cascade) ────────────────────────────────
+  router.delete('/trash/purge-all', async (req, res) => {
+    try {
+      const deletedSongs = await songService.getDeletedSongs(req.userId);
+      for (const song of deletedSongs) {
+        await songService.purgeSong(song._id, req.userId, auditRepository, techniqueRepository);
+      }
+      res.json({ success: true, count: deletedSongs.length });
+    } catch (error) {
+      console.error('Purge all songs error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // ── Get song by ID ────────────────────────────────────────────────────────
   router.get('/:id', async (req, res) => {
     try {

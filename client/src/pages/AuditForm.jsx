@@ -50,10 +50,10 @@ function formatTime(seconds) {
 }
 
 const SAVE_LABEL = {
-  saved:  '✓ SYNCHRONIZED',
-  saving: 'SAVING SIGNAL...',
-  dirty:  '● DIRTY BUFFERS',
-  error:  '✗ TRANSMISSION ERROR',
+  saved:  '✓ Synchronized',
+  saving: 'Saving signal...',
+  dirty:  '● Dirty buffers',
+  error:  '✗ Transmission error',
 };
 const SAVE_COLOR = {
   saved:  '#4ade80',
@@ -204,9 +204,9 @@ const AuditForm = () => {
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
-  if (loading) return <div className="loading">LOADING AUDIT WORKSPACE...</div>;
+  if (loading) return <div className="loading">Loading audit workspace...</div>;
   if (error && !audit) return <div className="error">{error}</div>;
-  if (!audit) return <div className="loading">LOADING AUDIT WORKSPACE...</div>;
+  if (!audit) return <div className="loading">Loading audit workspace...</div>;
 
   const template = audit.templateQuestions;
   const lenses = template?.lenses ? Object.keys(template.lenses) : audit.lensSelection || [];
@@ -551,7 +551,7 @@ const AuditForm = () => {
               {techniques.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                   <h3 style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono', marginBottom: '10px' }}>
-                    LOGGED IN THIS SESSION ({techniques.length})
+                    Logged in this session ({techniques.length})
                   </h3>
                   <div style={{ display: 'grid', gap: '10px' }}>
                     {techniques.map((tech) => (
@@ -626,7 +626,7 @@ const AuditForm = () => {
             ))}
             {globalBookmarks.length === 0 && (
               <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '11px', fontFamily: 'Roboto Mono' }}>
-                NO BOOKMARKS LOGGED IN THIS SESSION.
+                No bookmarks logged in this session.
               </span>
             )}
           </div>

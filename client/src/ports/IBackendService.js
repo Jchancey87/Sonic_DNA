@@ -10,6 +10,9 @@ export class IBackendService {
   async register(email, password, name) { throw new Error('Not implemented'); }
   async getUserProfile() { throw new Error('Not implemented'); }
   async updatePreferences(preferences) { throw new Error('Not implemented'); }
+  async updateProfile(profileData) { throw new Error('Not implemented'); }
+  async changePassword(oldPassword, newPassword) { throw new Error('Not implemented'); }
+  async deleteAccount() { throw new Error('Not implemented'); }
   
   // Songs
   async getSongs(filters) { throw new Error('Not implemented'); }
@@ -19,6 +22,7 @@ export class IBackendService {
   async getDeletedSongs() { throw new Error('Not implemented'); }
   async restoreSong(id) { throw new Error('Not implemented'); }
   async purgeSong(id) { throw new Error('Not implemented'); }
+  async purgeAllSongs() { throw new Error('Not implemented'); }
   
   // Audits
   async getAudits() { throw new Error('Not implemented'); }
@@ -31,6 +35,7 @@ export class IBackendService {
   async getDeletedAudits() { throw new Error('Not implemented'); }
   async restoreAudit(id) { throw new Error('Not implemented'); }
   async purgeAudit(id) { throw new Error('Not implemented'); }
+  async purgeAllAudits() { throw new Error('Not implemented'); }
   
   // Techniques
   async getTechniques(filters) { throw new Error('Not implemented'); }

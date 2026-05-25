@@ -38,6 +38,8 @@ const AppContent = () => {
     isMuted,
     showVideo,
     setShowVideo,
+    bottomOpen,
+    setBottomOpen,
     play,
     pause,
     seekTo,
@@ -51,7 +53,6 @@ const AppContent = () => {
   // Layout Panel States
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(false);
-  const [bottomOpen, setBottomOpen] = useState(true);
   
   // Local state for bookmark notes inside bottom panel
   const [deckBookmarkNote, setDeckBookmarkNote] = useState('');
@@ -170,9 +171,9 @@ const AppContent = () => {
                   color: rightOpen ? '#0c0c0e' : '#d08f60',
                   borderColor: 'rgba(208, 143, 96, 0.3)' 
                 }}
-                title="Toggle Inspector"
+                title="Toggle active track metadata & bookmarks inspector"
               >
-                INSPECT
+                Inspect Song
               </button>
             )}
           </div>
@@ -183,7 +184,7 @@ const AppContent = () => {
           display: 'flex', 
           flex: 1, 
           overflow: 'hidden',
-          height: `calc(100vh - 48px - ${bottomOpen ? '140px' : '30px'})`
+          height: `calc(100vh - 48px - ${activeSong ? (bottomOpen ? '140px' : '30px') : '0px'})`
         }}>
           
           {/* Left Sidebar (Navigation) */}
@@ -198,19 +199,20 @@ const AppContent = () => {
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ fontFamily: 'Roboto Mono', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '5px' }}>
+              <div style={{ padding: '15px 15px 15px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ fontFamily: 'Roboto Mono', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '5px', paddingLeft: '15px' }}>
                   NAVIGATOR
                 </div>
                 
                 {[
-                  { path: '/dashboard', label: '🎛️ LIBRARY' },
-                  { path: '/import', label: '▲ IMPORT SONG' },
-                  { path: '/techniques', label: '📖 NOTEBOOK' },
-                  { path: '/trash', label: '🗑️ ARCHIVES' },
-                  { path: '/settings', label: '⚙️ SETTINGS' }
+                  { path: '/dashboard', label: 'Library' },
+                  { path: '/import', label: 'Import Song' },
+                  { path: '/techniques', label: 'Notebook' },
+                  { path: '/trash', label: 'Archives' },
+                  { path: '/settings', label: 'Settings' }
                 ].map(item => {
-                  const active = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
+                  const active = location.pathname === item.path || 
+                                 (item.path === '/dashboard' && (location.pathname === '/' || location.pathname.startsWith('/audit')));
                   return (
                     <Link 
                       key={item.path} 
@@ -219,10 +221,11 @@ const AppContent = () => {
                         fontFamily: 'Roboto Mono',
                         fontSize: '11px',
                         padding: '10px 12px',
-                        background: active ? 'rgba(208, 143, 96, 0.1)' : 'transparent',
+                        paddingLeft: active ? '12px' : '15px',
+                        background: active ? 'rgba(208, 143, 96, 0.08)' : 'transparent',
                         color: active ? '#d08f60' : 'rgba(255, 255, 255, 0.75)',
-                        border: active ? '1px solid rgba(208, 143, 96, 0.25)' : '1px solid transparent',
-                        borderRadius: '2px',
+                        borderLeft: active ? '3px solid #d08f60' : '3px solid transparent',
+                        borderRadius: '0 2px 2px 0',
                         display: 'block'
                       }}
                     >
@@ -358,7 +361,7 @@ const AppContent = () => {
         </div>
 
         {/* Bottom Tape Deck (Transport & Scrubber) */}
-        {isAuthenticated && (
+        {isAuthenticated && activeSong && (
           <footer style={{
             height: bottomOpen ? '140px' : '30px',
             background: '#141418',
@@ -387,7 +390,7 @@ const AppContent = () => {
                 userSelect: 'none'
               }}
             >
-              <span>TAPE DECK DECK // TRANSPORT PANEL</span>
+              <span>Tape Deck // Transport Panel</span>
               <span>{bottomOpen ? 'Minimize ▼' : 'Expand ▲'}</span>
             </div>
 
@@ -469,7 +472,7 @@ const AppContent = () => {
                 {/* Quick volume & visual monitor toggles */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>VOL</span>
+                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>Vol</span>
                     <input 
                       type="range"
                       min="0"
@@ -494,17 +497,20 @@ const AppContent = () => {
                 </div>
 
                 {/* Bookmark Creator */}
-                <div style={{ 
-                  borderLeft: '1px solid rgba(255,255,255,0.08)',
-                  paddingLeft: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
+                <div 
+                  style={{ 
+                    borderLeft: '1px solid rgba(255,255,255,0.08)',
+                    paddingLeft: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  title={!activeAudit ? "To save bookmarks, you must open or start a song audit." : ""}
+                >
                   <form onSubmit={handleDeckBookmarkSubmit} style={{ display: 'flex', gap: '8px' }}>
                     <input
                       type="text"
-                      placeholder={activeAudit ? "Quick bookmark note..." : "Load an active audit to bookmark"}
+                      placeholder={activeAudit ? "Quick bookmark note..." : "Open an audit to bookmark"}
                       value={deckBookmarkNote}
                       onChange={(e) => setDeckBookmarkNote(e.target.value)}
                       disabled={!activeAudit}

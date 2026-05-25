@@ -71,7 +71,7 @@ const Dashboard = () => {
       ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : '';
 
-  if (loading) return <div className="loading">LOADING LIBRARY MATRIX...</div>;
+  if (loading) return <div className="loading">Loading Library Crate...</div>;
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -94,13 +94,12 @@ const Dashboard = () => {
         <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
           <input
             type="text"
-            placeholder="FILTER CHANNELS BY TITLE, ARTIST, OR RESEARCH TEXT..."
+            placeholder="Filter channels by title, artist, or research text..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               background: '#0c0c0e',
               borderColor: 'rgba(255,255,255,0.08)',
-              textTransform: 'uppercase',
             }}
           />
         </div>
@@ -109,7 +108,7 @@ const Dashboard = () => {
       {songs.length === 0 ? (
         <EmptyState
           icon="🎧"
-          title={search ? 'NO CHANNELS FOUND MATCHING SEARCH' : 'LIBRARY CRATE EMPTY'}
+          title={search ? 'No Channels Found Matching Search' : 'Library Crate Empty'}
           description={
             search
               ? 'Refine filter queries or reset search parameters.'
@@ -145,6 +144,7 @@ const Dashboard = () => {
                     <img
                       src={song.thumbnailUrl || song.thumbnail}
                       alt={song.title}
+                      className="song-card-thumbnail"
                       style={{
                         width: '100%',
                         height: '100%',
@@ -168,7 +168,7 @@ const Dashboard = () => {
                           borderRadius: '1px',
                         }}
                       >
-                        ACTIVE FEED
+                        Active Feed
                       </div>
                     )}
                   </div>
@@ -188,8 +188,8 @@ const Dashboard = () => {
 
                   {/* Badges */}
                   <div style={{ marginBottom: 'auto', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    <span className="badge primary">{songAuditList.length} AUDITS</span>
-                    {song.researchStatus === 'success' && <span className="badge">RESEARCHED</span>}
+                    <span className="badge primary">{songAuditList.length} {songAuditList.length === 1 ? 'Audit' : 'Audits'}</span>
+                    {song.researchStatus === 'success' && <span className="badge success">Researched</span>}
                   </div>
 
                   {/* Action row */}
@@ -204,10 +204,10 @@ const Dashboard = () => {
                         fontWeight: isActive ? 'bold' : 'normal',
                       }}
                     >
-                      {isActive ? '■ ACTIVE' : '▲ LOAD'}
+                      {isActive ? '■ Active' : '▲ Load'}
                     </button>
                     <Link to={`/audit/create/${song._id}`} style={{ flex: 1.2 }}>
-                      <button style={{ width: '100%', fontSize: '10px' }}>AUDIT</button>
+                      <button style={{ width: '100%', fontSize: '10px' }}>Audit</button>
                     </Link>
                     <button
                       className="danger"
@@ -239,7 +239,7 @@ const Dashboard = () => {
                           borderRadius: '2px',
                         }}
                       >
-                        <span>AUDIT HISTORY ({songAuditList.length})</span>
+                        <span>Audit History ({songAuditList.length})</span>
                         <span>{isExpanded ? '▲' : '▼'}</span>
                       </button>
 

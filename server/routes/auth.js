@@ -51,6 +51,40 @@ export default function createAuthRoutes(authService) {
     }
   });
 
+  // Update profile info (name)
+  router.put('/profile', authMiddleware, async (req, res) => {
+    try {
+      const result = await authService.updateProfile(req.userId, req.body);
+      res.json(result);
+    } catch (err) {
+      console.error('Update profile error:', err);
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // Change password
+  router.put('/change-password', authMiddleware, async (req, res) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      const result = await authService.changePassword(req.userId, oldPassword, newPassword);
+      res.json({ success: result });
+    } catch (err) {
+      console.error('Change password error:', err);
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // Delete account
+  router.delete('/delete-account', authMiddleware, async (req, res) => {
+    try {
+      const result = await authService.deleteAccount(req.userId);
+      res.json({ success: result });
+    } catch (err) {
+      console.error('Delete account error:', err);
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   return router;
 }
 

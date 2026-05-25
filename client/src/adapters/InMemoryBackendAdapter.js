@@ -50,6 +50,27 @@ export class InMemoryBackendAdapter extends IBackendService {
     return this.currentUser.preferences;
   }
 
+  async updateProfile(profileData) {
+    if (!this.currentUser) throw new Error('Not authenticated');
+    this.currentUser = {
+      ...this.currentUser,
+      ...profileData,
+      displayName: profileData.name || this.currentUser.displayName,
+      name: profileData.name || this.currentUser.name
+    };
+    return this.currentUser;
+  }
+
+  async changePassword(oldPassword, newPassword) {
+    if (!this.currentUser) throw new Error('Not authenticated');
+    return { success: true };
+  }
+
+  async deleteAccount() {
+    this.currentUser = null;
+    return { success: true };
+  }
+
   // ── Songs ─────────────────────────────────────────────────────────────────
   async getSongs(filters = {}) {
     return this.songs.filter((s) => !s.deletedAt);
@@ -314,6 +335,14 @@ export class InMemoryBackendAdapter extends IBackendService {
     return true;
   }
 
+  async purgeAllSongs() {
+    const deleted = this.songs.filter((s) => s.deletedAt).map((s) => s._id);
+    for (const id of deleted) {
+      await this.purgeSong(id);
+    }
+    return { success: true, count: deleted.length };
+  }
+
   async getDeletedAudits() {
     // Return deleted audits whose parent song is active
     const deleted = this.audits.filter((a) => {
@@ -348,5 +377,13 @@ export class InMemoryBackendAdapter extends IBackendService {
     this.audits = this.audits.filter((a) => a._id !== id);
     this.techniques = this.techniques.filter((t) => t.auditId !== id);
     return true;
+  }
+
+  async purgeAllAudits() {
+    const deleted = this.audits.filter((a) => a.deletedAt).map((a) => a._id);
+    for (const id of deleted) {
+      await this.purgeAudit(id);
+    }
+    return { success: true, count: deleted.length };
   }
 }

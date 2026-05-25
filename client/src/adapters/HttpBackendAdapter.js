@@ -42,6 +42,21 @@ export class HttpBackendAdapter extends IBackendService {
     return res.data;
   }
 
+  async updateProfile(profileData) {
+    const res = await this.api.put('/auth/profile', profileData);
+    return res.data;
+  }
+
+  async changePassword(oldPassword, newPassword) {
+    const res = await this.api.put('/auth/change-password', { oldPassword, newPassword });
+    return res.data;
+  }
+
+  async deleteAccount() {
+    const res = await this.api.delete('/auth/delete-account');
+    return res.data;
+  }
+
   // ── Songs ─────────────────────────────────────────────────────────────────
   async getSongs(filters = {}) {
     const res = await this.api.get('/songs', { params: filters });
@@ -80,6 +95,11 @@ export class HttpBackendAdapter extends IBackendService {
 
   async purgeSong(id) {
     const res = await this.api.delete(`/songs/${id}/purge`);
+    return res.data;
+  }
+
+  async purgeAllSongs() {
+    const res = await this.api.delete('/songs/trash/purge-all');
     return res.data;
   }
 
@@ -135,6 +155,11 @@ export class HttpBackendAdapter extends IBackendService {
 
   async purgeAudit(id) {
     const res = await this.api.delete(`/audits/${id}/purge`);
+    return res.data;
+  }
+
+  async purgeAllAudits() {
+    const res = await this.api.delete('/audits/trash/purge-all');
     return res.data;
   }
 

@@ -40,7 +40,6 @@ const styles = `
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     letter-spacing: -0.02em;
-    text-transform: uppercase;
   }
 
   h1 { font-size: 1.5rem; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; }
@@ -82,13 +81,20 @@ const styles = `
     border-color: rgba(208, 143, 96, 0.2);
   }
 
+  .song-card-thumbnail {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  }
+  .panel:hover .song-card-thumbnail {
+    transform: scale(1.04);
+    opacity: 0.85 !important;
+  }
+
   .card-title {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.85);
     margin-bottom: 8px;
-    text-transform: uppercase;
   }
 
   .card-subtitle {
@@ -102,7 +108,6 @@ const styles = `
   button {
     font-family: 'Roboto Mono', monospace;
     font-size: 11px;
-    text-transform: uppercase;
     font-weight: 500;
     background: #1c1c22;
     color: #d08f60;
@@ -163,7 +168,6 @@ const styles = `
     font-size: 11px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.5);
-    text-transform: uppercase;
   }
 
   input, textarea, select {

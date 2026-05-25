@@ -39,7 +39,7 @@ const Login = () => {
     <div style={{ maxWidth: '400px', margin: '0 auto', padding: '40px 20px' }}>
       <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#d08f60', fontSize: '16px', letterSpacing: '0.05em' }}>
-          🎵 SONIC DNA // ACCESS PORT
+          🎵 SONIC DNA // AUDIT SYSTEM
         </h1>
 
         {error && <div className="error">{error}</div>}
@@ -53,7 +53,7 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required={!isLogin}
-                placeholder="YOUR NAME"
+                placeholder="Your name"
                 style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
               />
             </div>
@@ -66,7 +66,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="YOUR@EMAIL.COM"
+              placeholder="your@email.com"
               style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
             />
           </div>
@@ -84,14 +84,14 @@ const Login = () => {
           </div>
 
           <button type="submit" disabled={loading} style={{ width: '100%', marginTop: '10px' }}>
-            {loading ? 'AUTHENTICATING...' : isLogin ? 'SIGN IN' : 'REGISTER'}
+            {loading ? 'Authenticating...' : isLogin ? 'Sign In' : 'Register'}
           </button>
         </form>
 
         <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '11px', fontFamily: 'Roboto Mono', color: 'rgba(255, 255, 255, 0.45)' }}>
           {isLogin ? (
             <>
-              NO ACCOUNT ASSIGNED?{' '}
+              Don't have an account?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -109,12 +109,12 @@ const Login = () => {
                   fontFamily: 'Roboto Mono'
                 }}
               >
-                REGISTER
+                Register
               </button>
             </>
           ) : (
             <>
-              EXISTING SYSTEM ACCOUNT?{' '}
+              Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -132,7 +132,7 @@ const Login = () => {
                   fontFamily: 'Roboto Mono'
                 }}
               >
-                SIGN IN
+                Sign In
               </button>
             </>
           )}

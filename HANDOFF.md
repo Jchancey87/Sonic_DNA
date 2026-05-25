@@ -1,7 +1,7 @@
-# Hand-off Document: Sonic DNA — Bug Fixes & Feature Hardening
+# Hand-off Document: Sonic DNA — UI/UX Hardening & Profile Updates
 
-## Project Status: **Core Workflow Fully Functional** ✅
-**Current State**: All five core workflow issues have been resolved. The app can now complete a full audit cycle end-to-end: import → load → audit → log techniques → review. Infrastructure remains connected to the remote Proxmox MongoDB instance.
+## Project Status: **System Hardening & Profile Mutations Completed** ✅
+**Current State**: All core workflow issues, UI/UX critiques, and user profile operations have been successfully implemented and verified. The application supports end-to-end Title Case typography, sidebar highlights for subpaths, a collapsible and responsive global audio footer, simulated signal extraction visual feedback, collapsible trash, bulk empty trash features, and complete user security mutations (profile name editing, password changes, and account deletion).
 
 ---
 
@@ -16,39 +16,35 @@ The system uses **Hexagonal Architecture (Ports & Adapters)** to isolate busines
 
 ---
 
-## 💎 Key Features Delivered (This Session)
+## 💎 Key Features Delivered
 
-### 1. **Interactive Technique Notebook Overhaul**
-- **3-Tab Control Center**: Overhauled the page into a central dashboard with three tabs: **🗂️ Library** (grid with search/sorting/lenses), **🏋️ Practice Room** (Kanban board with 6 columns grouped by `nextAction`), and **✍️ Quick Log** (manual standalone technique logger).
-- **Interactive Console Cards**: Styled with musical lens color-coded borders. Built clickable 1-5 confidence stars, inline nextAction lane mapping, and auto-saving practice logs (updating the database on blur event). Exposes live sync status badges (`● SAVING...` and `✔ SAVED`).
-- **Load & Seek Integration**: Clicking `LOAD & SEEK` loads the reference song in the persistent audio player (fetching metadata from backend if inactive) and seeks directly to the technique timestamp.
+### 1. **UI/UX & Typography Overhaul**
+- **ALL CAPS Overload Removed**: Eliminated forced uppercase rules in `global.js` for headings, card titles, buttons, and labels. Converted components to clean Title/Sentence Case.
+- **Micro-interactions**: Added smooth hover scaling on song cards (`.song-card-thumbnail`) to provide premium depth.
+- **Sidebar Highlighting**: The Navigator sidebar now highlights active page states (including subpaths of `/audit/...` for the Library tab) with a prominent left accent border (`borderLeft: '3px solid #d08f60'`). Removed emojis from navigation labels.
 
-### 2. **User Preferences & Settings Panel**
-- **Settings Page**: Added `/settings` page where users configure default timezone, default workflow type (Quick vs Guided), and default lenses.
-- **Audit Auto-Population**: When initiating a new audit, settings are retrieved and pre-populate configuration fields dynamically.
+### 2. **Dynamic Audio Transport Footer**
+- **Conditional Visibility**: The tape deck footer is hidden completely when no active track is loaded.
+- **Floating Monitor Coordinates Sync**: The tape deck's minimize/expand states are stored in the global `AudioContext` to automatically shift the floating YouTube monitor bottom alignment, maintaining layout consistency.
+- **Tooltip Explanations**: Added guidance tooltips to bookmark creators indicating that a song audit must be active.
 
-### 3. **Audit Review Navigation**
-- Dashboard now shows per-song **AUDIT HISTORY** toggle. Each audit is listed with lens badges, status, date, and a **Review →** link to the full `AuditDetail` page.
-- Route: `GET /audit/:id` → `AuditDetail.jsx`
+### 3. **Simulated Signal Extraction Sequence**
+- **Live Progress Steps**: During song imports, a simulated live progress tracker steps through metadata extraction, production research, and GPT template synthesis dynamically.
 
-### 4. **YouTube Embedding Fixed**
-- Changed `controls: 0 → 1` in YouTube player config. Added `origin` param for trusted embedding.
-- Added `onError` handler: when a video blocks embedding (error codes 101/150), a fallback renders with a direct "Open in YouTube →" link.
-- Custom tape deck scrubber and Play/Pause controls still work via the YouTube iframe API alongside native controls.
+### 4. **Practice Room Kanban Board Updates**
+- **Compact Technique Cards**: Passes `compact={true}` to `TechniqueCard` in Kanban lanes to hide notes textareas and tag lists.
+- **Guide Banner**: Added an instructions header explaining actions and categories at the top.
 
-### 5. **Technique Notebook — Data Pipeline Fixed (Critical)**
-- **Root cause**: `addTechnique()` in `AuditForm` only updated local React state. Techniques were embedded on `audit.techniques[]` (a subdoc array), but `TechniqueNotebook` queries the separate `TechniqueEntry` collection. These paths never connected.
-- **Fix**: Each "Save to Notebook" click now immediately calls `POST /api/techniques` → `TechniqueService.addTechnique()` → `TechniqueEntry` collection. Techniques appear in the Notebook instantly without waiting for audit save/completion.
+### 5. **Collapsible Archives & Bulk Purge**
+- **Collapsible Accordions**: Replaced the tab layout in `Trash.jsx` with collapsible "Deleted Songs" and "Deleted Audits" accordions.
+- **Empty Trash Trigger**: Added a bulk-delete action to purge all archived songs, audits, and technique notes in a single step.
+- **Duration Fallback**: Formats invalid or zero durations as `"--:--"`.
+- **Dark Theme modal**: Styled confirmation modals to match the dark aesthetic.
 
-### 6. **Research Intelligence Overhaul**
-- **Tavily**: Now runs a single focused search with `max_results: 6`. Stores structured source objects `{ title, url, content, score }` in `researchSummary.results[]`.
-- **AI Template**: The `audits.js` creation route now reads `researchSummary.results[]` from MongoDB and passes up to 1500 chars of real source content to the AI template composer.
-- **UI**: Collapsible **📡 RESEARCH INTELLIGENCE** panel in `AuditForm` shows all sources with titles, previews, and "Open ↗" links.
-
-### 7. **Audio Playback Restored**
-- Removed `pointerEvents: none` from the YouTube monitor container. The video player is now fully interactive, satisfying browser autoplay gesture policies.
-- Monitor enlarged to `240×160px`, repositioned above the tape deck (`bottom: 155px`).
-- Guided "Listen" step now shows an animated "▶ Press Play" instruction.
+### 6. **Profile Mutations & Settings**
+- **Editable display name**: Replaced static name label with an editable input field.
+- **Security Actions**: Implemented Change Password and Delete Account modals in Settings.
+- **Timezone search**: Enabled instant timezone filtering via a query text field.
 
 ---
 
@@ -70,10 +66,9 @@ npm --prefix server test
 ---
 
 ## 📋 Next Steps
-1. **Delete Confirmation UX**: "Impact Preview" (e.g., "Deleting this song will archive 3 audits") in delete modals — backend `getDeletePreview()` already exists.
-2. **Custom Research Sources**: Allow users to manually add source URLs to a song's research data from `AuditDetail`. Backend endpoint stub needed.
-3. **Mobile Optimization**: Refine the AudioPlayer tape deck and 5-step Guided Workflow for tablet/mobile viewports.
-4. **Audit Search/Filter**: Dashboard currently filters songs; adding audit-level search (by lens, date, status) would help as the library grows.
+1. **Custom Research Sources**: Allow users to manually add source URLs to a song's research data from `AuditDetail`. Backend endpoint stub needed.
+2. **Mobile Optimization**: Refine the AudioPlayer tape deck and 5-step Guided Workflow for tablet/mobile viewports.
+3. **Audit Search/Filter**: Add audit-level search (by lens, date, status) on the main Library tab as the database grows.
 
 ---
 
@@ -81,6 +76,6 @@ npm --prefix server test
 - [devlogs.md](./devlogs.md) — Session-by-session development learnings and architectural decisions.
 - [PROXMOX_DEPLOYMENT.md](./PROXMOX_DEPLOYMENT.md) — Manual deployment guide for Proxmox LXC.
 - [SETUP.md](./SETUP.md) — Local development environment setup.
+- [REDEPLOYMENT.md](./REDEPLOYMENT.md) — Commands to push changes to Git and redeploy to the Proxmox LXC.
 
-**Core workflow, settings preferences, and technique practice room workspace are fully functional and complete.** 🎵
 

@@ -3,12 +3,15 @@ import { useBackend } from '../context/BackendContext';
 
 const Trash = () => {
   const backend = useBackend();
-  const [activeTab, setActiveTab] = useState('songs'); // 'songs' | 'audits'
   const [songs, setSongs] = useState([]);
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Collapsible section states
+  const [songsOpen, setSongsOpen] = useState(true);
+  const [auditsOpen, setAuditsOpen] = useState(true);
 
   // Modal State
   const [purgeTarget, setPurgeTarget] = useState(null); // { type: 'song'|'audit', item }
@@ -51,6 +54,27 @@ const Trash = () => {
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (err) {
       setError(err.message || `Failed to restore ${type}`);
+    }
+  };
+
+  const handleEmptyTrash = async () => {
+    if (window.confirm("CRITICAL WARNING: Are you sure you want to permanently empty the trash? All deleted songs, audits, and technique notes will be lost forever. This action is irreversible.")) {
+      try {
+        setLoading(true);
+        setError('');
+        setSuccessMessage('');
+        await Promise.all([
+          backend.purgeAllSongs(),
+          backend.purgeAllAudits()
+        ]);
+        setSuccessMessage('Trash successfully emptied!');
+        await loadTrash();
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } catch (err) {
+        setError(err.message || 'Failed to empty trash');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -104,25 +128,11 @@ const Trash = () => {
   };
 
   const formatDuration = (seconds) => {
-    if (!seconds) return '0:00';
+    if (!seconds || seconds <= 0) return '--:--';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Styled Tab Button Helper
-  const tabStyle = (tabName) => ({
-    padding: '8px 16px',
-    cursor: 'pointer',
-    fontFamily: 'Roboto Mono',
-    fontSize: '11px',
-    textTransform: 'uppercase',
-    background: activeTab === tabName ? '#d08f60' : '#1c1c22',
-    color: activeTab === tabName ? '#0c0c0e' : '#d08f60',
-    border: `1px solid ${activeTab === tabName ? '#d08f60' : 'rgba(208, 143, 96, 0.3)'}`,
-    borderRadius: '2px',
-    transition: 'all 0.15s ease',
-  });
 
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -131,8 +141,19 @@ const Trash = () => {
         background: '#151518', 
         borderBottom: '2px solid #d08f60'
       }}>
-        <h1>🗑️ Archives & Trash</h1>
-        <p className="card-subtitle" style={{ margin: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ margin: 0, border: 'none', padding: 0 }}>🗑️ Archives & Trash</h1>
+          {(songs.length > 0 || audits.length > 0) && (
+            <button 
+              onClick={handleEmptyTrash} 
+              className="danger"
+              style={{ fontSize: '11px', fontWeight: 'bold' }}
+            >
+              Empty Trash
+            </button>
+          )}
+        </div>
+        <p className="card-subtitle" style={{ margin: '8px 0 0 0' }}>
           Restore soft-deleted songs and audits, or purge them permanently from the system database.
         </p>
       </div>
@@ -141,176 +162,208 @@ const Trash = () => {
       {error && <div className="error">⚠️ {error}</div>}
       {successMessage && <div className="success">✅ {successMessage}</div>}
 
-      {/* Navigation Tabs */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', marginTop: '10px' }}>
-        <button 
-          id="tab-deleted-songs"
-          style={tabStyle('songs')}
-          onClick={() => setActiveTab('songs')}
-        >
-          🎵 Deleted Songs ({songs.length})
-        </button>
-        <button 
-          id="tab-deleted-audits"
-          style={tabStyle('audits')}
-          onClick={() => setActiveTab('audits')}
-        >
-          📝 Deleted Audits ({audits.length})
-        </button>
-      </div>
-
       {loading ? (
         <div className="loading">
-          SYNCHRONIZING ARCHIVE STORAGE...
+          Synchronizing archive storage...
         </div>
       ) : (
-        <div>
-          {/* Songs Tab */}
-          {activeTab === 'songs' && (
-            <div>
-              {songs.length === 0 ? (
-                <div className="panel" style={{ textAlign: 'center', padding: '50px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
-                  <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>🎧</span>
-                  <h3 style={{ marginBottom: '8px' }}>Deleted songs folder is empty</h3>
-                  <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
-                    Songs deleted from the library will appear here.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {songs.map((song) => (
-                    <div 
-                      key={song._id} 
-                      className="panel" 
-                      style={{ 
-                        display: 'flex', 
-                        gap: '20px', 
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '15px',
-                        background: '#151518',
-                        borderColor: 'rgba(255, 255, 255, 0.08)'
-                      }}
-                    >
-                      <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flex: 1 }}>
-                        {(song.thumbnailUrl || song.thumbnail) && (
-                          <img 
-                            src={song.thumbnailUrl || song.thumbnail} 
-                            alt={song.title} 
-                            style={{ 
-                              width: '80px', 
-                              height: '60px', 
-                              objectFit: 'cover', 
-                              borderRadius: '2px', 
-                              border: '1px solid rgba(255,255,255,0.06)' 
-                            }}
-                          />
-                        )}
-                        <div>
-                          <h3 style={{ margin: 0, fontSize: '13px' }}>{song.title}</h3>
-                          <p style={{ margin: '2px 0 0', color: 'rgba(255, 255, 255, 0.45)', fontSize: '11px', fontFamily: 'Roboto Mono' }}>
-                            {song.artistName || song.artist}
-                          </p>
-                          <div style={{ display: 'flex', gap: '15px', marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Roboto Mono' }}>
-                            <span>⏱️ {formatDuration(song.durationSeconds)}</span>
-                            <span>📅 Deleted: {formatDate(song.deletedAt)}</span>
+        <div style={{ marginTop: '20px' }}>
+          {/* Songs Accordion */}
+          <div style={{ marginBottom: '20px' }}>
+            <div 
+              onClick={() => setSongsOpen(!songsOpen)}
+              style={{
+                background: '#1a1a20',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '2px',
+                padding: '10px 15px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                userSelect: 'none',
+                marginBottom: '10px'
+              }}
+            >
+              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#d08f60' }}>
+                {songsOpen ? '▼' : '▶'} Deleted Songs ({songs.length})
+              </span>
+            </div>
+
+            {songsOpen && (
+              <div>
+                {songs.length === 0 ? (
+                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+                    <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>🎧</span>
+                    <h3 style={{ marginBottom: '6px', fontSize: '12px' }}>Deleted songs folder is empty</h3>
+                    <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
+                      Songs deleted from the library will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {songs.map((song) => (
+                      <div 
+                        key={song._id} 
+                        className="panel" 
+                        style={{ 
+                          display: 'flex', 
+                          gap: '20px', 
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '12px 15px',
+                          background: '#151518',
+                          borderColor: 'rgba(255, 255, 255, 0.08)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flex: 1 }}>
+                          {(song.thumbnailUrl || song.thumbnail) && (
+                            <img 
+                              src={song.thumbnailUrl || song.thumbnail} 
+                              alt={song.title} 
+                              style={{ 
+                                width: '70px', 
+                                height: '52px', 
+                                objectFit: 'cover', 
+                                borderRadius: '2px', 
+                                border: '1px solid rgba(255,255,255,0.06)' 
+                              }}
+                            />
+                          )}
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '12px' }}>{song.title}</h3>
+                            <p style={{ margin: '2px 0 0', color: 'rgba(255, 255, 255, 0.45)', fontSize: '11px', fontFamily: 'Roboto Mono' }}>
+                              {song.artistName || song.artist}
+                            </p>
+                            <div style={{ display: 'flex', gap: '15px', marginTop: '6px', fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Roboto Mono' }}>
+                              <span>⏱️ {formatDuration(song.durationSeconds)}</span>
+                              <span>📅 Deleted: {formatDate(song.deletedAt)}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button 
-                          onClick={() => handleRestore('song', song._id)}
-                          style={{ 
-                            background: '#1c2d21', 
-                            color: '#4ade80',
-                            borderColor: 'rgba(74, 222, 128, 0.3)'
-                          }}
-                        >
-                          🔄 Restore
-                        </button>
-                        <button 
-                          className="danger"
-                          onClick={() => openPurgeModal('song', song)}
-                        >
-                          🗑️ Purge
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Audits Tab */}
-          {activeTab === 'audits' && (
-            <div>
-              {audits.length === 0 ? (
-                <div className="panel" style={{ textAlign: 'center', padding: '50px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
-                  <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>📝</span>
-                  <h3 style={{ marginBottom: '8px' }}>Deleted audits folder is empty</h3>
-                  <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
-                    Audits deleted individually will appear here. Audits deleted as part of a song are restored when restoring the song.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {audits.map((audit) => (
-                    <div 
-                      key={audit._id} 
-                      className="panel" 
-                      style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '15px',
-                        background: '#151518',
-                        borderColor: 'rgba(255, 255, 255, 0.08)'
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: 0, fontSize: '13px' }}>{audit.title || 'Untitled Audit'}</h3>
-                        <p style={{ margin: '2px 0 0', color: 'rgba(255, 255, 255, 0.65)', fontSize: '12px' }}>
-                          Song: <strong style={{ color: '#d08f60', fontFamily: 'Roboto Mono' }}>{audit.songId?.title || 'Unknown Song'}</strong> by {audit.songId?.artistName || audit.songId?.artist || 'Unknown Artist'}
-                        </p>
-                        
-                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                          {(audit.lensSelection || []).map((lens) => (
-                            <span key={lens} className="badge primary" style={{ fontSize: '10px', textTransform: 'capitalize' }}>
-                              {lens}
-                            </span>
-                          ))}
-                          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', fontFamily: 'Roboto Mono', marginLeft: '5px', alignSelf: 'center' }}>
-                            📅 Deleted: {formatDate(audit.deletedAt)}
-                          </span>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button 
+                            onClick={() => handleRestore('song', song._id)}
+                            style={{ 
+                              background: '#1c2d21', 
+                              color: '#4ade80',
+                              borderColor: 'rgba(74, 222, 128, 0.3)',
+                              padding: '6px 12px',
+                              fontSize: '10px'
+                            }}
+                          >
+                            🔄 Restore
+                          </button>
+                          <button 
+                            className="danger"
+                            onClick={() => openPurgeModal('song', song)}
+                            style={{ padding: '6px 12px', fontSize: '10px' }}
+                          >
+                            🗑️ Purge
+                          </button>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button 
-                          onClick={() => handleRestore('audit', audit._id)}
-                          style={{ 
-                            background: '#1c2d21', 
-                            color: '#4ade80',
-                            borderColor: 'rgba(74, 222, 128, 0.3)'
-                          }}
-                        >
-                          🔄 Restore
-                        </button>
-                        <button 
-                          className="danger"
-                          onClick={() => openPurgeModal('audit', audit)}
-                        >
-                          🗑️ Purge
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          {/* Audits Accordion */}
+          <div style={{ marginBottom: '20px' }}>
+            <div 
+              onClick={() => setAuditsOpen(!auditsOpen)}
+              style={{
+                background: '#1a1a20',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '2px',
+                padding: '10px 15px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                userSelect: 'none',
+                marginBottom: '10px'
+              }}
+            >
+              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#d08f60' }}>
+                {auditsOpen ? '▼' : '▶'} Deleted Audits ({audits.length})
+              </span>
             </div>
-          )}
+
+            {auditsOpen && (
+              <div>
+                {audits.length === 0 ? (
+                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+                    <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📝</span>
+                    <h3 style={{ marginBottom: '6px', fontSize: '12px' }}>Deleted audits folder is empty</h3>
+                    <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
+                      Audits deleted individually will appear here. Audits deleted as part of a song are restored when restoring the song.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {audits.map((audit) => (
+                      <div 
+                        key={audit._id} 
+                        className="panel" 
+                        style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '12px 15px',
+                          background: '#151518',
+                          borderColor: 'rgba(255, 255, 255, 0.08)'
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <h3 style={{ margin: 0, fontSize: '12px' }}>{audit.title || 'Untitled Audit'}</h3>
+                          <p style={{ margin: '2px 0 0', color: 'rgba(255, 255, 255, 0.65)', fontSize: '11px' }}>
+                            Song: <strong style={{ color: '#d08f60', fontFamily: 'Roboto Mono' }}>{audit.songId?.title || 'Unknown Song'}</strong> by {audit.songId?.artistName || audit.songId?.artist || 'Unknown Artist'}
+                          </p>
+                          
+                          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                            {(audit.lensSelection || []).map((lens) => (
+                              <span key={lens} className="badge primary" style={{ fontSize: '9px', textTransform: 'capitalize' }}>
+                                {lens}
+                              </span>
+                            ))}
+                            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px', fontFamily: 'Roboto Mono', marginLeft: '5px', alignSelf: 'center' }}>
+                              📅 Deleted: {formatDate(audit.deletedAt)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button 
+                            onClick={() => handleRestore('audit', audit._id)}
+                            style={{ 
+                              background: '#1c2d21', 
+                              color: '#4ade80',
+                              borderColor: 'rgba(74, 222, 128, 0.3)',
+                              padding: '6px 12px',
+                              fontSize: '10px'
+                            }}
+                          >
+                            🔄 Restore
+                          </button>
+                          <button 
+                            className="danger"
+                            onClick={() => openPurgeModal('audit', audit)}
+                            style={{ padding: '6px 12px', fontSize: '10px' }}
+                          >
+                            🗑️ Purge
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

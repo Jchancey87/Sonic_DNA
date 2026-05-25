@@ -74,7 +74,7 @@ const AuditCreate = () => {
     }
   };
 
-  if (loading) return <div className="loading">LOADING REFERENCE TARGET...</div>;
+  if (loading) return <div className="loading">Loading Reference Target...</div>;
   if (!song)   return <div className="error">Song not found</div>;
 
   return (
@@ -98,7 +98,7 @@ const AuditCreate = () => {
               borderRadius: '2px',
               border: '1px solid rgba(255, 255, 255, 0.06)'
             }}>
-              <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#d08f60' }}>RESEARCH INTELLIGENCE LOG:</strong>
+              <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#d08f60' }}>Research Intelligence Log:</strong>
               <p style={{ fontSize: '12px', lineHeight: '1.6', marginTop: '8px', color: 'rgba(255, 255, 255, 0.75)' }}>
                 {song.researchSummary.summary}
               </p>
@@ -115,7 +115,7 @@ const AuditCreate = () => {
               padding: '8px 12px',
               borderRadius: '2px'
             }}>
-              ⚠️ RESEARCH SUMMARY UNAVAILABLE — INITIALIZING DIRECT OBSERVATION WORKFLOW.
+              ⚠️ Research summary unavailable — initializing direct observation workflow.
             </div>
           )}
         </div>
@@ -152,7 +152,7 @@ const AuditCreate = () => {
                   }}
                 >
                   <div style={{ fontSize: '24px', marginBottom: '6px' }}>{meta.emoji}</div>
-                  <div style={{ fontFamily: 'Roboto Mono', fontSize: '11px', textTransform: 'uppercase' }}>{meta.label}</div>
+                  <div style={{ fontFamily: 'Roboto Mono', fontSize: '11px' }}>{meta.label}</div>
                   <div style={{ 
                     fontSize: '9px', 
                     fontFamily: 'Inter',
@@ -174,8 +174,8 @@ const AuditCreate = () => {
           <h3>Workflow Type</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             {[
-              { id: 'quick',   emoji: '⚡', label: 'Quick',   time: '5–15 MIN',  hint: 'All questions unified on a single screen' },
-              { id: 'guided',  emoji: '🎓', label: 'Guided',  time: '30–60 MIN', hint: 'Listen → Sketch → Translate → Recreate → Log' },
+              { id: 'quick',   emoji: '⚡', label: 'Quick',   time: '5–15 Min',  hint: 'All questions unified on a single screen' },
+              { id: 'guided',  emoji: '🎓', label: 'Guided',  time: '30–60 Min', hint: 'Listen → Sketch → Translate → Recreate → Log' },
             ].map((w) => {
               const active = workflowType === w.id;
               return (
@@ -199,7 +199,7 @@ const AuditCreate = () => {
                     gap: '4px'
                   }}
                 >
-                  <div style={{ fontSize: '14px', fontFamily: 'Roboto Mono', textTransform: 'uppercase' }}>{w.emoji} {w.label}</div>
+                  <div style={{ fontSize: '14px', fontFamily: 'Roboto Mono' }}>{w.emoji} {w.label}</div>
                   <div style={{ fontSize: '10px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: active ? '#0c0c0e' : 'rgba(255, 255, 255, 0.65)' }}>{w.time}</div>
                   <div style={{ 
                     fontSize: '9px', 
@@ -229,7 +229,7 @@ const AuditCreate = () => {
             fontWeight: 'bold'
           }}
         >
-          {creating ? 'SYNTHESIZING QUESTIONS...' : 'START AUDIT SEQUENCE →'}
+          {creating ? 'Synthesizing Questions...' : 'Start Audit Sequence →'}
         </button>
 
         {creating && (
@@ -240,7 +240,7 @@ const AuditCreate = () => {
             fontSize: '11px',
             fontFamily: 'Roboto Mono'
           }}>
-            CONTACTING GPT CORE MODULE FOR CUSTOM SYNTHESIS GENERATION...
+            Contacting GPT core module for custom synthesis generation...
           </p>
         )}
       </div>

@@ -17,6 +17,7 @@ export const AudioProvider = ({ children }) => {
   const [showVideo, setShowVideo] = useState(true);
   // Issue 2: track embed errors so we can show a fallback link
   const [embedError, setEmbedError] = useState(false);
+  const [bottomOpen, setBottomOpen] = useState(true);
 
   const playerRef = useRef(null);
   const timerRef = useRef(null);
@@ -175,6 +176,8 @@ export const AudioProvider = ({ children }) => {
     showVideo,
     setShowVideo,
     embedError,
+    bottomOpen,
+    setBottomOpen,
     loadSong,
     play,
     pause,
@@ -195,7 +198,7 @@ export const AudioProvider = ({ children }) => {
           id="global-youtube-monitor"
           style={{
             position: 'fixed',
-            bottom: showVideo ? '155px' : '-220px', // sit above the tape deck (tape deck ~140px tall)
+            bottom: showVideo ? (bottomOpen ? '155px' : '45px') : '-220px',
             right: '15px',
             width: '240px',
             height: '160px',

@@ -72,7 +72,7 @@ const AuditDetail = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (loading) return <div className="loading">LOADING AUDIT SCHEMATIC...</div>;
+  if (loading) return <div className="loading">Loading audit schematic...</div>;
   if (error || !audit) return <div className="error">{error || 'Audit not found'}</div>;
 
   return (
@@ -112,7 +112,7 @@ const AuditDetail = () => {
         {audit.responses && Object.keys(audit.responses).length > 0 && (
           <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
-              SIGNAL OBSERVATIONS MATRIX
+              Signal Observations Matrix
             </h2>
             <div style={{ marginTop: '15px' }}>
               {Object.entries(audit.responses).map(([key, value]) => {
@@ -152,7 +152,7 @@ const AuditDetail = () => {
         {audit.bookmarks && audit.bookmarks.length > 0 && (
           <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
-              SESSION BOOKMARKS ({audit.bookmarks.length})
+              Session Bookmarks ({audit.bookmarks.length})
             </h2>
             <div style={{ marginTop: '15px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
               {audit.bookmarks.map((bookmark, idx) => (
@@ -194,7 +194,7 @@ const AuditDetail = () => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em', margin: 0 }}>
-                PORTABLE TECHNIQUES LOG ({audit.techniques.length})
+                Portable Techniques Log ({audit.techniques.length})
               </h2>
               <Link to="/techniques">
                 <button className="secondary" style={{ padding: '4px 10px', fontSize: '10px' }}>Open Notebook</button>

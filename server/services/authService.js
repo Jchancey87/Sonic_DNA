@@ -86,4 +86,54 @@ export class AuthService {
     const updatedUser = await this.userRepository.updateById(userId, { preferences: updatedPrefs });
     return updatedUser.preferences;
   }
+
+  async updateProfile(userId, { name }) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedUser = await this.userRepository.updateById(userId, { name, displayName: name });
+    return {
+      id: updatedUser._id,
+      email: updatedUser.email,
+      name: updatedUser.name,
+      displayName: updatedUser.displayName,
+      preferences: updatedUser.preferences
+    };
+  }
+
+  async changePassword(userId, oldPassword, newPassword) {
+    if (this.userRepository.model) {
+      // Production path (Mongoose)
+      const userDoc = await this.userRepository.model.findById(userId);
+      if (!userDoc) {
+        throw new Error('User not found');
+      }
+      const isValid = await bcrypt.compare(oldPassword, userDoc.password);
+      if (!isValid) {
+        throw new Error('Invalid credentials');
+      }
+      userDoc.password = newPassword;
+      await userDoc.save();
+    } else {
+      // Test/In-Memory path
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      const isValid = await bcrypt.compare(oldPassword, user.password);
+      if (!isValid) {
+        throw new Error('Invalid credentials');
+      }
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      await this.userRepository.updateById(userId, { password: hashedPassword });
+    }
+    return true;
+  }
+
+  async deleteAccount(userId) {
+    const deleted = await this.userRepository.deleteById(userId);
+    return deleted;
+  }
 }

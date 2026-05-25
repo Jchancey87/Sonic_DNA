@@ -64,6 +64,38 @@ export const AuthProvider = ({ children }) => {
     }
   }, [backend]);
 
+  const updateUserProfile = useCallback(async (profileData) => {
+    try {
+      const updatedUser = await backend.updateProfile(profileData);
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
+    } catch (err) {
+      console.error('Failed to update user profile:', err);
+      throw err;
+    }
+  }, [backend]);
+
+  const changePassword = useCallback(async (oldPassword, newPassword) => {
+    try {
+      return await backend.changePassword(oldPassword, newPassword);
+    } catch (err) {
+      console.error('Failed to change password:', err);
+      throw err;
+    }
+  }, [backend]);
+
+  const deleteAccount = useCallback(async () => {
+    try {
+      const result = await backend.deleteAccount();
+      logout();
+      return result;
+    } catch (err) {
+      console.error('Failed to delete account:', err);
+      throw err;
+    }
+  }, [backend, logout]);
+
   const value = {
     user,
     token,
@@ -72,6 +104,9 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUserPreferences,
+    updateUserProfile,
+    changePassword,
+    deleteAccount,
     isAuthenticated: !!user,
   };
 

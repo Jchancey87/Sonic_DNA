@@ -236,7 +236,7 @@ const TechniqueNotebook = () => {
   };
 
   // Reusable Technique Card
-  const TechniqueCard = ({ tech }) => {
+  const TechniqueCard = ({ tech, compact = false }) => {
     const [localNotes, setLocalNotes] = useState(tech.notes || '');
 
     useEffect(() => {
@@ -287,12 +287,12 @@ const TechniqueNotebook = () => {
               {tech.techniqueName || 'Untitled Technique'}
               {isSaving && (
                 <span style={{ fontSize: '9px', color: '#f59e0b', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}>
-                  ● SAVING...
+                  ● Saving...
                 </span>
               )}
               {isSaved && (
                 <span style={{ fontSize: '9px', color: '#10b981', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}>
-                  ✔ SAVED
+                  ✔ Saved
                 </span>
               )}
             </h3>
@@ -300,7 +300,6 @@ const TechniqueNotebook = () => {
               <span 
                 className="badge primary" 
                 style={{ 
-                  textTransform: 'uppercase', 
                   borderColor: getLensColor(tech.lens), 
                   color: getLensColor(tech.lens), 
                   background: `${getLensColor(tech.lens)}15`,
@@ -309,7 +308,7 @@ const TechniqueNotebook = () => {
               >
                 {tech.lens}
               </span>
-              {tech.tags?.map(tag => (
+              {!compact && tech.tags?.map(tag => (
                 <span 
                   key={tag} 
                   style={{ 
@@ -352,7 +351,7 @@ const TechniqueNotebook = () => {
         }}>
           {/* Clickable Confidence Stars */}
           <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginRight: '6px', fontFamily: 'Roboto Mono' }}>CONFIDENCE:</span>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginRight: '6px', fontFamily: 'Roboto Mono' }}>Confidence:</span>
             {[1, 2, 3, 4, 5].map((i) => {
               const isFilled = i <= (tech.confidence || 0);
               return (
@@ -376,7 +375,7 @@ const TechniqueNotebook = () => {
 
           {/* Next Action Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono' }}>ACTION:</span>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono' }}>Action:</span>
             <select
               value={tech.nextAction || ''}
               onChange={(e) => handleUpdateTechnique(tech._id, { nextAction: e.target.value || null })}
@@ -392,12 +391,12 @@ const TechniqueNotebook = () => {
                 cursor: 'pointer'
               }}
             >
-              <option value="">NO ACTION</option>
-              <option value="study">STUDY</option>
-              <option value="practice">PRACTICE</option>
-              <option value="transcribe">TRANSCRIBE</option>
-              <option value="apply">APPLY</option>
-              <option value="revisit">REVISIT</option>
+              <option value="">No Action</option>
+              <option value="study">Study</option>
+              <option value="practice">Practice</option>
+              <option value="transcribe">Transcribe</option>
+              <option value="apply">Apply</option>
+              <option value="revisit">Revisit</option>
             </select>
           </div>
         </div>
@@ -449,36 +448,38 @@ const TechniqueNotebook = () => {
                   whiteSpace: 'nowrap'
                 }}
               >
-                ▶ LOAD & SEEK ({formatTimestamp(tech.exampleTimestamp)})
+                ▶ Load & Seek ({formatTimestamp(tech.exampleTimestamp)})
               </button>
             )}
           </div>
         )}
 
         {/* Inline Practice Notes */}
-        <div style={{ marginTop: 'auto' }}>
-          <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginBottom: '4px', display: 'block' }}>
-            PRACTICE LOG / ATTEMPTS
-          </label>
-          <textarea
-            value={localNotes}
-            onChange={(e) => setLocalNotes(e.target.value)}
-            onBlur={handleNotesBlur}
-            placeholder="Type notes or practice experiments here. Click away to auto-save..."
-            style={{
-              width: '100%',
-              minHeight: '50px',
-              fontSize: '11px',
-              background: '#0a0a0c',
-              borderColor: 'rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.85)',
-              padding: '6px 8px',
-              borderRadius: '2px',
-              fontFamily: 'inherit',
-              lineHeight: '1.4'
-            }}
-          />
-        </div>
+        {!compact && (
+          <div style={{ marginTop: 'auto' }}>
+            <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginBottom: '4px', display: 'block' }}>
+              Practice Log / Attempts
+            </label>
+            <textarea
+              value={localNotes}
+              onChange={(e) => setLocalNotes(e.target.value)}
+              onBlur={handleNotesBlur}
+              placeholder="Type notes or practice experiments here. Click away to auto-save..."
+              style={{
+                width: '100%',
+                minHeight: '50px',
+                fontSize: '11px',
+                background: '#0a0a0c',
+                borderColor: 'rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.85)',
+                padding: '6px 8px',
+                borderRadius: '2px',
+                fontFamily: 'inherit',
+                lineHeight: '1.4'
+              }}
+            />
+          </div>
+        )}
       </div>
     );
   };
@@ -536,6 +537,7 @@ const TechniqueNotebook = () => {
       <div style={{ display: 'flex', gap: '5px', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '1px' }}>
         <button 
           onClick={() => setActiveTab('library')}
+          title="View and search your full collection of discovered techniques"
           style={{
             background: activeTab === 'library' ? '#1c1c22' : 'transparent',
             color: activeTab === 'library' ? '#d08f60' : 'rgba(255,255,255,0.5)',
@@ -547,10 +549,11 @@ const TechniqueNotebook = () => {
             fontWeight: 'bold',
           }}
         >
-          🗂️ LIBRARY
+          Library
         </button>
         <button 
           onClick={() => setActiveTab('practice')}
+          title="Organize your discoveries into a step-by-step practice pipeline (Kanban board)"
           style={{
             background: activeTab === 'practice' ? '#1c1c22' : 'transparent',
             color: activeTab === 'practice' ? '#d08f60' : 'rgba(255,255,255,0.5)',
@@ -562,10 +565,11 @@ const TechniqueNotebook = () => {
             fontWeight: 'bold',
           }}
         >
-          🏋️ PRACTICE ROOM
+          Practice Room
         </button>
         <button 
           onClick={() => setActiveTab('quicklog')}
+          title="Log a new standalone technique or musical discovery manually"
           style={{
             background: activeTab === 'quicklog' ? '#1c1c22' : 'transparent',
             color: activeTab === 'quicklog' ? '#d08f60' : 'rgba(255,255,255,0.5)',
@@ -577,7 +581,7 @@ const TechniqueNotebook = () => {
             fontWeight: 'bold',
           }}
         >
-          ✍️ QUICK LOG
+          Quick Log
         </button>
       </div>
 
@@ -651,6 +655,21 @@ const TechniqueNotebook = () => {
 
       {activeTab === 'practice' && (
         <div>
+          {/* Practice Room explanation banner */}
+          <div style={{
+            background: 'rgba(208, 143, 96, 0.05)',
+            border: '1px solid rgba(208, 143, 96, 0.15)',
+            borderRadius: '2px',
+            padding: '12px 15px',
+            marginBottom: '20px',
+            fontSize: '12px',
+            lineHeight: '1.5',
+            color: 'rgba(255, 255, 255, 0.75)'
+          }}>
+            <strong>Welcome to the Practice Room:</strong> Organize your discoveries into a structured practice pipeline. 
+            Assign or update actions on technique cards to move them through study, practice, transcription, and application phases.
+          </div>
+
           {/* Interactive Kanban Board */}
           <div style={{
             display: 'flex',
@@ -697,7 +716,7 @@ const TechniqueNotebook = () => {
                   flexDirection: 'column',
                   gap: '10px',
                   overflowY: 'auto',
-                  maxHeight: 'calc(100vh - 350px)'
+                  maxHeight: 'calc(100vh - 380px)'
                 }}>
                   {lane.items.length === 0 ? (
                     <div style={{
@@ -713,7 +732,7 @@ const TechniqueNotebook = () => {
                     </div>
                   ) : (
                     lane.items.map(tech => (
-                      <TechniqueCard key={tech._id} tech={tech} />
+                      <TechniqueCard key={tech._id} tech={tech} compact={true} />
                     ))
                   )}
                 </div>

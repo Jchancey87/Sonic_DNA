@@ -141,6 +141,20 @@ export default function createAuditRoutes(auditService, templateComposer) {
     }
   });
 
+  // ── Purge all soft-deleted audits ─────────────────────────────────────────
+  router.delete('/trash/purge-all', async (req, res) => {
+    try {
+      const deletedAudits = await auditService.getDeletedAudits(req.userId);
+      for (const audit of deletedAudits) {
+        await auditService.purgeAudit(audit._id, req.userId, techniqueRepository);
+      }
+      res.json({ success: true, count: deletedAudits.length });
+    } catch (error) {
+      console.error('Purge all audits error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // ── Get audit by ID ───────────────────────────────────────────────────────
   router.get('/:id', async (req, res) => {
     try {
