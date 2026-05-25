@@ -31,8 +31,28 @@ export async function searchSongInfo(title, artist) {
           {
             api_key: TAVILY_API_KEY,
             query: query,
-            topic: 'music',
             max_results: 5,
+            exclude_domains: [
+              'spotify.com',
+              'open.spotify.com',
+              'youtube.com',
+              'youtu.be',
+              'music.youtube.com',
+              'soundcloud.com',
+              'music.apple.com',
+              'amazon.com',
+              'instagram.com',
+              'facebook.com',
+              'tiktok.com',
+              'deezer.com',
+              'tidal.com',
+              'bandcamp.com',
+              'vimeo.com',
+              'dailymotion.com',
+              'pinterest.com',
+              'twitter.com',
+              'x.com'
+            ]
           },
           { timeout: 10000 }
         );
