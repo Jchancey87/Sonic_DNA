@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useBackend } from '../context/BackendContext';
 import { useAudio } from '../context/AudioContext';
 import EmptyState from '../components/EmptyState';
+import TechniqueDetailModal from '../components/TechniqueDetailModal';
 
 const TechniqueNotebook = () => {
   const [activeTab, setActiveTab] = useState('library');
@@ -10,6 +11,15 @@ const TechniqueNotebook = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Modal state
+  const [selectedTech, setSelectedTech] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (tech) => {
+    setSelectedTech(tech);
+    setIsModalOpen(true);
+  };
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
@@ -91,6 +101,7 @@ const TechniqueNotebook = () => {
       setTechniques(prev => 
         prev.map(t => t._id === id ? { ...t, ...updates } : t)
       );
+      setSelectedTech(prev => prev && prev._id === id ? { ...prev, ...updates } : prev);
 
       await backend.updateTechnique(id, updates);
 
@@ -269,6 +280,7 @@ const TechniqueNotebook = () => {
     return (
       <div 
         className="panel" 
+        onClick={() => openModal(tech)}
         style={{ 
           margin: 0, 
           display: 'flex', 
@@ -277,7 +289,8 @@ const TechniqueNotebook = () => {
           borderLeft: `4px solid ${getLensColor(tech.lens)}`,
           borderColor: 'rgba(255,255,255,0.08)',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          position: 'relative'
+          position: 'relative',
+          cursor: 'pointer'
         }}
       >
         {/* Card Header */}
@@ -327,7 +340,7 @@ const TechniqueNotebook = () => {
             </div>
           </div>
           <button
-            onClick={() => deleteTechnique(tech._id)}
+            onClick={(e) => { e.stopPropagation(); deleteTechnique(tech._id); }}
             className="danger"
             style={{ padding: '4px 6px', fontSize: '9px', border: 'none', background: 'transparent' }}
             title="Remove from notebook"
@@ -357,7 +370,7 @@ const TechniqueNotebook = () => {
               return (
                 <span 
                   key={i}
-                  onClick={() => handleUpdateTechnique(tech._id, { confidence: i })}
+                  onClick={(e) => { e.stopPropagation(); handleUpdateTechnique(tech._id, { confidence: i }); }}
                   style={{
                     cursor: 'pointer',
                     fontSize: '13px',
@@ -374,7 +387,7 @@ const TechniqueNotebook = () => {
           </div>
 
           {/* Next Action Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
             <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono' }}>Action:</span>
             <select
               value={tech.nextAction || ''}
@@ -437,7 +450,7 @@ const TechniqueNotebook = () => {
             </span>
             {hasTimestamp && (
               <button
-                onClick={() => handleLoadAndSeek(tech)}
+                onClick={(e) => { e.stopPropagation(); handleLoadAndSeek(tech); }}
                 style={{
                   padding: '2px 8px',
                   fontSize: '9px',
@@ -456,7 +469,7 @@ const TechniqueNotebook = () => {
 
         {/* Inline Practice Notes */}
         {!compact && (
-          <div style={{ marginTop: 'auto' }}>
+          <div style={{ marginTop: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginBottom: '4px', display: 'block' }}>
               Practice Log / Attempts
             </label>
@@ -482,6 +495,7 @@ const TechniqueNotebook = () => {
         )}
       </div>
     );
+
   };
 
   // Grouping for Practice Kanban Board lanes
@@ -897,9 +911,22 @@ const TechniqueNotebook = () => {
         </form>
       )}
 
+      {/* Detail / Edit Modal */}
+      <TechniqueDetailModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedTech(null);
+        }}
+        tech={selectedTech}
+        songs={songs}
+        onUpdate={handleUpdateTechnique}
+        onDelete={deleteTechnique}
+      />
     </div>
   );
 };
+
 
 export default TechniqueNotebook;
 
