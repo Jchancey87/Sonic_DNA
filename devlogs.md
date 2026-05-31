@@ -204,6 +204,8 @@ Check status:
 - **Implementation**:
   - Created `analysis_service/` module containing `app.py` (FastAPI router with BackgroundTasks) and `analyzer.py` (orchestrates downloads via `yt-dlp` and features extraction).
   - Designed a high-fidelity deterministic fallback simulation that seeds values from the YouTube ID hash. This guarantees flawless operation, realistic mock data (BPM, key, scale, meter, loudness, temporal curves), and absolute styling consistency in environments without python packages installed.
+  - **Environment Path Resolution**: Dynamically resolved the path of `yt-dlp` relative to `sys.executable` (current running virtual environment venv/bin folder) to ensure it executes correctly under PM2 paths.
+  - **Mix/Playlist Downloader Fix**: Integrated the `--no-playlist` flag to standard `yt-dlp` download command parameters, preventing background task timeouts when importing YouTube URLs containing `&list=RD...` parameters.
 
 #### 2. Node/Express Backend Integration
 - **Endpoints & Webhooks**:
