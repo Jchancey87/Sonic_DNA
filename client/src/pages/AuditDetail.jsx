@@ -78,7 +78,7 @@ const AuditDetail = () => {
   if (error || !audit) return <div className="error">{error || 'Audit not found'}</div>;
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '20px' }}>
           <div>

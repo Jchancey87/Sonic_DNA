@@ -219,7 +219,7 @@ const AuditForm = () => {
   const researchSources = song?.researchSummary?.results || [];
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
 
         {/* Save status indicator */}

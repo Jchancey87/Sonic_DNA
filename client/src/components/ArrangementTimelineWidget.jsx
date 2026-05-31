@@ -36,14 +36,14 @@ const AutoExpandingTextarea = ({ value, onChange, placeholder, disabled }) => {
       disabled={disabled}
       style={{
         width: '100%',
-        minHeight: '60px',
-        maxHeight: '220px',
+        minHeight: '70px',
+        maxHeight: '260px',
         background: '#161619',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '4px',
-        padding: '8px 10px',
+        padding: '10px 12px',
         color: '#ffffff',
-        fontSize: '12px',
+        fontSize: '14px',
         lineHeight: '1.5',
         resize: 'none',
         outline: 'none',
@@ -266,10 +266,10 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     return (
       <div style={{
         position: 'relative',
-        height: '24px',
+        height: '28px',
         width: '100%',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
-        fontSize: '9px',
+        fontSize: '11px',
         fontFamily: '"Roboto Mono", monospace',
         color: 'rgba(255,255,255,0.3)',
         marginBottom: '6px'
@@ -288,7 +288,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
               height: '100%'
             }}>
               <span>{formatTime(t)}</span>
-              <div style={{ width: '1px', height: '5px', background: 'rgba(255,255,255,0.15)', marginTop: '2px' }} />
+              <div style={{ width: '1px', height: '6px', background: 'rgba(255,255,255,0.15)', marginTop: '2px' }} />
             </div>
           );
         })}
@@ -318,7 +318,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ 
             margin: 0, 
-            fontSize: '11px', 
+            fontSize: '13px', 
             fontFamily: '"Roboto Mono", monospace', 
             letterSpacing: '0.05em', 
             color: 'rgba(255,255,255,0.45)' 
@@ -330,8 +330,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
               type="button" 
               onClick={addBlock}
               style={{ 
-                padding: '6px 14px', 
-                fontSize: '11px', 
+                padding: '8px 18px', 
+                fontSize: '13px', 
                 fontWeight: '600',
                 background: '#d08f60', 
                 color: '#151518', 
@@ -353,13 +353,13 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         {/* Workstation view Container */}
         {sortedBlocks.length === 0 ? (
           <div style={{
-            padding: '40px 20px',
+            padding: '50px 20px',
             textAlign: 'center',
             background: '#111114',
             border: '1px dashed rgba(255,255,255,0.08)',
             borderRadius: '4px',
             color: 'rgba(255,255,255,0.3)',
-            fontSize: '12px',
+            fontSize: '14px',
             fontStyle: 'italic'
           }}>
             No arrangement sections defined. Click "+ Add Section" (or press key 'A') to begin mapping.
@@ -370,7 +370,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
             {/* Timeline Wrapper (Ruler + Track) */}
             <div style={{ 
               background: '#0c0c0f', 
-              padding: '10px', 
+              padding: '12px', 
               borderRadius: '4px', 
               border: '1px solid rgba(255,255,255,0.05)' 
             }}>
@@ -384,13 +384,13 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 style={{
                   position: 'relative',
                   width: '100%',
-                  minHeight: '110px',
+                  minHeight: '120px',
                   background: '#070709',
                   borderRadius: '3px',
                   border: '1px solid rgba(255,255,255,0.05)',
                   display: 'flex',
-                  padding: '5px',
-                  gap: '4px',
+                  padding: '6px',
+                  gap: '6px',
                   overflowX: 'auto',
                   boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.7)',
                   alignItems: 'stretch'
@@ -438,12 +438,12 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                         }
                       }}
                       style={{
-                        flex: `0 0 max(130px, ${widthPct}%)`,
+                        flex: `0 0 max(140px, ${widthPct}%)`,
                         background: isSelected ? 'rgba(255, 255, 255, 0.04)' : '#111114',
                         border: `1px solid ${isSelected ? '#d08f60' : 'rgba(255,255,255,0.05)'}`,
                         borderLeft: `4px solid ${color}`,
                         borderRadius: '3px',
-                        padding: '10px',
+                        padding: '12px',
                         cursor: 'pointer',
                         display: 'flex',
                         flexDirection: 'column',
@@ -475,7 +475,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ 
                             fontWeight: '600', 
-                            fontSize: '11px', 
+                            fontSize: '13px', 
                             color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.85)', 
                             textOverflow: 'ellipsis', 
                             overflow: 'hidden', 
@@ -486,7 +486,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                         </div>
                         {block.notes && (
                           <span style={{ 
-                            fontSize: '9px', 
+                            fontSize: '11px', 
                             color: 'rgba(255,255,255,0.35)', 
                             display: 'block', 
                             textOverflow: 'ellipsis', 
@@ -502,10 +502,10 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                       {/* Times Footer */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                        <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '9px', color: color, fontWeight: 'bold' }}>
+                        <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '11px', color: color, fontWeight: 'bold' }}>
                           {formatTime(block.startTime)}
                         </span>
-                        <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>
+                        <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
                           {block.duration}s
                         </span>
                       </div>
@@ -530,7 +530,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                         >
                           <div style={{
                             width: '2px',
-                            height: '16px',
+                            height: '18px',
                             background: isSelected ? '#d08f60' : 'rgba(255,255,255,0.15)',
                             margin: 'auto',
                             position: 'absolute',
@@ -588,7 +588,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                       background: TYPE_COLORS[selectedBlock.type] || TYPE_COLORS.custom,
                       boxShadow: `0 0 6px ${TYPE_COLORS[selectedBlock.type] || TYPE_COLORS.custom}`
                     }} />
-                    <strong style={{ fontSize: '11px', fontFamily: '"Roboto Mono", monospace', color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    <strong style={{ fontSize: '13px', fontFamily: '"Roboto Mono", monospace', color: '#ffffff', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                       INSPECTOR: {selectedBlock.name}
                     </strong>
                   </div>
@@ -596,8 +596,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                     type="button"
                     onClick={() => deleteBlock(selectedBlock.id)}
                     style={{ 
-                      padding: '4px 10px', 
-                      fontSize: '10px', 
+                      padding: '5px 12px', 
+                      fontSize: '12px', 
                       border: '1px solid rgba(244, 63, 94, 0.3)', 
                       background: 'rgba(244, 63, 94, 0.05)',
                       color: '#f43f5e',
@@ -617,7 +617,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                     
                     {/* Section Name */}
                     <div className="form-group">
-                      <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px' }}>
                         Section Name
                       </label>
                       <input
@@ -630,9 +630,9 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                           background: '#161619',
                           border: '1px solid rgba(255,255,255,0.08)',
                           borderRadius: '4px',
-                          padding: '8px 10px',
+                          padding: '10px 12px',
                           color: '#ffffff',
-                          fontSize: '12px',
+                          fontSize: '14px',
                           outline: 'none'
                         }}
                       />
@@ -640,7 +640,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                     {/* Timing controls grouped */}
                     <div className="form-group">
-                      <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px' }}>
+                      <label style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px' }}>
                         Timing Boundaries
                       </label>
                       <div style={{ display: 'flex', gap: '8px' }}>
@@ -655,14 +655,14 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                               background: '#161619',
                               border: '1px solid rgba(255,255,255,0.08)',
                               borderRadius: '4px',
-                              padding: '8px 10px',
+                              padding: '10px 12px',
                               color: '#ffffff',
-                              fontSize: '12px',
+                              fontSize: '14px',
                               outline: 'none',
                               fontFamily: '"Roboto Mono", monospace'
                             }}
                           />
-                          <span style={{ position: 'absolute', right: '8px', top: '9px', fontSize: '9px', color: 'rgba(255,255,255,0.2)' }}>
+                          <span style={{ position: 'absolute', right: '8px', top: '11px', fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>
                             Start
                           </span>
                         </div>
@@ -677,14 +677,14 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                               background: '#161619',
                               border: '1px solid rgba(255,255,255,0.08)',
                               borderRadius: '4px',
-                              padding: '8px 10px',
+                              padding: '10px 12px',
                               color: '#ffffff',
-                              fontSize: '12px',
+                              fontSize: '14px',
                               outline: 'none',
                               fontFamily: '"Roboto Mono", monospace'
                             }}
                           />
-                          <span style={{ position: 'absolute', right: '8px', top: '9px', fontSize: '9px', color: 'rgba(255,255,255,0.2)' }}>
+                          <span style={{ position: 'absolute', right: '8px', top: '11px', fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>
                             Secs
                           </span>
                         </div>
@@ -692,8 +692,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                           type="button"
                           onClick={() => updateBlock(selectedBlock.id, { startTime: Math.floor(currentTime) })}
                           style={{ 
-                            padding: '0 12px', 
-                            fontSize: '11px', 
+                            padding: '0 14px', 
+                            fontSize: '13px', 
                             background: 'rgba(208, 143, 96, 0.1)', 
                             color: '#d08f60', 
                             border: '1px solid rgba(208, 143, 96, 0.3)',
@@ -713,7 +713,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                   {/* Visual Category Swatch Picker */}
                   <div className="form-group">
-                    <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>
                       Category / Sound Type
                     </label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
@@ -723,8 +723,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                           type="button"
                           onClick={() => updateBlock(selectedBlock.id, { type })}
                           style={{
-                            padding: '5px 10px',
-                            fontSize: '10px',
+                            padding: '6px 12px',
+                            fontSize: '12px',
                             borderRadius: '4px',
                             border: `1px solid ${selectedBlock.type === type ? TYPE_COLORS[type] : 'rgba(255,255,255,0.06)'}`,
                             background: selectedBlock.type === type ? `${TYPE_COLORS[type]}20` : '#161619',
@@ -733,12 +733,12 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                             textTransform: 'capitalize',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '5px',
+                            gap: '6px',
                             fontFamily: '"Roboto Mono", monospace',
                             transition: 'all 0.15s ease'
                           }}
                         >
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: TYPE_COLORS[type] }} />
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: TYPE_COLORS[type] }} />
                           {type}
                         </button>
                       ))}
@@ -754,7 +754,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                         background: 'transparent',
                         border: 'none',
                         color: '#d08f60',
-                        fontSize: '11px',
+                        fontSize: '13px',
                         cursor: 'pointer',
                         padding: 0,
                         display: 'flex',
@@ -771,7 +771,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                   {/* Advanced Observations Panel */}
                   {showAdvanced && (
                     <div style={{ 
-                      padding: '14px', 
+                      padding: '16px', 
                       background: 'rgba(255,255,255,0.02)', 
                       borderRadius: '4px',
                       border: '1px solid rgba(255,255,255,0.04)',
@@ -779,7 +779,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                       flexDirection: 'column',
                       gap: '8px'
                     }}>
-                      <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', display: 'block' }}>
+                      <label style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', display: 'block' }}>
                         Production Cues / Dynamic Actions
                       </label>
                       <AutoExpandingTextarea
@@ -803,8 +803,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                       type="button"
                       onClick={() => handleSeek(selectedBlock.startTime || 0)}
                       style={{ 
-                        padding: '6px 14px', 
-                        fontSize: '11px', 
+                        padding: '8px 18px', 
+                        fontSize: '13px', 
                         fontWeight: 'bold',
                         background: '#d08f60',
                         color: '#151518',
@@ -820,8 +820,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                       type="button"
                       onClick={() => setSelectedBlockId(null)}
                       style={{ 
-                        padding: '6px 12px', 
-                        fontSize: '11px', 
+                        padding: '8px 14px', 
+                        fontSize: '13px', 
                         background: 'transparent',
                         color: 'rgba(255,255,255,0.4)',
                         border: 'none',
@@ -858,14 +858,14 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
           <h3 style={{ 
             margin: 0, 
             fontFamily: '"Roboto Mono", monospace', 
-            fontSize: '12px', 
+            fontSize: '14px', 
             color: '#d08f60', 
             letterSpacing: '0.05em', 
             textTransform: 'uppercase' 
           }}>
             🔬 ANALYSIS MATRIX: ARRANGEMENT
           </h3>
-          <p style={{ margin: '6px 0 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.4' }}>
+          <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.4' }}>
             Map sections, transitions, and dynamic layers over the timeline.
           </p>
         </div>
@@ -873,11 +873,11 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         {/* Guidance and prompts */}
         {lensData?.description && (
           <div style={{ 
-            fontSize: '12px', 
+            fontSize: '14px', 
             color: 'rgba(255,255,255,0.6)', 
             lineHeight: '1.5',
             background: '#161619',
-            padding: '12px 14px',
+            padding: '14px 16px',
             borderLeft: '3px solid #d08f60',
             borderRadius: '2px'
           }}>
@@ -888,13 +888,13 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         {/* Practical tailored exercises */}
         {lensData?.exercises && lensData.exercises.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#d08f60', textTransform: 'uppercase' }}>
               Exercises
             </span>
             {lensData.exercises.map((ex, idx) => (
-              <div key={idx} style={{ background: '#0c0c0f', padding: '10px 12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                <strong style={{ fontSize: '11px', color: '#ffffff', display: 'block' }}>{ex.name}</strong>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'block', marginTop: '2px', lineHeight: '1.4' }}>
+              <div key={idx} style={{ background: '#0c0c0f', padding: '12px 14px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                <strong style={{ fontSize: '13px', color: '#ffffff', display: 'block' }}>{ex.name}</strong>
+                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', display: 'block', marginTop: '2px', lineHeight: '1.4' }}>
                   {ex.description}
                 </span>
               </div>
@@ -905,7 +905,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         {/* Adaptive Questions */}
         {lensData?.questions && lensData.questions.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '5px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#d08f60', textTransform: 'uppercase' }}>
               Structural Inquiries
             </span>
             {lensData.questions.map((question, idx) => {
@@ -913,16 +913,16 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
               const val = responses[key] || '';
               return (
                 <div key={key}>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.8)', marginBottom: '6px', fontWeight: '500', lineHeight: '1.4' }}>
+                  <label style={{ display: 'block', fontSize: '13px', color: 'rgba(255,255,255,0.8)', marginBottom: '6px', fontWeight: '500', lineHeight: '1.4' }}>
                     {question}
                   </label>
                   {readOnly ? (
                     <div style={{ 
                       background: '#0c0c0f', 
-                      padding: '10px 12px', 
+                      padding: '12px 14px', 
                       borderRadius: '4px', 
                       border: '1px solid rgba(255,255,255,0.03)',
-                      fontSize: '11px', 
+                      fontSize: '13px', 
                       color: 'rgba(255,255,255,0.7)', 
                       whiteSpace: 'pre-wrap', 
                       lineHeight: '1.4' 
@@ -937,13 +937,13 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                       placeholder="Add technical findings..."
                       style={{
                         width: '100%',
-                        height: '75px',
+                        height: '80px',
                         background: '#161619',
                         border: '1px solid rgba(255,255,255,0.08)',
                         borderRadius: '4px',
-                        padding: '8px 10px',
+                        padding: '10px 12px',
                         color: '#ffffff',
-                        fontSize: '11px',
+                        fontSize: '13px',
                         resize: 'vertical',
                         outline: 'none',
                         fontFamily: 'system-ui, sans-serif'
