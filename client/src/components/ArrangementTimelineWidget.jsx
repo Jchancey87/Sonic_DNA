@@ -299,133 +299,19 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
   return (
     <div style={{ 
       display: 'flex', 
+      flexDirection: 'column',
       gap: '24px', 
-      flexWrap: 'wrap', 
       width: '100%', 
       margin: '10px 0 25px 0',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
       
-      {/* ── LEFT PANEL: Guidance & Prompt Responses ── */}
+      {/* ── TOP SECTION: Workstation Timeline & Inspector ── */}
       <div style={{ 
-        flex: '1 1 340px', 
         display: 'flex', 
         flexDirection: 'column', 
-        gap: '20px', 
-        background: '#111114', 
-        padding: '20px',
-        border: '1px solid rgba(255,255,255,0.04)',
-        borderRadius: '4px'
-      }}>
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px' }}>
-          <h3 style={{ 
-            margin: 0, 
-            fontFamily: '"Roboto Mono", monospace', 
-            fontSize: '12px', 
-            color: '#d08f60', 
-            letterSpacing: '0.05em', 
-            textTransform: 'uppercase' 
-          }}>
-            🔬 ANALYSIS MATRIX: ARRANGEMENT
-          </h3>
-          <p style={{ margin: '6px 0 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.4' }}>
-            Map sections, transitions, and dynamic layers over the timeline.
-          </p>
-        </div>
-
-        {/* Guidance and prompts */}
-        {lensData?.description && (
-          <div style={{ 
-            fontSize: '12px', 
-            color: 'rgba(255,255,255,0.6)', 
-            lineHeight: '1.5',
-            background: '#161619',
-            padding: '12px 14px',
-            borderLeft: '3px solid #d08f60',
-            borderRadius: '2px'
-          }}>
-            {lensData.description}
-          </div>
-        )}
-
-        {/* Practical tailored exercises */}
-        {lensData?.exercises && lensData.exercises.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
-              Exercises
-            </span>
-            {lensData.exercises.map((ex, idx) => (
-              <div key={idx} style={{ background: '#0c0c0f', padding: '10px 12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                <strong style={{ fontSize: '11px', color: '#ffffff', display: 'block' }}>{ex.name}</strong>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'block', marginTop: '2px', lineHeight: '1.4' }}>
-                  {ex.description}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Adaptive Questions */}
-        {lensData?.questions && lensData.questions.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '5px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
-              Structural Inquiries
-            </span>
-            {lensData.questions.map((question, idx) => {
-              const key = `arrangement-q${idx}`;
-              const val = responses[key] || '';
-              return (
-                <div key={key}>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.8)', marginBottom: '6px', fontWeight: '500', lineHeight: '1.4' }}>
-                    {question}
-                  </label>
-                  {readOnly ? (
-                    <div style={{ 
-                      background: '#0c0c0f', 
-                      padding: '10px 12px', 
-                      borderRadius: '4px', 
-                      border: '1px solid rgba(255,255,255,0.03)',
-                      fontSize: '11px', 
-                      color: 'rgba(255,255,255,0.7)', 
-                      whiteSpace: 'pre-wrap', 
-                      lineHeight: '1.4' 
-                    }}>
-                      {val || <em style={{ color: 'rgba(255,255,255,0.3)' }}>No response entered</em>}
-                    </div>
-                  ) : (
-                    <textarea
-                      value={val}
-                      onChange={(e) => onChange(key, e.target.value)}
-                      onBlur={saveNow}
-                      placeholder="Add technical findings..."
-                      style={{
-                        width: '100%',
-                        height: '75px',
-                        background: '#161619',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '4px',
-                        padding: '8px 10px',
-                        color: '#ffffff',
-                        fontSize: '11px',
-                        resize: 'vertical',
-                        outline: 'none',
-                        fontFamily: 'system-ui, sans-serif'
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── RIGHT PANEL: Workstation Timeline & Inspector ── */}
-      <div style={{ 
-        flex: '2 2 480px', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: '15px'
+        gap: '15px',
+        width: '100%'
       }}>
         
         {/* Workspace Toolbar */}
@@ -953,6 +839,120 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 </div>
               </div>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* ── BOTTOM SECTION: Guidance & Prompt Responses (Analysis Matrix) ── */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '20px', 
+        background: '#111114', 
+        padding: '20px',
+        border: '1px solid rgba(255,255,255,0.04)',
+        borderRadius: '4px',
+        width: '100%'
+      }}>
+        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px' }}>
+          <h3 style={{ 
+            margin: 0, 
+            fontFamily: '"Roboto Mono", monospace', 
+            fontSize: '12px', 
+            color: '#d08f60', 
+            letterSpacing: '0.05em', 
+            textTransform: 'uppercase' 
+          }}>
+            🔬 ANALYSIS MATRIX: ARRANGEMENT
+          </h3>
+          <p style={{ margin: '6px 0 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.4' }}>
+            Map sections, transitions, and dynamic layers over the timeline.
+          </p>
+        </div>
+
+        {/* Guidance and prompts */}
+        {lensData?.description && (
+          <div style={{ 
+            fontSize: '12px', 
+            color: 'rgba(255,255,255,0.6)', 
+            lineHeight: '1.5',
+            background: '#161619',
+            padding: '12px 14px',
+            borderLeft: '3px solid #d08f60',
+            borderRadius: '2px'
+          }}>
+            {lensData.description}
+          </div>
+        )}
+
+        {/* Practical tailored exercises */}
+        {lensData?.exercises && lensData.exercises.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
+              Exercises
+            </span>
+            {lensData.exercises.map((ex, idx) => (
+              <div key={idx} style={{ background: '#0c0c0f', padding: '10px 12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                <strong style={{ fontSize: '11px', color: '#ffffff', display: 'block' }}>{ex.name}</strong>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'block', marginTop: '2px', lineHeight: '1.4' }}>
+                  {ex.description}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Adaptive Questions */}
+        {lensData?.questions && lensData.questions.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '5px' }}>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '10px', color: '#d08f60', textTransform: 'uppercase' }}>
+              Structural Inquiries
+            </span>
+            {lensData.questions.map((question, idx) => {
+              const key = `arrangement-q${idx}`;
+              const val = responses[key] || '';
+              return (
+                <div key={key}>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.8)', marginBottom: '6px', fontWeight: '500', lineHeight: '1.4' }}>
+                    {question}
+                  </label>
+                  {readOnly ? (
+                    <div style={{ 
+                      background: '#0c0c0f', 
+                      padding: '10px 12px', 
+                      borderRadius: '4px', 
+                      border: '1px solid rgba(255,255,255,0.03)',
+                      fontSize: '11px', 
+                      color: 'rgba(255,255,255,0.7)', 
+                      whiteSpace: 'pre-wrap', 
+                      lineHeight: '1.4' 
+                    }}>
+                      {val || <em style={{ color: 'rgba(255,255,255,0.3)' }}>No response entered</em>}
+                    </div>
+                  ) : (
+                    <textarea
+                      value={val}
+                      onChange={(e) => onChange(key, e.target.value)}
+                      onBlur={saveNow}
+                      placeholder="Add technical findings..."
+                      style={{
+                        width: '100%',
+                        height: '75px',
+                        background: '#161619',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '4px',
+                        padding: '8px 10px',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                        resize: 'vertical',
+                        outline: 'none',
+                        fontFamily: 'system-ui, sans-serif'
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
