@@ -428,10 +428,10 @@ const AuditDetail = () => {
                         backgroundColor: '#0c0c0e', 
                         padding: '15px', 
                         borderRadius: '2px', 
-                        borderLeft: '4px solid #d08f60',
-                        border: '1px solid rgba(255,255,255,0.05)',
-                        borderLeftWidth: '4px',
-                        borderLeftColor: '#d08f60'
+                        borderTop: '1px solid rgba(255,255,255,0.05)',
+                        borderRight: '1px solid rgba(255,255,255,0.05)',
+                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        borderLeft: '4px solid #d08f60'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -455,9 +455,10 @@ const AuditDetail = () => {
                     backgroundColor: '#0c0c0e', 
                     padding: '15px', 
                     borderRadius: '2px', 
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    borderLeft: '4px solid #14b8a6',
-                    borderLeftWidth: '4px'
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    borderLeft: '4px solid #14b8a6'
                   }}
                 >
                   <strong style={{ color: '#14b8a6', textTransform: 'uppercase', fontSize: '11px', fontFamily: 'Roboto Mono' }}>

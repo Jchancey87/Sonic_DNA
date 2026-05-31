@@ -399,7 +399,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 {/* SVG audio waveform background overlay */}
                 <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', opacity: 0.04 }} preserveAspectRatio="none">
                   {Array.from({ length: 90 }).map((_, i) => {
-                    const height = 15 + Math.sin(i * 0.18) * 20 + Math.cos(i * 0.45) * 12;
+                    const height = Math.max(1, 15 + Math.sin(i * 0.18) * 20 + Math.cos(i * 0.45) * 12);
                     return (
                       <rect
                         key={i}
