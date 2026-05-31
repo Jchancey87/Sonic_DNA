@@ -226,6 +226,7 @@ def download_and_analyze(youtube_url, yt_id, callback_url=None):
         # Fallback to general mp4 download if ffmpeg is missing.
         download_cmd = [
             ytdlp_bin,
+            "--no-playlist",
             "-x",
             "--audio-format", "mp3",
             "--audio-quality", "5", # low quality/small size for faster speed
@@ -241,6 +242,7 @@ def download_and_analyze(youtube_url, yt_id, callback_url=None):
             # Try downloading without -x format conversion as fallback
             download_cmd_fallback = [
                 ytdlp_bin,
+                "--no-playlist",
                 "-f", "ba", # best audio directly without transcoding
                 "-o", output_template,
                 youtube_url
