@@ -180,60 +180,61 @@ const AuditDetail = () => {
                       <h3 style={{ textTransform: 'capitalize', color: '#d08f60', fontSize: '12px', fontFamily: 'Roboto Mono', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '12px' }}>
                         {lens} Lens
                       </h3>
-                      {lens === 'arrangement' && (
+                      {lens === 'arrangement' ? (
                         <ArrangementTimelineWidget
                           responses={audit.responses}
                           song={song}
+                          lensData={lensData}
                           readOnly={true}
                         />
-                      )}
-                      {lensData.exercises && lensData.exercises.length > 0 && (
-                        <div style={{
-                          marginBottom: '15px',
-                          padding: '12px',
-                          background: 'rgba(208, 143, 96, 0.02)',
-                          border: '1px dashed rgba(208, 143, 96, 0.15)',
-                          borderRadius: '2px',
-                        }}>
-                          <strong style={{ display: 'block', fontSize: '10px', fontFamily: 'Roboto Mono', color: '#d08f60', marginBottom: '8px' }}>
-                            🔬 CONCRETE EXERCISES (TAILORED)
-                          </strong>
-                          <div style={{ display: 'grid', gap: '8px' }}>
-                            {lensData.exercises.map((ex, idx) => (
-                              <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
-                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)' }}>{ex.name}</div>
-                                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{ex.description}</div>
+                      ) : (
+                        <>
+                          {lensData.exercises && lensData.exercises.length > 0 && (
+                            <div style={{
+                              marginBottom: '15px',
+                              padding: '12px',
+                              background: 'rgba(208, 143, 96, 0.02)',
+                              border: '1px dashed rgba(208, 143, 96, 0.15)',
+                              borderRadius: '2px',
+                            }}>
+                              <strong style={{ display: 'block', fontSize: '10px', fontFamily: 'Roboto Mono', color: '#d08f60', marginBottom: '8px' }}>
+                                🔬 CONCRETE EXERCISES (TAILORED)
+                              </strong>
+                              <div style={{ display: 'grid', gap: '8px' }}>
+                                {lensData.exercises.map((ex, idx) => (
+                                  <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
+                                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)' }}>{ex.name}</div>
+                                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{ex.description}</div>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {questions.map((question, idx) => {
-                        const answer = audit.responses[`${lens}-q${idx}`];
-                        if (!answer) return null;
-                        return (
-                          <div 
-                            key={idx} 
-                            style={{ 
-                              marginBottom: '15px', 
-                              backgroundColor: '#0c0c0e', 
-                              padding: '15px', 
-                              borderRadius: '2px', 
-                              borderLeft: '4px solid #d08f60',
-                              border: '1px solid rgba(255,255,255,0.05)',
-                              borderLeftWidth: '4px',
-                              borderLeftColor: '#d08f60'
-                            }}
-                          >
-                            <div style={{ fontWeight: '600', marginBottom: '8px', color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
-                              {question}
                             </div>
-                            <p style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap', color: 'rgba(255, 255, 255, 0.65)', fontSize: '12px', margin: 0 }}>
-                              {answer}
-                            </p>
-                          </div>
-                        );
-                      })}
+                          )}
+                          {questions.map((question, idx) => {
+                            const answer = audit.responses[`${lens}-q${idx}`];
+                            if (!answer) return null;
+                            return (
+                              <div 
+                                key={idx} 
+                                style={{ 
+                                  marginBottom: '15px', 
+                                  backgroundColor: '#0c0c0e', 
+                                  padding: '15px', 
+                                  borderRadius: '2px', 
+                                  border: '1px solid rgba(255,255,255,0.04)' 
+                                }}
+                              >
+                                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'Roboto Mono', marginBottom: '6px' }}>
+                                  Q: {question}
+                                </div>
+                                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+                                  {answer}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
                     </div>
                   );
                 })

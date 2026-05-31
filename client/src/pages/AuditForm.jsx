@@ -465,66 +465,71 @@ const AuditForm = () => {
                         {lensData.description}
                       </p>
                     )}
-                    {lens === 'arrangement' && (
+                    {lens === 'arrangement' ? (
                       <ArrangementTimelineWidget
                         responses={responses}
                         onChange={handleResponseChange}
                         song={song}
+                        lensData={lensData}
+                        saveNow={saveNow}
                       />
-                    )}
-                    {/* Render Concrete Exercises if available */}
-                    {lensData?.exercises && lensData.exercises.length > 0 && (
-                      <div style={{
-                        marginTop: '15px',
-                        marginBottom: '25px',
-                        padding: '15px',
-                        background: 'rgba(208, 143, 96, 0.03)',
-                        border: '1px dashed rgba(208, 143, 96, 0.25)',
-                        borderRadius: '2px',
-                      }}>
-                        <h4 style={{
-                          fontFamily: 'Roboto Mono',
-                          fontSize: '11px',
-                          color: '#d08f60',
-                          marginTop: 0,
-                          marginBottom: '10px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}>
-                          🔬 CONCRETE EXERCISES (TAILORED)
-                        </h4>
-                        <div style={{ display: 'grid', gap: '12px' }}>
-                          {lensData.exercises.map((ex, idx) => (
-                            <div key={idx} style={{ background: '#0a0a0c', padding: '12px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
-                              <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
-                                {ex.name}
-                              </strong>
-                              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.4' }}>
-                                {ex.description}
-                              </p>
+                    ) : (
+                      <>
+                        {/* Render Concrete Exercises if available */}
+                        {lensData?.exercises && lensData.exercises.length > 0 && (
+                          <div style={{
+                            marginTop: '15px',
+                            marginBottom: '25px',
+                            padding: '15px',
+                            background: 'rgba(208, 143, 96, 0.03)',
+                            border: '1px dashed rgba(208, 143, 96, 0.25)',
+                            borderRadius: '2px',
+                          }}>
+                            <h4 style={{
+                              fontFamily: 'Roboto Mono',
+                              fontSize: '11px',
+                              color: '#d08f60',
+                              marginTop: 0,
+                              marginBottom: '10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}>
+                              🔬 CONCRETE EXERCISES (TAILORED)
+                            </h4>
+                            <div style={{ display: 'grid', gap: '12px' }}>
+                              {lensData.exercises.map((ex, idx) => (
+                                <div key={idx} style={{ background: '#0a0a0c', padding: '12px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
+                                  <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
+                                    {ex.name}
+                                  </strong>
+                                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.4' }}>
+                                    {ex.description}
+                                  </p>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </div>
+                        )}
+                        {questions.map((question, idx) => {
+                          const key = `${lens}-q${idx}`;
+                          return (
+                            <div key={key} className="form-group" style={{ marginBottom: '20px' }}>
+                              <label style={{ fontWeight: '600', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                                {question}
+                              </label>
+                              <textarea
+                                id={`response-${key}`}
+                                value={responses[key] || ''}
+                                onChange={(e) => handleResponseChange(key, e.target.value)}
+                                onBlur={saveNow}
+                                placeholder="Type technical observations..."
+                              />
+                            </div>
+                          );
+                        })}
+                      </>
                     )}
-                    {questions.map((question, idx) => {
-                      const key = `${lens}-q${idx}`;
-                      return (
-                        <div key={key} className="form-group" style={{ marginBottom: '20px' }}>
-                          <label style={{ fontWeight: '600', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
-                            {question}
-                          </label>
-                          <textarea
-                            id={`response-${key}`}
-                            value={responses[key] || ''}
-                            onChange={(e) => handleResponseChange(key, e.target.value)}
-                            onBlur={saveNow}
-                            placeholder="Type technical observations..."
-                          />
-                        </div>
-                      );
-                    })}
                   </div>
                 );
               })}
