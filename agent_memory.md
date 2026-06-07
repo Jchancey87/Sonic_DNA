@@ -259,3 +259,5 @@ barToSec(b, bpm) = (b - 1) * barDurSecs(bpm)
 | 2026-05-25 | Tavily domain exclusion (streaming/social), removed invalid `topic` param | — |
 | 2026-05-31 | Python FastAPI audio analysis service (Essentia/madmom/librosa + deterministic fallback), Node webhook, Tap Tempo UI | — |
 | 2026-06-06 | ArrangementTimelineWidget v2: BPM autofill, BARS/SECS ruler toggle (4/4), multi-track instrument lanes, drag-move/resize track blocks, shared scroll, track block inspector | `b6f3e75` |
+| 2026-06-07 | Integrate SigMap and configure Antigravity MCP server | `0f0a791` |
+

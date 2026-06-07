@@ -257,4 +257,25 @@ Check status:
 - Contains: file map, full data model shapes, all `responses` key documentation, design tokens, architecture patterns, known gotchas, open TODOs, and session log.
 - Intent: read this at session start to orient in ~30 seconds instead of crawling the codebase.
 
+---
+
+### 2026-06-07: SigMap Integration & Antigravity MCP Server Setup
+
+#### 1. SigMap Integration
+- **Goal**: Integrate SigMap to provide highly compressed codebase signature maps to AI coding assistants, reducing prompt sizes and token usage.
+- **Implementation**:
+  - Initialized SigMap in the target codebase (`/home/jackc/projects/sonic-dna`) using `npx -y sigmap --init`, generating `gen-context.config.json` and `.contextignore`.
+  - Configured `gen-context.config.json` to utilize the `hot-cold` strategy with a `10` commit window, outputting to `.github/copilot-instructions.md`, `.github/gemini-context.md`, and `.github/context-cold.md`.
+  - Defined file exclusions (`node_modules/**`, `venv/**`, `.venv/**`, `dist/**`, `build/**`, `out/**`, `.git/**`, lockfiles, caches) to prevent token waste on compiled files or dependencies.
+  - Ran the initial codebase signature scan (`npx sigmap`) to generate the initial map of active ("hot") signatures (8 files, ~781 tokens) and archived ("cold") signatures (24 files, ~1831 tokens), achieving a 99% token reduction.
+  - Installed a git post-commit hook using `npx sigmap --setup` to automatically regenerate signatures on subsequent commits.
+
+#### 2. Antigravity MCP Server Setup
+- **Goal**: Enable the Antigravity assistant to query the cold signature map on-demand via the Model Context Protocol (MCP).
+- **Implementation**:
+  - Registered SigMap as an MCP server by creating/updating the configuration file at `/home/jackc/.gemini/antigravity-cli/mcp_config.json`.
+  - Configured the server command to execute `npx -y sigmap --mcp`, allowing Antigravity to run queries (`read_context`, `query`, `get_signatures`) over the codebase structures via JSON-RPC stdio.
+- **Commit**: `0f0a791`
+
+
 
