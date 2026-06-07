@@ -23,3 +23,4 @@
 | 2026-06-06 | ArrangementTimelineWidget v2: BPM autofill, BARS/SECS ruler toggle (4/4), multi-track lanes | `b6f3e75` |
 | 2026-06-07 | Integrate SigMap and configure Antigravity MCP server | `0f0a791` |
 | 2026-06-07 | Prune agent_memory.md to optimize token usage | `c4c348c` |
+| 2026-06-07 | Scaffold CLAP GPU analysis pipeline & fallback simulation | `7151075` |

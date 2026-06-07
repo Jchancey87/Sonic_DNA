@@ -277,5 +277,22 @@ Check status:
   - Configured the server command to execute `npx -y sigmap --mcp`, allowing Antigravity to run queries (`read_context`, `query`, `get_signatures`) over the codebase structures via JSON-RPC stdio.
 - **Commit**: `0f0a791`
 
+---
+
+### 2026-06-07: CLAP GPU Audio Analysis Scaffolding & Fallback Simulation
+
+#### 1. GPU Acceleration & CLAP Proposal
+- **Goal**: Evaluate the feasibility of using a local 4GB Nvidia 1050 Ti GPU (via passthrough) to accelerate audio semantic extraction.
+- **Architectural Proposal**: Drafted a comprehensive integration plan in [clap_analysis_proposal.md](file:///home/jackc/.gemini/antigravity-cli/brain/7e8ab30b-88cf-4042-9d46-e87b0d5cd747/clap_analysis_proposal.md), highlighting lens-by-lens benefits (specifically targeting the Texture and Arrangement lenses) and listing VRAM optimizations (FP16 mixed precision, small batch sizes, segment chunking).
+
+#### 2. CLAP Scaffolding & Simulation Integration
+- **Implementation**:
+  - Created a robust `ClapAnalyzer` class inside [analyzer.py](file:///home/jackc/projects/sonic-dna/analysis_service/analyzer.py) utilizing Hugging Face `transformers` and PyTorch.
+  - Implemented lazy loading for the CLAP model using `get_clap_analyzer()` to minimize memory footprint during server idle.
+  - Configured sliding-window feature extraction: splits audio into 10-second segments, runs CLAP model inference, and aggregates cosine similarities for target lists of vibes, instruments, and production textures.
+  - Designed a high-fidelity simulation fallback when PyTorch/CLAP is missing, ensuring consistent schema output (`clap_semantic_features`) for backend parsing.
+  - Updated [requirements.txt](file:///home/jackc/projects/sonic-dna/analysis_service/requirements.txt) with commented-out machine learning libraries to simplify setup in future containers.
+- **Commit**: `7151075`
+
 
 
