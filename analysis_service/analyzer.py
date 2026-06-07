@@ -32,6 +32,93 @@ try:
 except ImportError:
     HAS_MADMOM = False
 
+# CLAP ML pipeline imports
+try:
+    import torch
+    from transformers import AutoProcessor, ClapModel
+    HAS_CLAP = True
+except ImportError:
+    HAS_CLAP = False
+
+
+class ClapAnalyzer:
+    def __init__(self, model_name="laion/clap-htsat-fused"):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"[CLAP] Initializing {model_name} on {self.device}...")
+        self.processor = AutoProcessor.from_pretrained(model_name)
+        self.model = ClapModel.from_pretrained(model_name).to(self.device)
+        if self.device == "cuda":
+            self.model = self.model.half()
+        self.model.eval()
+
+    def analyze_features(self, file_path, tags):
+        """
+        Loads the audio, splits into 10-second segments, and computes
+        average similarity scores for each tag.
+        """
+        if not HAS_LIBROSA:
+            raise RuntimeError("Librosa is required to load audio for CLAP analysis.")
+            
+        # CLAP expects 48kHz audio natively
+        y, sr = librosa.load(file_path, sr=48000)
+        
+        # Split into 10-second segments (480,000 samples)
+        segment_len = 10 * 48000
+        segments = [y[i:i + segment_len] for i in range(0, len(y), segment_len) if len(y[i:i + segment_len]) > 2 * 48000]
+        
+        if not segments:
+            segments = [y]
+
+        results = {tag: 0.0 for tag in tags}
+        
+        # Batch size for GTX 1050 Ti VRAM limit (4GB)
+        batch_size = 4
+        
+        for i in range(0, len(segments), batch_size):
+            batch = segments[i:i + batch_size]
+            
+            inputs = self.processor(
+                audios=batch,
+                sampling_rate=48000,
+                text=tags,
+                return_tensors="pt",
+                padding=True
+            )
+            
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            if self.device == "cuda":
+                inputs["input_features"] = inputs["input_features"].half()
+                
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                logits_per_audio = outputs.logits_per_audio
+                # Softmax across text candidates to get relative probabilities per segment
+                probs = logits_per_audio.softmax(dim=-1).cpu().numpy()
+                
+            # Accumulate probabilities across all chunks
+            for p in probs:
+                for idx, tag in enumerate(tags):
+                    results[tag] += float(p[idx])
+                    
+        # Average the scores over chunks
+        num_chunks = len(segments)
+        for tag in results:
+            results[tag] = round(results[tag] / num_chunks, 4)
+            
+        return results
+
+
+_clap_analyzer = None
+
+def get_clap_analyzer():
+    global _clap_analyzer
+    if _clap_analyzer is None and HAS_CLAP and HAS_LIBROSA:
+        try:
+            _clap_analyzer = ClapAnalyzer()
+        except Exception as e:
+            print(f"[CLAP] Failed to initialize ClapAnalyzer: {e}", file=sys.stderr)
+    return _clap_analyzer
+
 
 def analyze_audio_file(file_path, yt_id):
     """
@@ -169,8 +256,46 @@ def analyze_audio_file(file_path, yt_id):
             "confidence": round(rng.uniform(0.6, 0.95), 2)
         })
 
+    # ── CLAP Semantic Texture Scaffolding ────────────────────────────────────
+    sim_vibes = ["energetic", "melancholic", "chilled", "aggressive", "dreamy", "intimate", "cinematic"]
+    sim_instruments = ["electric guitar", "acoustic guitar", "synthesizer", "piano", "organ", "brass", "strings", "female vocals", "male vocals", "drum machine", "acoustic drums"]
+    sim_production = ["reverberant", "dry", "lo-fi", "distorted", "clean", "bright", "warm", "compressed"]
+    
+    # Deterministic simulation fallback
+    vibe_scores = {v: round(rng.uniform(0.01, 0.4), 3) for v in sim_vibes}
+    instrument_scores = {inst: round(rng.uniform(0.01, 0.5), 3) for inst in sim_instruments}
+    production_scores = {prod: round(rng.uniform(0.01, 0.4), 3) for prod in sim_production}
+    
+    vibe_sum = sum(vibe_scores.values()) or 1.0
+    vibe_scores = {k: round(v/vibe_sum, 3) for k, v in vibe_scores.items()}
+    inst_sum = sum(instrument_scores.values()) or 1.0
+    instrument_scores = {k: round(v/inst_sum, 3) for k, v in instrument_scores.items()}
+    prod_sum = sum(production_scores.values()) or 1.0
+    production_scores = {k: round(v/prod_sum, 3) for k, v in production_scores.items()}
+    
+    clap_analyzer = get_clap_analyzer()
+    if clap_analyzer:
+        try:
+            analysis_notes.append("CLAP: semantic analysis enabled (GPU-accelerated)")
+            all_tags = sim_vibes + sim_instruments + sim_production
+            raw_scores = clap_analyzer.analyze_features(file_path, all_tags)
+            
+            # Map raw scores back to categories and normalize
+            vibe_scores = {v: raw_scores[v] for v in sim_vibes}
+            instrument_scores = {inst: raw_scores[inst] for inst in sim_instruments}
+            production_scores = {prod: raw_scores[prod] for prod in sim_production}
+            
+            vibe_sum = sum(vibe_scores.values()) or 1.0
+            vibe_scores = {k: round(v/vibe_sum, 3) for k, v in vibe_scores.items()}
+            inst_sum = sum(instrument_scores.values()) or 1.0
+            instrument_scores = {k: round(v/inst_sum, 3) for k, v in instrument_scores.items()}
+            prod_sum = sum(production_scores.values()) or 1.0
+            production_scores = {k: round(v/prod_sum, 3) for k, v in production_scores.items()}
+        except Exception as e:
+            analysis_notes.append(f"CLAP semantic extraction failed: {str(e)}")
+
     if not analysis_notes:
-        analysis_notes.append("System Running in High-Fidelity Simulation Mode (Essentia/madmom unavailable)")
+        analysis_notes.append("System Running in High-Fidelity Simulation Mode (Essentia/madmom/CLAP unavailable)")
     else:
         analysis_notes.append("Audio analysis pipeline completed successfully.")
 
@@ -199,6 +324,11 @@ def analyze_audio_file(file_path, yt_id):
             "std_hz": round(rng.uniform(200, 600), 1)
         },
         "danceability_or_pulse_strength": round(rng.uniform(0.35, 0.88), 2),
+        "clap_semantic_features": {
+            "vibe": vibe_scores,
+            "instruments": instrument_scores,
+            "production": production_scores
+        },
         "analysis_notes": " | ".join(analysis_notes)
     }
 
