@@ -15,9 +15,24 @@ server/adapters/OpenAIAdapter.js ← ports/IAIModelService
 server/adapters/TavilyAdapter.js ← ports/ISearchService
 server/services/auditService.js ← models/Audit
 client/src/App.jsx ← styles/global, context/AuthContext, context/AudioContext, pages/Login, pages/Dashboard
+client/src/adapters/HttpBackendAdapter.js ← ports/IBackendService
+client/src/adapters/InMemoryBackendAdapter.js ← ports/IBackendService
 client/src/context/AudioContext.jsx ← BackendContext
 client/src/context/AuthContext.jsx ← BackendContext
 client/src/context/BackendContext.jsx ← adapters/HttpBackendAdapter
+client/src/pages/AuditForm.jsx ← context/BackendContext, context/AudioContext, components/ArrangementTimelineWidget
+analysis_service/app.py ← fastapi, pydantic, analyzer
+```
+
+## analysis_service
+
+### analysis_service/app.py
+```
+class AnalysisRequest(BaseModel) {song_id*, youtube_url*, yt_id*, callback_url?}  :28-32
+def health()  :35-36
+def trigger_analysis(request: AnalysisRequest, background_tasks: BackgroundTasks)  :39-60  # Triggers an asynchronous audio analysis job
+GET /health  →  health()  :35-36
+POST /analyze  →  trigger_analysis()  :39-60
 ```
 
 ## client
@@ -39,6 +54,32 @@ div#root
 function App()  :541-553
 ```
 
+### client/src/adapters/HttpBackendAdapter.js
+```
+export class HttpBackendAdapter  :8-172
+  constructor(baseURL)  :9-22
+  async login(email, password)  :25-28
+  async register(email, password, name)  :30-33
+  async getUserProfile()  :35-38
+  async updatePreferences(preferences)  :40-43
+  async updateProfile(profileData)  :45-48
+  async changePassword(oldPassword, newPassword)  :50-53
+  async deleteAccount()  :55-58
+```
+
+### client/src/adapters/InMemoryBackendAdapter.js
+```
+export class InMemoryBackendAdapter  :7-150
+  constructor()  :8-15
+  async login(email, password)  :18-27
+  async register(email, password, name)  :29-38
+  async getUserProfile()  :40-43
+  async updatePreferences(preferences)  :45-52
+  async updateProfile(profileData)  :54-63
+  async changePassword(oldPassword, newPassword)  :65-68
+  async deleteAccount()  :70-73
+```
+
 ### client/src/context/AudioContext.jsx
 ```
 export const AudioProvider = ({ children }) =>  :7-148
@@ -55,6 +96,25 @@ export const useAuth = () =>  :116-122
 ```
 export const BackendProvider = ({ children, adapter }) =>  :6-17
 export const useBackend = () =>  :19-25
+```
+
+### client/src/pages/AuditForm.jsx
+```
+function useAutosave(auditId, data, backend, delay = 3000)  :8-45
+function formatTime(seconds)  :48-51
+```
+
+### client/src/ports/IBackendService.js
+```
+export class IBackendService  :7-51
+  async login(email, password)  :9-9
+  async register(email, password, name)  :10-10
+  async getUserProfile()  :11-11
+  async updatePreferences(preferences)  :12-12
+  async updateProfile(profileData)  :13-13
+  async changePassword(oldPassword, newPassword)  :14-14
+  async deleteAccount()  :15-15
+  async getSongs(filters)  :18-18
 ```
 
 ## server
@@ -158,6 +218,12 @@ export class ISearchService  :12-33
   async search(query, maxResults = 10) → Promise<{query: string, r  :30-32
 ```
 
+### server/routes/songs.js
+```
+function extractYouTubeId(url)  :12-24
+function _sanitizeSong(song)  :252-278
+```
+
 ### server/services/auditGenerator.js
 ```
 export async function generateAuditTemplate(songTitle, artist, researchSummary, lenses)  :42-77
@@ -189,6 +255,17 @@ export class AuthService  :4-146
   if(!email || !password)  :34-36
   if(!user)  :41-43
   if(!isValid)  :47-49
+```
+
+### server/services/songService.js
+```
+export class SongService  :11-116
+  constructor(songRepository, searchService, aiService)  :12-17
+  async importSong(songData, research) → Promise<Object>  :31-116
+  if(!title || !resolvedSourceId || !userId)  :55-57
+  if(existing)  :67-72
+  if(research && research.results?.length > 0 && this.aiService)  :75-116
+  if(aiSummary && aiSummary.overview)  :100-112
 ```
 
 ### server/services/tasteService.js
