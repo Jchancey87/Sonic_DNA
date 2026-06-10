@@ -92,6 +92,8 @@ const AuditForm = () => {
   // Audio Analysis pipeline state
   const [showAnalysis, setShowAnalysis] = useState(true);
   const [showOverrideControls, setShowOverrideControls] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisStage, setAnalysisStage] = useState('Initiating extraction pipeline...');
   const [overrideBpm, setOverrideBpm] = useState('');
   const [overrideKey, setOverrideKey] = useState('');
   const [overrideScale, setOverrideScale] = useState('');
@@ -129,6 +131,41 @@ const AuditForm = () => {
       if (intervalId) clearInterval(intervalId);
     };
   }, [song?.audioAnalysisStatus, song?._id]);
+
+  // Simulated progress state driver for analysis
+  useEffect(() => {
+    let timer;
+    if (song && song.audioAnalysisStatus === 'pending') {
+      setAnalysisProgress(0);
+      setAnalysisStage('Connecting to signal source...');
+      
+      const stages = [
+        { threshold: 15, text: 'Downloading audio source from stream...' },
+        { threshold: 40, text: 'Running transient beat & downbeat tracking...' },
+        { threshold: 65, text: 'Calculating keys, scales, and chords...' },
+        { threshold: 85, text: 'Running CLAP semantic vibe analysis...' },
+        { threshold: 98, text: 'Assembling override vectors...' },
+      ];
+
+      timer = setInterval(() => {
+        setAnalysisProgress((prev) => {
+          const next = Math.min(prev + Math.floor(Math.random() * 4) + 1, 99);
+          const currentStage = stages.find(s => next <= s.threshold);
+          if (currentStage) {
+            setAnalysisStage(currentStage.text);
+          } else {
+            setAnalysisStage('Finalizing background database sync...');
+          }
+          return next;
+        });
+      }, 400);
+    } else {
+      setAnalysisProgress(0);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [song?.audioAnalysisStatus]);
 
   const handleTapTempo = () => {
     const now = Date.now();
@@ -505,14 +542,20 @@ const AuditForm = () => {
                 )}
 
                 {song.audioAnalysisStatus === 'pending' && (
-                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                    <div style={{ display: 'inline-block', width: '20px', height: '20px', border: '2px solid rgba(208, 143, 96, 0.3)', borderTopColor: '#d08f60', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '10px' }} />
-                    <p style={{ fontSize: '12px', fontFamily: 'Roboto Mono', color: '#d08f60', margin: 0 }}>
-                      📡 EXTRACTING HARMONIC & RHYTHMIC CODES IN BACKGROUND (ETA 15-30s)...
+                  <div style={{ textAlign: 'center', padding: '25px 0' }}>
+                    <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '2.5px solid rgba(208, 143, 96, 0.2)', borderTopColor: '#d08f60', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '12px' }} />
+                    <p style={{ fontSize: '12px', fontFamily: 'Roboto Mono', color: '#d08f60', margin: '0 0 10px 0', letterSpacing: '0.05em' }}>
+                      📡 EXTRACTING HARMONIC & RHYTHMIC CODES ({analysisProgress}%)
                     </p>
-                    <small style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginTop: '6px', display: 'block' }}>
-                      Using Essentia / madmom / librosa core modules
-                    </small>
+                    
+                    {/* Simulated Progress Bar */}
+                    <div style={{ width: '80%', maxWidth: '380px', height: '5px', background: 'rgba(255, 255, 255, 0.08)', margin: '0 auto 12px auto', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                      <div style={{ width: `${analysisProgress}%`, height: '100%', background: 'linear-gradient(90deg, #d08f60, #e2a87c)', transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)', borderRadius: '4px' }} />
+                    </div>
+                    
+                    <p style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.45)', margin: 0, fontFamily: 'Roboto Mono', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                      {analysisStage}
+                    </p>
                   </div>
                 )}
 
