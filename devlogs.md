@@ -296,3 +296,25 @@ Check status:
 
 
 
+
+### 2026-06-10: Full Rebrand — Sonic DNA → Arra
+
+#### Goal
+Systematically replace all remaining "Sonic DNA" branding with "Arra" across source code, documentation, and deploy scripts.
+
+#### Changes Made
+- **Source code**:
+  - `client/src/pages/AuditForm.jsx`: `"DNA Audit"` → `"Arra Audit"` in audit h1 heading
+  - `client/src/pages/TechniqueNotebook.jsx`: `"musical DNA"` → `"musical vocabulary"` in description text
+  - `analysis_service/app.py`: FastAPI title and startup log updated
+  - `deploy.sh`: Banner text updated
+  - `client/public/favicon.ico`: Placeholder text updated
+  - `.github/context-cold.md`: Titles updated
+- **Docs**: `README.md`, `SETUP.md`, `IMPLEMENTATION.md`, `PROXMOX_DEPLOYMENT.md`, `REDEPLOYMENT.md`, `HANDOFF.md`, `START_HERE.md`, `ADAPTER_IMPLEMENTATION.md`, `ARCHITECTURE_COMPLETE.md`, `DEPENDENCY_ASSESSMENT.md`, `QUICKSTART.md`
+- `IMPLEMENTATION.md`: `"musical DNA"` → `"musical vocabulary"`
+
+#### Verification
+Post-rename `grep -rn DNA` (excluding venv, .git, node_modules, devlogs.md) returned zero matches.
+
+#### Commit
+`66249ec` — rebrand: replace all Sonic DNA references with Arra (36 files changed)
