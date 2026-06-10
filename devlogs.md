@@ -387,4 +387,24 @@ Resolve the audio signal extraction compilation/execution failure on Phase 1 of 
 #### Commit
 `67f3148` — fix(ops): run python audio analysis service under PM2
 
+---
+
+### 2026-06-10: Simulated Progress Bar for Audio Signal Extraction
+
+#### Goal
+Improve the user experience during Phase 1 of guided audits by visualizing the stages of background audio signal extraction (downloading, transient detection, harmonic mapping, semantic analysis) with a progress bar.
+
+#### Implementation
+- **Progress Simulation Hook**:
+  - Declared `analysisProgress` and `analysisStage` state variables in [AuditForm.jsx](file:///home/jackc/projects/arra/client/src/pages/AuditForm.jsx).
+  - Added a `useEffect` hook that detects when `song.audioAnalysisStatus === 'pending'` and increments progress (0% to 99%) over time. It transitions the text to reflect current extraction phases (downloading, beat detection, harmonic calculations, CLAP semantics).
+- **Progress Bar UI**:
+  - Replaced the simple text loader in [AuditForm.jsx](file:///home/jackc/projects/arra/client/src/pages/AuditForm.jsx) with a custom progress container, featuring a smooth transition bar utilizing the theme's core color `#d08f60`.
+- **Verification**:
+  - Run the production build via `npm --prefix client run build` to ensure no bundling/compilation issues.
+
+#### Commit
+`1b6d53a` — feat(ui): add simulated progress bar for background audio analysis
+
+
 
