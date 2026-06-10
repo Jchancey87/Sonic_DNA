@@ -367,3 +367,24 @@ Prevent Tavily search from returning 0 results due to YouTube video title noise 
 #### Commit
 `6ed42a3` — fix(research): clean YouTube metadata noise from search query for song imports
 
+---
+
+### 2026-06-10: Python Audio Analysis Microservice PM2 Integration
+
+#### Goal
+Resolve the audio signal extraction compilation/execution failure on Phase 1 of guided audits caused by the Python FastAPI microservice being offline.
+
+#### Implementation
+- **PM2 Configuration**:
+  - Registered `arra-analysis` service inside [ecosystem.config.cjs](file:///home/jackc/projects/arra/ecosystem.config.cjs).
+  - Configured it to execute the virtual environment python interpreter `/home/jackc/projects/arra/venv/bin/python` to run `app.py` in the `analysis_service` directory on port `8080`.
+- **Deploy Script Sync**:
+  - Integrated `arra-analysis` controls into [deploy.sh](file:///home/jackc/projects/arra/deploy.sh) to automate stopping, launching, and restarting stages of the deployment pipeline.
+- **Verification**:
+  - Ran the revised `./deploy.sh` script to verify that all three PM2 services (`arra-server`, `arra-client`, and `arra-analysis`) start successfully and persist across reboots via `pm2 save`.
+  - Confirmed all Jest backend unit and integration tests continue to pass.
+
+#### Commit
+`67f3148` — fix(ops): run python audio analysis service under PM2
+
+
