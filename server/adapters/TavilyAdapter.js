@@ -25,8 +25,10 @@ export class TavilyAdapter extends ISearchService {
       return this._noApiKeyResponse(title, artist);
     }
 
-    const query = `${title} ${artist} song production analysis technique`;
-    console.log(`[Tavily] Searching (max 6 results): "${query}"`);
+    const cleanedTitle = cleanQueryTerm(title);
+    const cleanedArtist = cleanQueryTerm(artist);
+    const query = `${cleanedTitle} ${cleanedArtist} song production analysis technique`;
+    console.log(`[Tavily] Searching (max 6 results): "${query}" (original: "${title}" by "${artist}")`);
 
     try {
       const response = await axios.post(
@@ -194,3 +196,12 @@ export class TavilyAdapter extends ISearchService {
     };
   }
 }
+
+function cleanQueryTerm(text) {
+  if (!text) return '';
+  return text
+    .replace(/\s*[\(\[][^)\]]*(?:official|music|video|audio|lyrics|hd|4k|hq|visualizer|clip|edit|version)[^)\]]*[\]\)]/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
