@@ -14,8 +14,8 @@
 - **Jest test paths**: Tests live in root `tests/` but import `../../services/`. Run from `server/` via symlink `server/tests -> ../tests`. Always run as `npm test` from `server/` dir.
 
 ## 🛠️ Open Priority TODOs
-- [ ] Time signature selector (3/4, 6/8) in ArrangementTimelineWidget.
-- [ ] Horizontal zoom control (PX_PER_SEC slider) in timeline.
+- [x] Time signature selector (3/4, 6/8) in ArrangementTimelineWidget.
+- [x] Horizontal zoom control (PX_PER_SEC slider) in timeline.
 - [ ] Multi-select and bulk-delete track blocks.
 - [ ] Export arrangement as image/PDF.
 
@@ -32,6 +32,7 @@
 | 2026-06-10 | Integrate python audio analysis microservice into PM2 and deploy script | `67f3148` |
 | 2026-06-10 | Add simulated progress bar displaying extraction stages to Phase 1 Audit loading state | `1b6d53a` |
 | 2026-06-10 | Allow resuming guided audits from Dashboard history list and AuditDetail review views | `9a95351` |
+| 2026-06-10 | Implement UI/UX design handoff: Bitwig dark studio theme, playheads, dynamic zoom, and meter signature dropdown | `e167637` |
 
 
 

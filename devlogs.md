@@ -425,6 +425,38 @@ Allow users to easily save their progress on guided audits (which are persisted 
 #### Commit
 `9a95351` — feat(ui): allow resuming guided audits from dashboard and detail views
 
+---
+
+### 2026-06-10: Bitwig Dark Studio Aesthetic Integration & Timeline Feature Overhauls
+
+#### Goal
+Implement the UI/UX design handoff to transform the Arra Audit interface into a premium, high-density, tactile "dark studio" engineering environment styled after Bitwig Studio. Add horizontal timeline zoom controls and a time signature meter selector to satisfy open priority TODOs.
+
+#### Implementation
+- **Tactile Color System & Surface Tiers**:
+  - Implemented 3-tier dark theme surfaces (`#111111` deep background/sidebar, `#1e1e1e` workspace panels, `#282828` header/transport bars) in `global.js` and `App.jsx`.
+  - Upgraded buttons to use linear hardware console gradients (`linear-gradient(180deg, #333333 0%, #222222 100%)`) and hover glow effects.
+  - Converted the old copper branding color `#d08f60` to Bitwig Orange `#ff6600` across 14 files under `client/src/` to ensure visual accent consistency.
+  - Replaced the navigation emojis in `App.jsx` with clean feather-style vector SVG paths and styled sidebar active states with a left-edge orange vertical border accent.
+- **Docked Signal Analysis Matrix**:
+  - Docked matrix cards inside `AuditForm.jsx` and `AuditDetail.jsx` into a unified grid panel layout with `1px` shared boundaries, dedicated `#2D2D2D` dark header labels, and glowing circular LED status indicator dots.
+- **Electric Cyan Playhead Snapping**:
+  - Replaced waveform and arranger playhead styles with a solid electric cyan `#00e5ff` line featuring a downward-pointing triangle handle at the top.
+  - Removed transition lag (`transition: 'none'`) to make timeline playhead snapping and scrubbing feel instantaneous and responsive.
+- **Horizontal Zoom & Time Signature Selectors**:
+  - Replaced the static constant `PX_PER_SEC` in `ArrangementTimelineWidget.jsx` with a dynamic `pxPerSec` state linked to a horizontal zoom control slider.
+  - Added a `METER` dropdown selector in the timeline toolbar supporting `4/4`, `3/4`, and `6/8` time signatures, updating bar duration calculations on-the-fly.
+  - Replaced track lane emojis with standard console abbreviations (e.g. `VOC`, `DRM`, `BAS`, `SYN`).
+  - Styled arranger timeline section blocks with a semi-transparent color matching their category (e.g. intro violet, chorus teal, bridge amber) and a thick colored border.
+
+#### Verification
+- Built successfully via `npm --prefix client run build` with zero compilation errors.
+- Verified all 29 Jest server unit and integration tests continue to pass.
+
+#### Commit
+`e167637` — feat(ui): implement Bitwig dark studio aesthetic and timeline features
+
+
 
 
 
