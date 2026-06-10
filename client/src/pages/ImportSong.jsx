@@ -56,7 +56,7 @@ const ImportSong = () => {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <h1>Import Song from YouTube</h1>
         <p className="card-subtitle">Paste a YouTube URL to import a song for analysis</p>
 
@@ -72,7 +72,7 @@ const ImportSong = () => {
               onChange={(e) => setYoutubeUrl(e.target.value)}
               placeholder="https://www.youtube.com/watch?v=..."
               disabled={loading}
-              style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+              style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
             />
             <small style={{ color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '9px', marginTop: '6px', display: 'block' }}>
               Supported: youtube.com, youtu.be, or any standard YouTube video link

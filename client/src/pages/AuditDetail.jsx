@@ -83,7 +83,7 @@ const AuditDetail = () => {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '20px' }}>
           <div>
             <h1>{song?.title || 'Unknown Song'}</h1>
@@ -132,7 +132,7 @@ const AuditDetail = () => {
 
         {/* 🧬 SIGNAL AUDIO ANALYSIS MATRIX (READ-ONLY) */}
         {song && song.audioAnalysisStatus === 'success' && song.audioAnalysis && (
-          <div className="panel" style={{ background: '#141418', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
+          <div className="panel" style={{ background: 'var(--bg-panel)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowAnalysis(!showAnalysis)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: '#ff6600', fontSize: '14px' }}>🧬</span>
@@ -225,7 +225,7 @@ const AuditDetail = () => {
 
                 {/* Timeline lanes */}
                 {duration > 0 && (
-                  <div style={{ background: '#0a0a0c', padding: '15px', borderRadius: '2px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ background: 'var(--bg-workspace)', padding: '15px', borderRadius: '2px', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ fontSize: '10px', fontFamily: 'Roboto Mono', color: 'rgba(255,255,255,0.45)', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
                       <span>⏱️ REAL-TIME TEMPORAL LANES</span>
                       <span>{formatTimestamp(currentTime)} / {formatTimestamp(duration)}</span>
@@ -233,7 +233,7 @@ const AuditDetail = () => {
                     
                     {/* Interactive Playhead Lane */}
                     <div 
-                      style={{ position: 'relative', height: '28px', background: '#101014', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
+                      style={{ position: 'relative', height: '28px', background: 'var(--bg-workspace)', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
                       onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const pct = (e.clientX - rect.left) / rect.width;
@@ -296,7 +296,7 @@ const AuditDetail = () => {
                     </div>
 
                     {/* Tonal lane (Sections) */}
-                    <div style={{ position: 'relative', height: '24px', background: '#0a0a0c', marginTop: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ position: 'relative', height: '24px', background: 'var(--bg-workspace)', marginTop: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
                       {(song.audioAnalysis.sectional_key_candidates || []).map((sect, i, arr) => {
                         const pctWidth = 100 / arr.length;
                         return (

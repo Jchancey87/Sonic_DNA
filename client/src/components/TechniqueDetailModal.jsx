@@ -162,7 +162,7 @@ const TechniqueDetailModal = ({ isOpen, onClose, tech, songs, onUpdate, onDelete
           maxHeight: '90vh',
           overflowY: 'auto',
           margin: '20px',
-          background: '#151518',
+          background: 'var(--bg-panel)',
           borderColor: 'rgba(255, 255, 255, 0.08)',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
           borderLeft: `5px solid ${getLensColor(lens)}`,

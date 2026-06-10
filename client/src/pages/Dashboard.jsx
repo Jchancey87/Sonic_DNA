@@ -77,7 +77,7 @@ const Dashboard = () => {
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
       {/* Header Panel */}
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <h1 style={{ margin: 0, border: 'none', padding: 0 }}>🎛️ Song Library Crate</h1>
           <Link to="/import">
@@ -140,7 +140,7 @@ const Dashboard = () => {
               >
                 {/* Thumbnail */}
                 {(song.thumbnailUrl || song.thumbnail) && (
-                  <div style={{ position: 'relative', width: '100%', height: '140px', background: '#0a0a0c', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '140px', background: 'var(--bg-workspace)', overflow: 'hidden' }}>
                     <img
                       src={song.thumbnailUrl || song.thumbnail}
                       alt={song.title}

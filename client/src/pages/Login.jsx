@@ -37,7 +37,7 @@ const Login = () => {
 
   return (
     <div style={{ maxWidth: '400px', margin: '0 auto', padding: '40px 20px' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#ff6600', fontSize: '16px', letterSpacing: '0.05em' }}>
           🎵 ARRA // AUDIT SYSTEM
         </h1>
@@ -54,7 +54,7 @@ const Login = () => {
                 onChange={(e) => setName(e.target.value)}
                 required={!isLogin}
                 placeholder="Your name"
-                style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
               />
             </div>
           )}
@@ -67,7 +67,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="your@email.com"
-              style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+              style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
             />
           </div>
 
@@ -79,7 +79,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
-              style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+              style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
             />
           </div>
 

@@ -330,7 +330,7 @@ const AuditForm = () => {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
 
         {/* Save status indicator */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
@@ -469,7 +469,7 @@ const AuditForm = () => {
 
             {currentStep && (
               <div style={{
-                background: '#1c1c22',
+                background: 'var(--bg-panel)',
                 padding: '15px',
                 borderLeft: '3px solid #ff6600',
                 borderRadius: '2px',
@@ -503,7 +503,7 @@ const AuditForm = () => {
 
         {/* 🧬 SIGNAL AUDIO ANALYSIS MATRIX */}
         {song && (
-          <div className="panel" style={{ background: '#141418', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
+          <div className="panel" style={{ background: 'var(--bg-panel)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowAnalysis(!showAnalysis)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: '#ff6600', fontSize: '14px' }}>🧬</span>
@@ -663,7 +663,7 @@ const AuditForm = () => {
 
                     {/* Timeline lanes */}
                     {duration > 0 && (
-                      <div style={{ background: '#0a0a0c', padding: '15px', borderRadius: '2px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
+                      <div style={{ background: 'var(--bg-workspace)', padding: '15px', borderRadius: '2px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
                         <div style={{ fontSize: '10px', fontFamily: 'Roboto Mono', color: 'rgba(255,255,255,0.45)', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
                           <span>⏱️ REAL-TIME TEMPORAL LANES</span>
                           <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
@@ -671,7 +671,7 @@ const AuditForm = () => {
                         
                         {/* Interactive Playhead Lane */}
                         <div 
-                          style={{ position: 'relative', height: '28px', background: '#101014', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
+                          style={{ position: 'relative', height: '28px', background: 'var(--bg-workspace)', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}
                           onClick={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
                             const pct = (e.clientX - rect.left) / rect.width;
@@ -734,7 +734,7 @@ const AuditForm = () => {
                         </div>
 
                         {/* Tonal lane (Sections) */}
-                        <div style={{ position: 'relative', height: '24px', background: '#0a0a0c', marginTop: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                        <div style={{ position: 'relative', height: '24px', background: 'var(--bg-workspace)', marginTop: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
                           {(song.audioAnalysis.sectional_key_candidates || []).map((sect, i, arr) => {
                             const pctWidth = 100 / arr.length;
                             return (
@@ -792,13 +792,13 @@ const AuditForm = () => {
                                 step="0.01"
                                 value={overrideBpm}
                                 onChange={(e) => setOverrideBpm(e.target.value)}
-                                style={{ background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px' }}
+                                style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px' }}
                               />
                               <button
                                 type="button"
                                 onClick={handleTapTempo}
                                 style={{
-                                  background: '#1c1c22',
+                                  background: 'var(--bg-panel)',
                                   color: '#ff6600',
                                   border: '1px solid rgba(255, 102, 0, 0.4)',
                                   padding: '4px 10px',
@@ -819,7 +819,7 @@ const AuditForm = () => {
                             <select
                               value={overrideKey}
                               onChange={(e) => setOverrideKey(e.target.value)}
-                              style={{ background: '#0a0a0c', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
+                              style={{ background: 'var(--bg-workspace)', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
                             >
                               <option value="">-- Choose Key --</option>
                               {['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'].map(k => (
@@ -834,7 +834,7 @@ const AuditForm = () => {
                             <select
                               value={overrideScale}
                               onChange={(e) => setOverrideScale(e.target.value)}
-                              style={{ background: '#0a0a0c', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
+                              style={{ background: 'var(--bg-workspace)', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
                             >
                               <option value="">-- Choose Scale --</option>
                               <option value="major">Major</option>
@@ -848,7 +848,7 @@ const AuditForm = () => {
                             <select
                               value={overrideMeter}
                               onChange={(e) => setOverrideMeter(e.target.value)}
-                              style={{ background: '#0a0a0c', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
+                              style={{ background: 'var(--bg-workspace)', color: '#fff', borderColor: 'rgba(255,255,255,0.1)', padding: '4px 8px', fontSize: '12px', width: '100%', boxSizing: 'border-box' }}
                             >
                               <option value="">-- Choose Meter --</option>
                               <option value="4/4">4/4</option>
@@ -863,7 +863,7 @@ const AuditForm = () => {
                         <div style={{ marginBottom: '15px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', textAlign: 'left' }}>
                             <thead>
-                              <tr style={{ background: '#101014', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
+                              <tr style={{ background: 'var(--bg-workspace)', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
                                 <th style={{ padding: '6px 8px' }}>DATA SOURCE</th>
                                 <th style={{ padding: '6px 8px' }}>BPM</th>
                                 <th style={{ padding: '6px 8px' }}>KEY SIGNATURE</th>
@@ -1034,7 +1034,7 @@ const AuditForm = () => {
                             </h4>
                             <div style={{ display: 'grid', gap: '12px' }}>
                               {lensData.exercises.map((ex, idx) => (
-                                <div key={idx} style={{ background: '#0a0a0c', padding: '12px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
+                                <div key={idx} style={{ background: 'var(--bg-workspace)', padding: '12px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
                                   <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
                                     {ex.name}
                                   </strong>
@@ -1082,7 +1082,7 @@ const AuditForm = () => {
                   const lensData = template?.lenses?.[lens];
                   if (!lensData?.exercises || lensData.exercises.length === 0) return null;
                   return (
-                    <div key={lens} style={{ marginBottom: '15px', padding: '12px', background: '#1c1c22', borderLeft: '3px solid #ff6600' }}>
+                    <div key={lens} style={{ marginBottom: '15px', padding: '12px', background: 'var(--bg-panel)', borderLeft: '3px solid #ff6600' }}>
                       <strong style={{ textTransform: 'uppercase', fontSize: '11px', color: '#ff6600', fontFamily: 'Roboto Mono', display: 'block', marginBottom: '8px' }}>
                         {lens} Lens
                       </strong>
@@ -1218,7 +1218,7 @@ const AuditForm = () => {
                 key={bm._id || idx}
                 onClick={() => seekTo(bm.timestampSeconds || bm.timestamp)}
                 style={{
-                  background: '#1c1c22',
+                  background: 'var(--bg-panel)',
                   border: '1px solid rgba(255, 102, 0, 0.3)',
                   color: '#ff6600',
                   padding: '5px 12px',

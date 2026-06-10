@@ -4,13 +4,13 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
 
   :root {
-    --bg-app: #111111;
+    --bg-app: #141414;
     --bg-workspace: #1e1e1e;
-    --bg-panel: #222222;
+    --bg-panel: #282828;
     --bg-header: #282828;
     --accent-orange: #ff6600;
     --accent-orange-hover: #e65c00;
-    --border-color: #2a2a2a;
+    --border-color: #383838;
     --text-muted: #8a8a8a;
     --text-active: #ffffff;
     
@@ -93,13 +93,13 @@ const styles = `
 
   /* Hard-edged Panels (replacing Cards) */
   .card, .panel {
-    background: var(--bg-workspace);
+    background: var(--bg-panel);
     border: 1px solid var(--border-color);
     border-radius: 2px;
     padding: 12px;
     margin-bottom: 12px;
     transition: border-color 0.2s ease, background 0.2s ease;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .card:hover, .panel:hover {

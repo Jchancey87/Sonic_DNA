@@ -285,7 +285,7 @@ const TechniqueNotebook = () => {
           margin: 0, 
           display: 'flex', 
           flexDirection: 'column', 
-          background: '#151518', 
+          background: 'var(--bg-panel)', 
           borderLeft: `4px solid ${getLensColor(tech.lens)}`,
           borderColor: 'rgba(255,255,255,0.08)',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -393,7 +393,7 @@ const TechniqueNotebook = () => {
               value={tech.nextAction || ''}
               onChange={(e) => handleUpdateTechnique(tech._id, { nextAction: e.target.value || null })}
               style={{
-                background: '#151518',
+                background: 'var(--bg-panel)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 color: 'rgba(255,255,255,0.8)',
                 padding: '2px 6px',
@@ -482,7 +482,7 @@ const TechniqueNotebook = () => {
                 width: '100%',
                 minHeight: '50px',
                 fontSize: '11px',
-                background: '#0a0a0c',
+                background: 'var(--bg-workspace)',
                 borderColor: 'rgba(255,255,255,0.08)',
                 color: 'rgba(255,255,255,0.85)',
                 padding: '6px 8px',
@@ -512,7 +512,7 @@ const TechniqueNotebook = () => {
     <div style={{ maxWidth: activeTab === 'practice' ? '100%' : '1200px', margin: '0 auto', transition: 'max-width 0.2s ease' }}>
       
       {/* Header Panel */}
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <h1>📚 Technique Notebook</h1>
         <p className="card-subtitle" style={{ margin: 0 }}>
           Your personal collection of musical vocabulary, portable patterns, and structural discoveries.
@@ -603,7 +603,7 @@ const TechniqueNotebook = () => {
       {activeTab === 'library' && (
         <>
           {/* Filters & Search */}
-          <div className="panel" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', background: '#111114' }}>
+          <div className="panel" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', background: 'var(--bg-panel)' }}>
             <div style={{ flex: 2, minWidth: '300px' }}>
               <label style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Search Query</label>
               <input
@@ -611,7 +611,7 @@ const TechniqueNotebook = () => {
                 placeholder="Filter by name, description, artist, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+                style={{ width: '100%', background: 'var(--bg-workspace)', borderColor: 'rgba(255,255,255,0.12)' }}
               />
             </div>
 
@@ -620,7 +620,7 @@ const TechniqueNotebook = () => {
               <select
                 value={filterLens}
                 onChange={(e) => setFilterLens(e.target.value)}
-                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+                style={{ width: '100%', background: 'var(--bg-workspace)', borderColor: 'rgba(255,255,255,0.12)' }}
               >
                 <option value="all">All Lenses</option>
                 <option value="rhythm">Rhythm</option>
@@ -635,7 +635,7 @@ const TechniqueNotebook = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                style={{ width: '100%', background: '#0a0a0c', borderColor: 'rgba(255,255,255,0.12)' }}
+                style={{ width: '100%', background: 'var(--bg-workspace)', borderColor: 'rgba(255,255,255,0.12)' }}
               >
                 <option value="createdAt">Date Added</option>
                 <option value="techniqueName">Technique Name</option>
@@ -698,7 +698,7 @@ const TechniqueNotebook = () => {
                 key={lane.id} 
                 style={{
                   flex: '0 0 340px',
-                  background: '#0a0a0c',
+                  background: 'var(--bg-workspace)',
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '3px',
                   display: 'flex',
@@ -757,7 +757,7 @@ const TechniqueNotebook = () => {
       )}
 
       {activeTab === 'quicklog' && (
-        <form onSubmit={handleQuickLogSubmit} className="panel" style={{ background: '#151518', maxWidth: '650px', margin: '0 auto' }}>
+        <form onSubmit={handleQuickLogSubmit} className="panel" style={{ background: 'var(--bg-panel)', maxWidth: '650px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '6px', marginBottom: '15px' }}>
             ✍️ QUICK LOG NEW DISCOVERY
           </h2>

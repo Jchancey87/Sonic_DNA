@@ -138,7 +138,7 @@ const Trash = () => {
     <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
       {/* Page Header */}
       <div className="panel" style={{ 
-        background: '#151518', 
+        background: 'var(--bg-panel)', 
         borderBottom: '2px solid #ff6600'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -173,7 +173,7 @@ const Trash = () => {
             <div 
               onClick={() => setSongsOpen(!songsOpen)}
               style={{
-                background: '#1a1a20',
+                background: 'var(--bg-workspace)',
                 border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: '2px',
                 padding: '10px 15px',
@@ -193,7 +193,7 @@ const Trash = () => {
             {songsOpen && (
               <div>
                 {songs.length === 0 ? (
-                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: 'var(--bg-panel)', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
                     <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>🎧</span>
                     <h3 style={{ marginBottom: '6px', fontSize: '12px' }}>Deleted songs folder is empty</h3>
                     <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
@@ -212,7 +212,7 @@ const Trash = () => {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           padding: '12px 15px',
-                          background: '#151518',
+                          background: 'var(--bg-panel)',
                           borderColor: 'rgba(255, 255, 255, 0.08)'
                         }}
                       >
@@ -276,7 +276,7 @@ const Trash = () => {
             <div 
               onClick={() => setAuditsOpen(!auditsOpen)}
               style={{
-                background: '#1a1a20',
+                background: 'var(--bg-workspace)',
                 border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: '2px',
                 padding: '10px 15px',
@@ -296,7 +296,7 @@ const Trash = () => {
             {auditsOpen && (
               <div>
                 {audits.length === 0 ? (
-                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: '#151518', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+                  <div className="panel" style={{ textAlign: 'center', padding: '30px 20px', background: 'var(--bg-panel)', borderColor: 'rgba(255, 255, 255, 0.08)' }}>
                     <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📝</span>
                     <h3 style={{ marginBottom: '6px', fontSize: '12px' }}>Deleted audits folder is empty</h3>
                     <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
@@ -314,7 +314,7 @@ const Trash = () => {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           padding: '12px 15px',
-                          background: '#151518',
+                          background: 'var(--bg-panel)',
                           borderColor: 'rgba(255, 255, 255, 0.08)'
                         }}
                       >
@@ -381,7 +381,7 @@ const Trash = () => {
           justifyContent: 'center',
           zIndex: 1000
         }}>
-          <div className="panel" style={{ maxWidth: '500px', width: '90%', margin: '20px', borderTop: '4px solid #f87171', background: '#151518' }}>
+          <div className="panel" style={{ maxWidth: '500px', width: '90%', margin: '20px', borderTop: '4px solid #f87171', background: 'var(--bg-panel)' }}>
             <h2 style={{ color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontFamily: 'Roboto Mono' }}>
               ⚠️ CRITICAL: PERMANENT PURGE SEQUENCE
             </h2>

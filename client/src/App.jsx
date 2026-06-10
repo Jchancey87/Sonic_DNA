@@ -265,7 +265,7 @@ const AppContent = () => {
             flex: 1, 
             overflowY: 'auto', 
             padding: '20px', 
-            background: '#161618' 
+            background: 'var(--bg-workspace)' 
           }}>
             <Routes>
               <Route path="/login" element={<Login />} />

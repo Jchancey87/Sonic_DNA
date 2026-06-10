@@ -274,7 +274,7 @@ const Settings = () => {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <h1>Preferences & Settings</h1>
         <p className="card-subtitle">Customize the default behavior of your Arra workshop</p>
 
@@ -505,7 +505,7 @@ const Settings = () => {
             <select
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              style={{ background: '#0a0a0c', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+              style={{ background: 'var(--bg-workspace)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
             >
               {/* Ensure currently selected timezone is always shown */}
               {!TIMEZONES.includes(timezone) && (
@@ -543,7 +543,7 @@ const Settings = () => {
           justifyContent: 'center',
           zIndex: 10000
         }}>
-          <div className="panel" style={{ maxWidth: '400px', width: '90%', margin: '20px', background: '#151518' }}>
+          <div className="panel" style={{ maxWidth: '400px', width: '90%', margin: '20px', background: 'var(--bg-panel)' }}>
             <h2 style={{ fontSize: '13px', fontFamily: 'Roboto Mono', color: '#ff6600', marginBottom: '15px' }}>
               Change Password
             </h2>
@@ -619,7 +619,7 @@ const Settings = () => {
           justifyContent: 'center',
           zIndex: 10000
         }}>
-          <div className="panel" style={{ maxWidth: '450px', width: '90%', margin: '20px', borderTop: '4px solid #f87171', background: '#151518' }}>
+          <div className="panel" style={{ maxWidth: '450px', width: '90%', margin: '20px', borderTop: '4px solid #f87171', background: 'var(--bg-panel)' }}>
             <h2 style={{ color: '#f87171', fontSize: '13px', fontFamily: 'Roboto Mono', marginBottom: '15px' }}>
               ⚠️ Critical: Delete System Account
             </h2>

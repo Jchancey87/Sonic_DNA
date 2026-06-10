@@ -79,7 +79,7 @@ const AuditCreate = () => {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+      <div className="panel" style={{ background: 'var(--bg-panel)', borderBottom: '2px solid #ff6600' }}>
         <h1>Configure New Audit</h1>
 
         {error && <div className="error">{error}</div>}
