@@ -77,11 +77,11 @@ const Dashboard = () => {
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
       {/* Header Panel */}
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <h1 style={{ margin: 0, border: 'none', padding: 0 }}>🎛️ Song Library Crate</h1>
           <Link to="/import">
-            <button style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold' }}>+ Import Track</button>
+            <button style={{ background: '#ff6600', color: '#0c0c0e', fontWeight: 'bold' }}>+ Import Track</button>
           </Link>
         </div>
 
@@ -132,7 +132,7 @@ const Dashboard = () => {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  borderColor: isActive ? '#d08f60' : 'rgba(255,255,255,0.08)',
+                  borderColor: isActive ? '#ff6600' : 'rgba(255,255,255,0.08)',
                   background: isActive ? '#1a1a20' : '#151518',
                   padding: 0,
                   overflow: 'hidden',
@@ -159,7 +159,7 @@ const Dashboard = () => {
                           position: 'absolute',
                           top: '8px',
                           left: '8px',
-                          background: '#d08f60',
+                          background: '#ff6600',
                           color: '#0c0c0e',
                           fontFamily: 'Roboto Mono',
                           fontSize: '9px',
@@ -199,8 +199,8 @@ const Dashboard = () => {
                       style={{
                         flex: 1,
                         fontSize: '10px',
-                        background: isActive ? '#d08f60' : '#1c1c22',
-                        color: isActive ? '#0c0c0e' : '#d08f60',
+                        background: isActive ? '#ff6600' : '#1c1c22',
+                        color: isActive ? '#0c0c0e' : '#ff6600',
                         fontWeight: isActive ? 'bold' : 'normal',
                       }}
                     >
@@ -287,9 +287,9 @@ const Dashboard = () => {
                                   style={{
                                     padding: '4px 10px',
                                     fontSize: '10px',
-                                    background: audit.status === 'completed' ? '#1c1c22' : 'rgba(208, 143, 96, 0.12)',
-                                    color: '#d08f60',
-                                    border: '1px solid rgba(208,143,96,0.3)',
+                                    background: audit.status === 'completed' ? '#1c1c22' : 'rgba(255, 102, 0, 0.12)',
+                                    color: '#ff6600',
+                                    border: '1px solid rgba(255,102,0,0.3)',
                                     borderRadius: '2px',
                                     whiteSpace: 'nowrap',
                                     cursor: 'pointer',

@@ -79,14 +79,14 @@ const AuditCreate = () => {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <h1>Configure New Audit</h1>
 
         {error && <div className="error">{error}</div>}
 
         {/* Song info */}
         <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <h3 style={{ color: '#d08f60' }}>{song.title}</h3>
+          <h3 style={{ color: '#ff6600' }}>{song.title}</h3>
           <p style={{ color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'Roboto Mono', fontSize: '11px', marginTop: '2px' }}>
             by {song.artistName || song.artist}
           </p>
@@ -98,7 +98,7 @@ const AuditCreate = () => {
               borderRadius: '2px',
               border: '1px solid rgba(255, 255, 255, 0.06)'
             }}>
-              <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#d08f60' }}>Research Intelligence Log:</strong>
+              <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#ff6600' }}>Research Intelligence Log:</strong>
               <p style={{ fontSize: '12px', lineHeight: '1.6', marginTop: '8px', color: 'rgba(255, 255, 255, 0.75)', whiteSpace: 'pre-wrap' }}>
                 {song.researchSummary.summary}
               </p>
@@ -107,11 +107,11 @@ const AuditCreate = () => {
           {song.researchStatus === 'failed' && (
             <div style={{ 
               marginTop: '12px', 
-              color: '#d08f60', 
+              color: '#ff6600', 
               fontSize: '11px', 
               fontFamily: 'Roboto Mono',
-              background: 'rgba(208, 143, 96, 0.05)',
-              border: '1px solid rgba(208, 143, 96, 0.15)',
+              background: 'rgba(255, 102, 0, 0.05)',
+              border: '1px solid rgba(255, 102, 0, 0.15)',
               padding: '8px 12px',
               borderRadius: '2px'
             }}>
@@ -135,13 +135,13 @@ const AuditCreate = () => {
                   id={`lens-${lens}`}
                   onClick={() => toggleLens(lens)}
                   style={{
-                    background: active ? '#d08f60' : '#1c1c22',
-                    color: active ? '#0c0c0e' : '#d08f60',
+                    background: active ? '#ff6600' : '#1c1c22',
+                    color: active ? '#0c0c0e' : '#ff6600',
                     padding: '15px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     cursor: 'pointer',
-                    border: `1px solid ${active ? '#d08f60' : 'rgba(208, 143, 96, 0.3)'}`,
+                    border: `1px solid ${active ? '#ff6600' : 'rgba(255, 102, 0, 0.3)'}`,
                     borderRadius: '2px',
                     transition: 'all 0.15s ease',
                     display: 'flex',
@@ -184,13 +184,13 @@ const AuditCreate = () => {
                   id={`workflow-${w.id}`}
                   onClick={() => setWorkflowType(w.id)}
                   style={{
-                    background: active ? '#d08f60' : '#1c1c22',
-                    color: active ? '#0c0c0e' : '#d08f60',
+                    background: active ? '#ff6600' : '#1c1c22',
+                    color: active ? '#0c0c0e' : '#ff6600',
                     padding: '15px',
                     textAlign: 'center',
                     fontWeight: 'bold',
                     cursor: 'pointer',
-                    border: `1px solid ${active ? '#d08f60' : 'rgba(208, 143, 96, 0.3)'}`,
+                    border: `1px solid ${active ? '#ff6600' : 'rgba(255, 102, 0, 0.3)'}`,
                     borderRadius: '2px',
                     transition: 'all 0.15s ease',
                     display: 'flex',
@@ -224,7 +224,7 @@ const AuditCreate = () => {
             width: '100%', 
             fontSize: '12px', 
             padding: '12px',
-            background: (selectedLenses.length === 0 || creating) ? '#1c1c22' : '#d08f60',
+            background: (selectedLenses.length === 0 || creating) ? '#1c1c22' : '#ff6600',
             color: (selectedLenses.length === 0 || creating) ? 'rgba(255,255,255,0.4)' : '#0c0c0e',
             fontWeight: 'bold'
           }}

@@ -77,13 +77,13 @@ const AppContent = () => {
       <StyleProvider />
       
       {/* DAW Wrapper */}
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0c0c0e' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#111111' }}>
         
         {/* Top Command Bar */}
         <header style={{
           height: '48px',
-          background: '#141418',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          background: '#282828',
+          borderBottom: '1px solid #2a2a2a',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -95,19 +95,19 @@ const AppContent = () => {
             {isAuthenticated && (
               <button 
                 onClick={() => setLeftOpen(!leftOpen)} 
-                style={{ padding: '4px 8px', background: 'transparent', borderColor: 'rgba(255,255,255,0.1)' }}
+                style={{ padding: '4px 8px', background: 'transparent', borderColor: '#2a2a2a' }}
                 title="Toggle Sidebar"
               >
                 {leftOpen ? '◀' : '▶'}
               </button>
             )}
             <Link to="/" style={{ 
-              fontFamily: 'Roboto Mono', 
+              fontFamily: 'Barlow', 
               fontSize: '14px', 
               fontWeight: '700', 
-              color: '#d08f60', 
+              color: '#ff6600', 
               textTransform: 'uppercase',
-              letterSpacing: '0.05em'
+              letterSpacing: '0.08em'
             }}>
               ARRA // AUDIT SYSTEM
             </Link>
@@ -136,7 +136,7 @@ const AppContent = () => {
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '2px'
                 }}>
-                  <span style={{ color: '#d08f60', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ color: '#ff6600', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {activeSong.title}
                   </span>
                   <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
@@ -167,9 +167,9 @@ const AppContent = () => {
                 onClick={() => setRightOpen(!rightOpen)} 
                 style={{ 
                   padding: '4px 8px', 
-                  background: rightOpen ? '#d08f60' : 'transparent',
-                  color: rightOpen ? '#0c0c0e' : '#d08f60',
-                  borderColor: 'rgba(208, 143, 96, 0.3)' 
+                  background: rightOpen ? '#ff6600' : 'transparent',
+                  color: rightOpen ? '#0c0c0e' : '#ff6600',
+                  borderColor: 'rgba(255, 102, 0, 0.3)' 
                 }}
                 title="Toggle active track metadata & bookmarks inspector"
               >
@@ -190,26 +190,46 @@ const AppContent = () => {
           {/* Left Sidebar (Navigation) */}
           {isAuthenticated && (
             <aside style={{
-              width: leftOpen ? '220px' : '0px',
-              background: '#141418',
-              borderRight: '1px solid rgba(255,255,255,0.08)',
+              width: leftOpen ? '180px' : '0px',
+              background: '#111111',
+              borderRight: '1px solid #2a2a2a',
               transition: 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
               overflowX: 'hidden',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <div style={{ padding: '15px 15px 15px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ fontFamily: 'Roboto Mono', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '5px', paddingLeft: '15px' }}>
+              <div style={{ padding: '15px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontFamily: 'Barlow', fontWeight: '600', letterSpacing: '0.08em', fontSize: '10px', color: '#8a8a8a', marginBottom: '5px', paddingLeft: '15px' }}>
                   NAVIGATOR
                 </div>
                 
                 {[
-                  { path: '/dashboard', label: 'Library' },
-                  { path: '/import', label: 'Import Song' },
-                  { path: '/techniques', label: 'Notebook' },
-                  { path: '/trash', label: 'Archives' },
-                  { path: '/settings', label: 'Settings' }
+                  { 
+                    path: '/dashboard', 
+                    label: 'Library', 
+                    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 
+                  },
+                  { 
+                    path: '/import', 
+                    label: 'Import Song', 
+                    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> 
+                  },
+                  { 
+                    path: '/techniques', 
+                    label: 'Notebook', 
+                    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> 
+                  },
+                  { 
+                    path: '/trash', 
+                    label: 'Archives', 
+                    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg> 
+                  },
+                  { 
+                    path: '/settings', 
+                    label: 'Settings', 
+                    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 
+                  }
                 ].map(item => {
                   const active = location.pathname === item.path || 
                                  (item.path === '/dashboard' && (location.pathname === '/' || location.pathname.startsWith('/audit')));
@@ -220,16 +240,19 @@ const AppContent = () => {
                       style={{
                         fontFamily: 'Roboto Mono',
                         fontSize: '11px',
-                        padding: '10px 12px',
-                        paddingLeft: active ? '12px' : '15px',
-                        background: active ? 'rgba(208, 143, 96, 0.08)' : 'transparent',
-                        color: active ? '#d08f60' : 'rgba(255, 255, 255, 0.75)',
-                        borderLeft: active ? '3px solid #d08f60' : '3px solid transparent',
-                        borderRadius: '0 2px 2px 0',
-                        display: 'block'
+                        padding: '8px 15px',
+                        background: 'transparent',
+                        color: active ? '#ff6600' : '#8a8a8a',
+                        borderLeft: active ? '2px solid #ff6600' : '2px solid transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
                       }}
                     >
-                      {item.label}
+                      <span style={{ display: 'inline-flex', alignItems: 'center' }}>{item.icon}</span>
+                      <span>{item.label}</span>
                     </Link>
                   );
                 })}
@@ -242,7 +265,7 @@ const AppContent = () => {
             flex: 1, 
             overflowY: 'auto', 
             padding: '20px', 
-            background: '#0c0c0e' 
+            background: '#161618' 
           }}>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -278,7 +301,7 @@ const AppContent = () => {
                   
                   {activeSong ? (
                     <div>
-                      <h3 style={{ fontSize: '12px', color: '#d08f60', marginBottom: '4px' }}>{activeSong.title}</h3>
+                      <h3 style={{ fontSize: '12px', color: '#ff6600', marginBottom: '4px' }}>{activeSong.title}</h3>
                       <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '15px', fontFamily: 'Roboto Mono' }}>
                         by {activeSong.artistName || activeSong.artist}
                       </p>
@@ -328,11 +351,11 @@ const AppContent = () => {
                                   cursor: 'pointer',
                                   transition: 'border-color 0.2s',
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = '#d08f60'}
+                                onMouseEnter={(e) => e.currentTarget.style.borderColor = '#ff6600'}
                                 onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
                               >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                  <span style={{ fontFamily: 'Roboto Mono', fontSize: '11px', fontWeight: 'bold', color: '#d08f60' }}>
+                                  <span style={{ fontFamily: 'Roboto Mono', fontSize: '11px', fontWeight: 'bold', color: '#ff6600' }}>
                                     {formatTime(bm.timestampSeconds || bm.timestamp)}
                                   </span>
                                   {bm.lens && (
@@ -364,8 +387,8 @@ const AppContent = () => {
         {isAuthenticated && activeSong && (
           <footer style={{
             height: bottomOpen ? '140px' : '30px',
-            background: '#141418',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
+            background: '#282828',
+            borderTop: '1px solid #2a2a2a',
             display: 'flex',
             flexDirection: 'column',
             transition: 'height 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -377,17 +400,20 @@ const AppContent = () => {
               onClick={() => setBottomOpen(!bottomOpen)}
               style={{
                 height: '30px',
-                background: '#1a1a20',
-                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                background: '#202020',
+                borderBottom: '1px solid #2a2a2a',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 15px',
                 cursor: 'pointer',
-                fontFamily: 'Roboto Mono',
+                fontFamily: 'Barlow',
                 fontSize: '10px',
-                color: 'rgba(255,255,255,0.45)',
-                userSelect: 'none'
+                fontWeight: '600',
+                letterSpacing: '0.08em',
+                color: '#8a8a8a',
+                userSelect: 'none',
+                textTransform: 'uppercase'
               }}
             >
               <span>Tape Deck // Transport Panel</span>
@@ -398,17 +424,23 @@ const AppContent = () => {
             {bottomOpen && (
               <div style={{
                 display: 'flex',
-                gap: '20px',
+                gap: '15px',
                 alignItems: 'center',
                 padding: '15px 20px',
                 flex: 1
               }}>
                 {/* Audio controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button 
                     onClick={play} 
                     disabled={!activeSong || isPlaying}
-                    style={{ minWidth: '50px' }}
+                    style={{ 
+                      minWidth: '50px',
+                      background: isPlaying ? '#ff6600' : 'linear-gradient(180deg, #333333 0%, #222222 100%)',
+                      color: isPlaying ? '#ffffff' : '#ff6600',
+                      border: isPlaying ? '1px solid #ff6600' : '1px solid #2a2a2a',
+                      opacity: isPlaying ? 1 : undefined
+                    }}
                   >
                     Play
                   </button>
@@ -438,7 +470,7 @@ const AppContent = () => {
 
                 {/* Scrubber / LED timeline */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Roboto Mono', fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Roboto Mono', fontSize: '10px', color: '#8a8a8a' }}>
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                   </div>
@@ -447,9 +479,9 @@ const AppContent = () => {
                   <div 
                     onClick={handleScrub}
                     style={{
-                      height: '8px',
-                      background: '#0c0c0e',
-                      border: '1px solid rgba(255,255,255,0.06)',
+                      height: '4px',
+                      background: '#151515',
+                      border: '1px solid #2a2a2a',
                       borderRadius: '1px',
                       position: 'relative',
                       cursor: activeSong ? 'pointer' : 'not-allowed',
@@ -460,10 +492,11 @@ const AppContent = () => {
                       <div style={{
                         width: `${(currentTime / duration) * 100}%`,
                         height: '100%',
-                        background: '#d08f60',
+                        background: '#ff6600',
                         position: 'absolute',
                         top: 0,
-                        left: 0
+                        left: 0,
+                        boxShadow: '0 0 4px #ff6600'
                       }} />
                     )}
                   </div>
@@ -472,7 +505,7 @@ const AppContent = () => {
                 {/* Quick volume & visual monitor toggles */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontFamily: 'Roboto Mono', fontSize: '11px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.4)' }}>Vol</span>
+                    <span style={{ color: '#8a8a8a' }}>Vol</span>
                     <input 
                       type="range"
                       min="0"
@@ -480,9 +513,9 @@ const AppContent = () => {
                       value={volume}
                       onChange={(e) => setVolume(Number(e.target.value))}
                       disabled={!activeSong}
-                      style={{ width: '70px', height: '3px', accentColor: '#d08f60', padding: 0 }}
+                      style={{ width: '70px', height: '3px', accentColor: '#ff6600', padding: 0 }}
                     />
-                    <span style={{ minWidth: '22px', textAlign: 'right' }}>{volume}</span>
+                    <span style={{ minWidth: '22px', textAlign: 'right', color: '#ffffff' }}>{volume}</span>
                   </div>
 
                   {activeSong && (
@@ -499,7 +532,7 @@ const AppContent = () => {
                 {/* Bookmark Creator */}
                 <div 
                   style={{ 
-                    borderLeft: '1px solid rgba(255,255,255,0.08)',
+                    borderLeft: '1px solid #2a2a2a',
                     paddingLeft: '20px',
                     display: 'flex',
                     alignItems: 'center',
@@ -514,7 +547,7 @@ const AppContent = () => {
                       value={deckBookmarkNote}
                       onChange={(e) => setDeckBookmarkNote(e.target.value)}
                       disabled={!activeAudit}
-                      style={{ width: '180px', padding: '6px 10px', fontSize: '11px' }}
+                      style={{ width: '180px', padding: '6px 10px', fontSize: '11px', background: '#111111', border: '1px solid #2a2a2a' }}
                     />
                     <button 
                       type="submit" 

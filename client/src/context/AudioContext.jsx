@@ -204,7 +204,7 @@ export const AudioProvider = ({ children }) => {
             height: '160px',
             zIndex: 10000,
             background: '#0a0a0c',
-            border: `1px solid ${embedError ? 'rgba(248,113,113,0.4)' : 'rgba(208,143,96,0.4)'}`,
+            border: `1px solid ${embedError ? 'rgba(248,113,113,0.4)' : 'rgba(255,102,0,0.4)'}`,
             borderRadius: '2px',
             overflow: 'hidden',
             boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
@@ -245,7 +245,7 @@ export const AudioProvider = ({ children }) => {
                 rel="noopener noreferrer"
                 style={{
                   fontSize: '10px',
-                  color: '#d08f60',
+                  color: '#ff6600',
                   fontFamily: 'Roboto Mono',
                   textDecoration: 'underline',
                   cursor: 'pointer',

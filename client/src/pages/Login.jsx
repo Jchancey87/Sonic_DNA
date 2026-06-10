@@ -37,8 +37,8 @@ const Login = () => {
 
   return (
     <div style={{ maxWidth: '400px', margin: '0 auto', padding: '40px 20px' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#d08f60', fontSize: '16px', letterSpacing: '0.05em' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
+        <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#ff6600', fontSize: '16px', letterSpacing: '0.05em' }}>
           🎵 ARRA // AUDIT SYSTEM
         </h1>
 
@@ -100,7 +100,7 @@ const Login = () => {
                 }}
                 style={{
                   background: 'none',
-                  color: '#d08f60',
+                  color: '#ff6600',
                   border: 'none',
                   textDecoration: 'underline',
                   cursor: 'pointer',
@@ -123,7 +123,7 @@ const Login = () => {
                 }}
                 style={{
                   background: 'none',
-                  color: '#d08f60',
+                  color: '#ff6600',
                   border: 'none',
                   textDecoration: 'underline',
                   cursor: 'pointer',

@@ -253,7 +253,7 @@ const TechniqueDetailModal = ({ isOpen, onClose, tech, songs, onUpdate, onDelete
                     style={{
                       cursor: 'pointer',
                       fontSize: '18px',
-                      color: i <= confidence ? '#d08f60' : 'rgba(255, 255, 255, 0.15)',
+                      color: i <= confidence ? '#ff6600' : 'rgba(255, 255, 255, 0.15)',
                       userSelect: 'none',
                     }}
                   >
@@ -304,9 +304,9 @@ const TechniqueDetailModal = ({ isOpen, onClose, tech, songs, onUpdate, onDelete
                     onClick={handleSeek}
                     style={{
                       padding: '8px 12px',
-                      background: 'rgba(208, 143, 96, 0.1)',
-                      borderColor: 'rgba(208, 143, 96, 0.3)',
-                      color: '#d08f60',
+                      background: 'rgba(255, 102, 0, 0.1)',
+                      borderColor: 'rgba(255, 102, 0, 0.3)',
+                      color: '#ff6600',
                     }}
                   >
                     ▶ Seek
@@ -372,7 +372,7 @@ const TechniqueDetailModal = ({ isOpen, onClose, tech, songs, onUpdate, onDelete
                 to={`/audit/${tech.auditId?._id || tech.auditId}`}
                 onClick={onClose}
                 style={{
-                  color: '#d08f60',
+                  color: '#ff6600',
                   fontWeight: 'bold',
                   textDecoration: 'underline',
                   fontFamily: 'Roboto Mono',
@@ -426,7 +426,7 @@ const TechniqueDetailModal = ({ isOpen, onClose, tech, songs, onUpdate, onDelete
               <button
                 type="submit"
                 disabled={isSaving}
-                style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold' }}
+                style={{ background: '#ff6600', color: '#0c0c0e', fontWeight: 'bold' }}
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>

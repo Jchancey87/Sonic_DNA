@@ -3,30 +3,30 @@ import { useAudio } from '../context/AudioContext';
 
 // ── Section type colors ──────────────────────────────────────────────────────
 const TYPE_COLORS = {
-  intro:        '#fbbf24',  // amber
+  intro:        '#a78bfa',  // soft violet
   verse:        '#34d399',  // emerald
-  chorus:       '#a78bfa',  // violet
-  bridge:       '#fb7185',  // rose
-  outro:        '#9ca3af',  // gray
-  'pre-chorus': '#22d3ee',  // cyan
-  solo:         '#f97316',  // orange
+  chorus:       '#22d3ee',  // bright teal / cyan
+  bridge:       '#fbbf24',  // amber
+  outro:        '#ffd700',  // soft gold
+  'pre-chorus': '#ff6f61',  // bright coral
+  solo:         '#ff6600',  // orange
   custom:       '#f472b6',  // pink
 };
 
 // ── Instrument track categories & defaults ───────────────────────────────────
 const TRACK_CATEGORIES = {
-  vocals:  { color: '#a78bfa', emoji: '🎤', label: 'Vocals'    },
-  rhythm:  { color: '#34d399', emoji: '🥁', label: 'Rhythm'    },
-  bass:    { color: '#fbbf24', emoji: '🎸', label: 'Bass'      },
-  synth:   { color: '#22d3ee', emoji: '🎹', label: 'Synth'     },
-  guitar:  { color: '#fb7185', emoji: '🎸', label: 'Guitar'    },
-  brass:   { color: '#f97316', emoji: '🎺', label: 'Brass'     },
-  strings: { color: '#f472b6', emoji: '🎻', label: 'Strings'   },
-  fx:      { color: '#9ca3af', emoji: '✨', label: 'FX / Other' },
+  vocals:  { color: '#a78bfa', code: 'VOC', emoji: '🎤', label: 'Vocals'    },
+  rhythm:  { color: '#34d399', code: 'DRM', emoji: '🥁', label: 'Rhythm'    },
+  bass:    { color: '#fbbf24', code: 'BAS', emoji: '🎸', label: 'Bass'      },
+  synth:   { color: '#22d3ee', code: 'SYN', emoji: '🎹', label: 'Synth'     },
+  guitar:  { color: '#fb7185', code: 'GTR', emoji: '🎸', label: 'Guitar'    },
+  brass:   { color: '#f97316', code: 'BRS', emoji: '🎺', label: 'Brass'     },
+  strings: { color: '#f472b6', code: 'STR', emoji: '🎻', label: 'Strings'   },
+  fx:      { color: '#9ca3af', code: 'SFX', emoji: '✨', label: 'FX / Other' },
 };
 
 // ── Layout constants ─────────────────────────────────────────────────────────
-const PX_PER_SEC    = 6;    // horizontal zoom: pixels per second
+
 const GUTTER_W      = 140;  // left label column width (px)
 const SECTION_ROW_H = 114;  // height of the sections row
 const TRACK_ROW_H   = 46;   // height of each instrument track lane
@@ -74,6 +74,28 @@ const AutoExpandingTextarea = ({ value, onChange, placeholder, disabled }) => {
 const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOnly = false, saveNow }) => {
   const { loadSong, activeSong, play, seekTo, currentTime } = useAudio();
 
+  // ── Zoom & Time signature states ──
+  const [pxPerSec, setPxPerSec] = useState(6);
+  const [timeSignature, setTimeSignature] = useState('4/4');
+
+  const getBeatsPerBar = () => {
+    if (timeSignature === '3/4') return 3;
+    if (timeSignature === '6/8') return 3; // 6/8 represented with 3 beats for simplified grid mapping
+    return 4;
+  };
+
+  const barDurSecs  = (bpm) => (60 / bpm) * getBeatsPerBar();
+  const secToBar    = (sec, bpm) => Math.floor(sec / barDurSecs(bpm)) + 1;
+  const barToSec    = (bar, bpm) => (bar - 1) * barDurSecs(bpm);
+  const snapDurBars = (sec, bpm) => {
+    const bd = barDurSecs(bpm);
+    return Math.max(bd, Math.round(sec / bd) * bd);
+  };
+  const snapStartBars = (sec, bpm) => {
+    const bd = barDurSecs(bpm);
+    return Math.max(0, Math.round(sec / bd) * bd);
+  };
+
   // ── Existing section state ──
   const [selectedBlockId, setSelectedBlockId]   = useState(null);
   const [showAdvanced,    setShowAdvanced]       = useState(false);
@@ -109,7 +131,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
   const totalDuration  = song?.durationSeconds
     || sortedBlocks.reduce((acc, b) => acc + (parseInt(b.duration) || 0), 0)
     || 120;
-  const contentWidth   = Math.max(600, totalDuration * PX_PER_SEC);
+  const contentWidth   = Math.max(600, totalDuration * pxPerSec);
   const selectedBlock  = sortedBlocks.find(b => b.id === selectedBlockId);
 
   // ── Persist helpers ──
@@ -162,7 +184,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
   // ── Playhead left position (px) ──
   const playheadLeft =
     activeSong && song?._id === activeSong._id && currentTime > 0 && currentTime <= totalDuration
-      ? currentTime * PX_PER_SEC
+      ? currentTime * pxPerSec
       : null;
 
   // ── Audio seek ──
@@ -241,7 +263,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     const startX = e.clientX;
     const startDur = block.duration || 30;
     const onMove = (me) => {
-      let delta = (me.clientX - startX) / PX_PER_SEC;
+      let delta = (me.clientX - startX) / pxPerSec;
       let dur = Math.max(1, startDur + delta);
       dur = viewMode === 'bars' ? snapDurBars(dur, bpm) : Math.round(dur);
       onChange('arrangement-timeline', JSON.stringify(
@@ -264,7 +286,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     const startX = e.clientX;
     const startDur = block.duration || 8;
     const onMove = (me) => {
-      let dur = Math.max(1, startDur + (me.clientX - startX) / PX_PER_SEC);
+      let dur = Math.max(1, startDur + (me.clientX - startX) / pxPerSec);
       dur = viewMode === 'bars' ? snapDurBars(dur, bpm) : Math.max(1, Math.round(dur));
       updateTrackBlock(track.id, block.id, { duration: dur });
     };
@@ -286,7 +308,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     let didMove = false;
     const onMove = (me) => {
       didMove = true;
-      let s = Math.max(0, startSec + (me.clientX - startX) / PX_PER_SEC);
+      let s = Math.max(0, startSec + (me.clientX - startX) / pxPerSec);
       s = viewMode === 'bars' ? snapStartBars(s, bpm) : Math.round(s);
       updateTrackBlock(track.id, block.id, { startTime: s });
     };
@@ -304,7 +326,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     if (readOnly) return;
     if (e.target.closest('[data-track-block]')) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    let s = (e.clientX - rect.left) / PX_PER_SEC;
+    let s = (e.clientX - rect.left) / pxPerSec;
     s = viewMode === 'bars' ? snapStartBars(s, bpm) : Math.round(s);
     addTrackBlock(track.id, s);
   };
@@ -321,7 +343,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
       else if (totalBarsCount > 16) interval = 2;
 
       for (let bar = 1; bar <= totalBarsCount + interval; bar += interval) {
-        const left = barToSec(bar, bpm) * PX_PER_SEC;
+        const left = barToSec(bar, bpm) * pxPerSec;
         if (left > contentWidth + 20) break;
         ticks.push(
           <div key={bar} style={{ position: 'absolute', left, top: 0, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateX(-50%)' }}>
@@ -335,7 +357,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
     } else {
       const tickInterval = totalDuration > 360 ? 60 : 30;
       for (let t = 0; t <= totalDuration + tickInterval; t += tickInterval) {
-        const left = t * PX_PER_SEC;
+        const left = t * pxPerSec;
         if (left > contentWidth + 20) break;
         ticks.push(
           <div key={t} style={{ position: 'absolute', left, top: 0, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateX(-50%)' }}>
@@ -434,7 +456,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 style={{
                   padding: '4px 13px', fontSize: '11px', border: 'none', cursor: 'pointer',
                   fontFamily: '"Roboto Mono", monospace', letterSpacing: '0.06em',
-                  background: viewMode === mode ? '#d08f60' : '#161619',
+                  background: viewMode === mode ? '#ff6600' : '#161619',
                   color:      viewMode === mode ? '#151518' : 'rgba(255,255,255,0.4)',
                   transition: 'all 0.15s ease',
                 }}
@@ -442,6 +464,37 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 {mode === 'bars' ? 'BARS' : 'SECS'}
               </button>
             ))}
+          </div>
+
+          {/* Horizontal Zoom Control */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontFamily: '"Roboto Mono", monospace', letterSpacing: '0.08em' }}>ZOOM</span>
+            <input 
+              type="range" 
+              min="2" 
+              max="20" 
+              value={pxPerSec} 
+              onChange={(e) => setPxPerSec(Number(e.target.value))} 
+              style={{ width: '80px', height: '3px', accentColor: '#ff6600', background: 'rgba(255,255,255,0.1)', cursor: 'pointer' }}
+            />
+          </div>
+
+          {/* Time Signature Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontFamily: '"Roboto Mono", monospace', letterSpacing: '0.08em' }}>METER</span>
+            <select
+              value={timeSignature}
+              onChange={(e) => setTimeSignature(e.target.value)}
+              style={{
+                background: '#161619', border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '4px', padding: '4px 8px', color: '#ffffff', fontSize: '11px',
+                fontFamily: '"Roboto Mono", monospace', outline: 'none', cursor: 'pointer'
+              }}
+            >
+              <option value="4/4">4/4</option>
+              <option value="3/4">3/4</option>
+              <option value="6/8">6/8</option>
+            </select>
           </div>
         </div>
 
@@ -451,9 +504,9 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
             type="button" onClick={addBlock}
             style={{
               padding: '8px 18px', fontSize: '13px', fontWeight: '600',
-              background: '#d08f60', color: '#151518', border: 'none', borderRadius: '4px',
+              background: '#ff6600', color: '#151518', border: 'none', borderRadius: '4px',
               cursor: 'pointer', fontFamily: '"Roboto Mono", monospace',
-              boxShadow: '0 2px 6px rgba(208,143,96,0.25)', transition: 'transform 0.1s ease',
+              boxShadow: '0 2px 6px rgba(255,102,0,0.25)', transition: 'transform 0.1s ease',
             }}
             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.96)'}
             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
@@ -521,7 +574,19 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                   borderBottom: idx < tracks.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                   background: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.008)',
                 }}>
-                  <span style={{ fontSize: '13px', lineHeight: 1, flexShrink: 0 }}>{track.emoji}</span>
+                  <span style={{ 
+                    fontSize: '8px', 
+                    fontFamily: '"Roboto Mono"', 
+                    fontWeight: 'bold', 
+                    color: '#000', 
+                    background: track.color, 
+                    padding: '2px 4px', 
+                    borderRadius: '2px', 
+                    marginRight: '2px',
+                    flexShrink: 0
+                  }}>
+                    {TRACK_CATEGORIES[track.category]?.code || track.emoji || 'FX'}
+                  </span>
                   <span style={{
                     flex: 1, fontSize: '11px', fontFamily: '"Roboto Mono", monospace',
                     color: 'rgba(255,255,255,0.65)', letterSpacing: '0.02em',
@@ -551,7 +616,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                   <button
                     type="button" onClick={() => setShowAddTrack(v => !v)}
                     style={{
-                      background: 'none', border: 'none', color: showAddTrack ? '#d08f60' : 'rgba(255,255,255,0.3)',
+                      background: 'none', border: 'none', color: showAddTrack ? '#ff6600' : 'rgba(255,255,255,0.3)',
                       fontSize: '11px', fontFamily: '"Roboto Mono", monospace',
                       cursor: 'pointer', padding: 0, letterSpacing: '0.04em',
                       transition: 'color 0.15s',
@@ -593,8 +658,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                     {/* Section blocks */}
                     {sortedBlocks.map(block => {
-                      const left    = (block.startTime || 0) * PX_PER_SEC;
-                      const width   = Math.max(80, (block.duration || 30) * PX_PER_SEC);
+                      const left    = (block.startTime || 0) * pxPerSec;
+                      const width   = Math.max(80, (block.duration || 30) * pxPerSec);
                       const isSel   = block.id === selectedBlockId;
                       const isCur   = activeBlock?.id === block.id;
                       const color   = TYPE_COLORS[block.type] || TYPE_COLORS.custom;
@@ -607,14 +672,14 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                           title={block.notes ? `Observations: ${block.notes}` : `Click to ${readOnly ? 'seek' : 'edit'}`}
                           style={{
                             position: 'absolute', left, top: 8, bottom: 8, width,
-                            background: isSel ? 'rgba(255,255,255,0.05)' : '#111114',
-                            border: `1px solid ${isSel ? '#d08f60' : 'rgba(255,255,255,0.07)'}`,
-                            borderLeft: `3px solid ${color}`,
+                            background: isSel ? `${color}40` : `${color}18`,
+                            border: `1px solid ${isSel ? '#ff6600' : color}`,
+                            borderLeft: `4px solid ${color}`,
                             borderRadius: '3px', cursor: 'pointer',
                             display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                             padding: '8px 10px',
-                            transition: 'border-color 0.15s, box-shadow 0.15s',
-                            boxShadow: isSel ? '0 0 12px rgba(208,143,96,0.15)' : isCur ? `0 0 8px ${color}30` : 'none',
+                            transition: 'background-color 0.15s, border-color 0.15s, box-shadow 0.15s',
+                            boxShadow: isSel ? '0 0 12px rgba(255,102,0,0.25)' : isCur ? `0 0 8px ${color}30` : 'none',
                             overflow: 'hidden', userSelect: 'none', zIndex: isSel ? 3 : 1,
                           }}
                         >
@@ -658,10 +723,10 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                               style={{
                                 position: 'absolute', right: 0, top: 0, bottom: 0, width: '7px',
                                 cursor: 'col-resize', zIndex: 5,
-                                background: isSel ? 'rgba(208,143,96,0.1)' : 'transparent',
+                                background: isSel ? 'rgba(255,102,0,0.1)' : 'transparent',
                               }}
                             >
-                              <div style={{ width: '2px', height: '16px', background: isSel ? '#d08f60' : 'rgba(255,255,255,0.1)', margin: 'auto', position: 'absolute', top: 0, bottom: 0, right: '2px', borderRadius: '1px' }} />
+                              <div style={{ width: '2px', height: '16px', background: isSel ? '#ff6600' : 'rgba(255,255,255,0.1)', margin: 'auto', position: 'absolute', top: 0, bottom: 0, right: '2px', borderRadius: '1px' }} />
                             </div>
                           )}
                         </div>
@@ -670,7 +735,17 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                     {/* Playhead */}
                     {playheadLeft !== null && (
-                      <div style={{ position: 'absolute', top: 0, bottom: 0, left: playheadLeft, width: '1px', background: '#f43f5e', boxShadow: '0 0 6px #f43f5e', pointerEvents: 'none', zIndex: 10, transition: 'left 0.4s linear' }} />
+                      <div style={{ position: 'absolute', top: 0, bottom: 0, left: playheadLeft, width: '1px', background: '#00e5ff', boxShadow: '0 0 6px #00e5ff', pointerEvents: 'none', zIndex: 10, transition: 'none' }}>
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '-5px',
+                          width: '11px',
+                          height: '8px',
+                          background: '#00e5ff',
+                          clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)'
+                        }} />
+                      </div>
                     )}
                   </div>
                 )}
@@ -689,8 +764,8 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                     }}
                   >
                     {track.blocks.map(block => {
-                      const left  = (block.startTime || 0) * PX_PER_SEC;
-                      const width = Math.max(18, (block.duration || 8) * PX_PER_SEC);
+                      const left  = (block.startTime || 0) * pxPerSec;
+                      const width = Math.max(18, (block.duration || 8) * pxPerSec);
                       const isSel = selectedTrackBlock?.trackId === track.id && selectedTrackBlock?.blockId === block.id;
 
                       return (
@@ -734,7 +809,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
                     {/* Playhead through track */}
                     {playheadLeft !== null && (
-                      <div style={{ position: 'absolute', top: 0, bottom: 0, left: playheadLeft, width: '1px', background: '#f43f5e', opacity: 0.6, pointerEvents: 'none', zIndex: 10, transition: 'left 0.4s linear' }} />
+                      <div style={{ position: 'absolute', top: 0, bottom: 0, left: playheadLeft, width: '1px', background: '#00e5ff', opacity: 0.6, pointerEvents: 'none', zIndex: 10, transition: 'none' }} />
                     )}
                   </div>
                 ))}
@@ -771,12 +846,12 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                     color: newTrackCategory === key ? '#ffffff' : 'rgba(255,255,255,0.5)',
                     fontFamily: '"Roboto Mono", monospace', transition: 'all 0.15s',
                   }}>
-                    {cat.emoji} {cat.label}
+                    {cat.code} | {cat.label}
                   </button>
                 ))}
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button type="button" onClick={addTrack} style={{ padding: '7px 18px', fontSize: '13px', fontWeight: '600', background: '#d08f60', color: '#151518', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
+                <button type="button" onClick={addTrack} style={{ padding: '7px 18px', fontSize: '13px', fontWeight: '600', background: '#ff6600', color: '#151518', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
                   Add
                 </button>
                 <button type="button" onClick={() => { setShowAddTrack(false); setNewTrackName(''); }} style={{ padding: '7px 12px', fontSize: '13px', background: 'transparent', color: 'rgba(255,255,255,0.4)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
@@ -792,7 +867,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
               <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: selTrack.color, boxShadow: `0 0 4px ${selTrack.color}` }} />
                 <span style={{ fontSize: '11px', fontFamily: '"Roboto Mono", monospace', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {selTrack.emoji} {selTrack.name}
+                  {TRACK_CATEGORIES[selTrack.category]?.code || selTrack.emoji || 'FX'} | {selTrack.name}
                 </span>
               </div>
 
@@ -836,7 +911,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                 />
               </div>
 
-              <button type="button" onClick={() => handleSeek(selTb.startTime || 0)} style={{ padding: '5px 12px', fontSize: '12px', background: 'rgba(208,143,96,0.1)', color: '#d08f60', border: '1px solid rgba(208,143,96,0.3)', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
+              <button type="button" onClick={() => handleSeek(selTb.startTime || 0)} style={{ padding: '5px 12px', fontSize: '12px', background: 'rgba(255,102,0,0.1)', color: '#ff6600', border: '1px solid rgba(255,102,0,0.3)', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
                 ▶ Play
               </button>
               <button type="button" onClick={() => updateTrackBlock(selTrack.id, selTb.id, { startTime: Math.floor(currentTime) })} title="Sync start to player position" style={{ padding: '5px 10px', fontSize: '12px', background: 'transparent', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}>
@@ -955,7 +1030,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
                     type="button"
                     onClick={() => updateBlock(selectedBlock.id, { startTime: Math.floor(currentTime) })}
                     title="Capture current player time as start"
-                    style={{ padding: '0 14px', fontSize: '13px', background: 'rgba(208,143,96,0.1)', color: '#d08f60', border: '1px solid rgba(208,143,96,0.3)', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    style={{ padding: '0 14px', fontSize: '13px', background: 'rgba(255,102,0,0.1)', color: '#ff6600', border: '1px solid rgba(255,102,0,0.3)', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
                     🎯 Sync
                   </button>
@@ -999,7 +1074,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
             <div>
               <button
                 type="button" onClick={() => setShowAdvanced(!showAdvanced)}
-                style={{ background: 'transparent', border: 'none', color: '#d08f60', fontSize: '13px', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px', fontFamily: '"Roboto Mono", monospace', outline: 'none' }}
+                style={{ background: 'transparent', border: 'none', color: '#ff6600', fontSize: '13px', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px', fontFamily: '"Roboto Mono", monospace', outline: 'none' }}
               >
                 {showAdvanced ? '▼ Hide Advanced Production Cues' : '▶ Show Advanced Production Cues'}
               </button>
@@ -1020,7 +1095,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
             <div style={{ marginTop: '10px', display: 'flex', gap: '10px', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '14px' }}>
               <button
                 type="button" onClick={() => handleSeek(selectedBlock.startTime || 0)}
-                style={{ padding: '8px 18px', fontSize: '13px', fontWeight: 'bold', background: '#d08f60', color: '#151518', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}
+                style={{ padding: '8px 18px', fontSize: '13px', fontWeight: 'bold', background: '#ff6600', color: '#151518', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Roboto Mono", monospace' }}
               >
                 ▶ Play Section
               </button>
@@ -1042,7 +1117,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
       ══════════════════════════════════════════════════════════════════════ */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#111114', padding: '20px', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '4px', width: '100%' }}>
         <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px' }}>
-          <h3 style={{ margin: 0, fontFamily: '"Roboto Mono", monospace', fontSize: '14px', color: '#d08f60', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          <h3 style={{ margin: 0, fontFamily: '"Roboto Mono", monospace', fontSize: '14px', color: '#ff6600', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             🔬 ANALYSIS MATRIX: ARRANGEMENT
           </h3>
           <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.4' }}>
@@ -1051,14 +1126,14 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
         </div>
 
         {lensData?.description && (
-          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.5', background: '#161619', padding: '14px 16px', borderLeft: '3px solid #d08f60', borderRadius: '2px' }}>
+          <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.5', background: '#161619', padding: '14px 16px', borderLeft: '3px solid #ff6600', borderRadius: '2px' }}>
             {lensData.description}
           </div>
         )}
 
         {lensData?.exercises?.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#d08f60', textTransform: 'uppercase' }}>Exercises</span>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#ff6600', textTransform: 'uppercase' }}>Exercises</span>
             {lensData.exercises.map((ex, idx) => (
               <div key={idx} style={{ background: '#0c0c0f', padding: '12px 14px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
                 <strong style={{ fontSize: '13px', color: '#ffffff', display: 'block' }}>{ex.name}</strong>
@@ -1070,7 +1145,7 @@ const ArrangementTimelineWidget = ({ responses, onChange, song, lensData, readOn
 
         {lensData?.questions?.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '5px' }}>
-            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#d08f60', textTransform: 'uppercase' }}>Structural Inquiries</span>
+            <span style={{ fontFamily: '"Roboto Mono", monospace', fontSize: '12px', color: '#ff6600', textTransform: 'uppercase' }}>Structural Inquiries</span>
             {lensData.questions.map((question, idx) => {
               const key = `arrangement-q${idx}`;
               const val = responses[key] || '';

@@ -123,8 +123,8 @@ const Settings = () => {
                 disabled={isLoading}
                 onClick={() => handleResearchTaste(lens, artist)}
                 style={{
-                  background: isLoading ? 'rgba(208, 143, 96, 0.1)' : '#d08f60',
-                  color: isLoading ? '#d08f60' : '#0c0c0e',
+                  background: isLoading ? 'rgba(255, 102, 0, 0.1)' : '#ff6600',
+                  color: isLoading ? '#ff6600' : '#0c0c0e',
                   border: 'none',
                   padding: '2px 6px',
                   borderRadius: '1px',
@@ -274,7 +274,7 @@ const Settings = () => {
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <h1>Preferences & Settings</h1>
         <p className="card-subtitle">Customize the default behavior of your Arra workshop</p>
 
@@ -284,7 +284,7 @@ const Settings = () => {
         <form onSubmit={handleSave}>
           {/* User profile info */}
           <div style={{ marginBottom: '25px', paddingBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <h3 style={{ color: '#d08f60', fontSize: '12px', fontFamily: 'Roboto Mono', marginBottom: '15px' }}>
+            <h3 style={{ color: '#ff6600', fontSize: '12px', fontFamily: 'Roboto Mono', marginBottom: '15px' }}>
               Account Profile
             </h3>
             
@@ -348,13 +348,13 @@ const Settings = () => {
                     type="button"
                     onClick={() => setDefaultWorkflow(w.id)}
                     style={{
-                      background: active ? '#d08f60' : '#1c1c22',
-                      color: active ? '#0c0c0e' : '#d08f60',
+                      background: active ? '#ff6600' : '#1c1c22',
+                      color: active ? '#0c0c0e' : '#ff6600',
                       padding: '15px',
                       textAlign: 'left',
                       fontWeight: 'bold',
                       cursor: 'pointer',
-                      border: `1px solid ${active ? '#d08f60' : 'rgba(208, 143, 96, 0.3)'}`,
+                      border: `1px solid ${active ? '#ff6600' : 'rgba(255, 102, 0, 0.3)'}`,
                       borderRadius: '2px',
                       transition: 'all 0.15s ease',
                       display: 'flex',
@@ -395,13 +395,13 @@ const Settings = () => {
                     type="button"
                     onClick={() => toggleLens(lens)}
                     style={{
-                      background: active ? '#d08f60' : '#1c1c22',
-                      color: active ? '#0c0c0e' : '#d08f60',
+                      background: active ? '#ff6600' : '#1c1c22',
+                      color: active ? '#0c0c0e' : '#ff6600',
                       padding: '12px',
                       textAlign: 'center',
                       fontWeight: 'bold',
                       cursor: 'pointer',
-                      border: `1px solid ${active ? '#d08f60' : 'rgba(208, 143, 96, 0.3)'}`,
+                      border: `1px solid ${active ? '#ff6600' : 'rgba(255, 102, 0, 0.3)'}`,
                       borderRadius: '2px',
                       transition: 'all 0.15s ease',
                       display: 'flex',
@@ -428,7 +428,7 @@ const Settings = () => {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div className="form-group">
-                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60' }}>🥁 Rhythm Tastes</label>
+                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600' }}>🥁 Rhythm Tastes</label>
                 <input
                   type="text"
                   value={rhythmTaste}
@@ -439,7 +439,7 @@ const Settings = () => {
                 {renderTasteStatus('rhythm', rhythmTaste)}
               </div>
               <div className="form-group">
-                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60' }}>🎛️ Texture Tastes</label>
+                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600' }}>🎛️ Texture Tastes</label>
                 <input
                   type="text"
                   value={textureTaste}
@@ -450,7 +450,7 @@ const Settings = () => {
                 {renderTasteStatus('texture', textureTaste)}
               </div>
               <div className="form-group">
-                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60' }}>🎹 Harmony Tastes</label>
+                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600' }}>🎹 Harmony Tastes</label>
                 <input
                   type="text"
                   value={harmonyTaste}
@@ -461,7 +461,7 @@ const Settings = () => {
                 {renderTasteStatus('harmony', harmonyTaste)}
               </div>
               <div className="form-group">
-                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60' }}>🎼 Arrangement Tastes</label>
+                <label style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600' }}>🎼 Arrangement Tastes</label>
                 <input
                   type="text"
                   value={arrangementTaste}
@@ -544,7 +544,7 @@ const Settings = () => {
           zIndex: 10000
         }}>
           <div className="panel" style={{ maxWidth: '400px', width: '90%', margin: '20px', background: '#151518' }}>
-            <h2 style={{ fontSize: '13px', fontFamily: 'Roboto Mono', color: '#d08f60', marginBottom: '15px' }}>
+            <h2 style={{ fontSize: '13px', fontFamily: 'Roboto Mono', color: '#ff6600', marginBottom: '15px' }}>
               Change Password
             </h2>
             

@@ -83,7 +83,7 @@ const AuditDetail = () => {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '20px' }}>
           <div>
             <h1>{song?.title || 'Unknown Song'}</h1>
@@ -106,7 +106,7 @@ const AuditDetail = () => {
             <button
               onClick={() => navigate(`/audit/form/${audit._id}`)}
               style={{
-                background: '#d08f60',
+                background: '#ff6600',
                 color: '#0c0c0e',
                 fontWeight: 'bold',
                 border: 'none',
@@ -135,8 +135,8 @@ const AuditDetail = () => {
           <div className="panel" style={{ background: '#141418', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowAnalysis(!showAnalysis)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#d08f60', fontSize: '14px' }}>🧬</span>
-                <h3 style={{ margin: 0, fontFamily: 'Roboto Mono', fontSize: '13px', color: '#d08f60' }}>
+                <span style={{ color: '#ff6600', fontSize: '14px' }}>🧬</span>
+                <h3 style={{ margin: 0, fontFamily: 'Roboto Mono', fontSize: '13px', color: '#ff6600' }}>
                   SIGNAL ANALYSIS MATRIX // CANONICAL DESCRIPTORS
                 </h3>
               </div>
@@ -148,7 +148,16 @@ const AuditDetail = () => {
             {showAnalysis && (
               <div style={{ marginTop: '15px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '15px' }}>
                 {/* Active Values Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                  background: '#2a2a2a',
+                  gap: '1px',
+                  border: '1px solid #2a2a2a',
+                  borderRadius: '2px',
+                  overflow: 'hidden',
+                  marginBottom: '20px'
+                }}>
                   {[
                     {
                       label: 'TEMPO / BPM',
@@ -182,22 +191,33 @@ const AuditDetail = () => {
                     const badgeText = isHigh ? 'CONFIDENT' : isMed ? 'PROBABLE' : 'REVIEW NEEDED';
 
                     return (
-                      <div key={idx} style={{ background: '#0a0a0c', border: '1px solid rgba(255, 255, 255, 0.05)', padding: '12px', borderRadius: '1px' }}>
-                        <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>
-                          {item.label}
+                      <div key={idx} style={{ background: '#1e1e1e', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ background: '#2D2D2D', padding: '6px 12px', borderBottom: '1px solid #2a2a2a' }}>
+                          <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', fontWeight: '600', color: '#8a8a8a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                            {item.label}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#d08f60', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                          {item.value}
-                          {item.isOverridden && (
-                            <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)', fontWeight: 'normal' }}>(override)</span>
+                        <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div style={{ fontSize: '20px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
+                            {item.value}
+                            {item.isOverridden && (
+                              <span style={{ fontSize: '9px', color: '#ff6600', fontWeight: 'normal' }}>(override)</span>
+                            )}
+                          </div>
+                          {!item.isReadOnly && (
+                            <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: badgeColor, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <span style={{ 
+                                width: '6px', 
+                                height: '6px', 
+                                borderRadius: '50%', 
+                                background: badgeColor,
+                                boxShadow: `0 0 4px ${badgeColor}`,
+                                display: 'inline-block'
+                              }} />
+                              {badgeText} ({Math.round(item.conf * 100)}%)
+                            </div>
                           )}
                         </div>
-                        {!item.isReadOnly && (
-                          <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: badgeColor, marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: badgeColor }} />
-                            {badgeText} ({Math.round(item.conf * 100)}%)
-                          </div>
-                        )}
                       </div>
                     );
                   })}
@@ -245,7 +265,7 @@ const AuditDetail = () => {
                             top: '10px',
                             width: '1.5px',
                             height: '12px',
-                            background: 'rgba(208, 143, 96, 0.4)'
+                            background: 'rgba(255, 102, 0, 0.4)'
                           }}
                         />
                       ))}
@@ -256,14 +276,22 @@ const AuditDetail = () => {
                           position: 'absolute',
                           left: `${(currentTime / duration) * 100}%`,
                           top: 0,
-                          width: '2px',
+                          width: '1px',
                           height: '100%',
-                          background: '#f87171',
-                          boxShadow: '0 0 8px #f87171',
+                          background: '#00e5ff',
+                          boxShadow: '0 0 4px #00e5ff',
                           zIndex: 10
                         }}
                       >
-                        <div style={{ position: 'absolute', top: '-3px', left: '-3px', width: '8px', height: '8px', borderRadius: '50%', background: '#f87171' }} />
+                        <div style={{ 
+                          position: 'absolute', 
+                          top: 0, 
+                          left: '-5px', 
+                          width: '11px', 
+                          height: '8px', 
+                          background: '#00e5ff',
+                          clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)'
+                        }} />
                       </div>
                     </div>
 
@@ -283,13 +311,13 @@ const AuditDetail = () => {
                               display: 'flex',
                               flexDirection: 'column',
                               justifyContent: 'center',
-                              background: Math.abs(currentTime - (duration / arr.length) * (i + 0.5)) < (duration / arr.length / 2) && isPlaying ? 'rgba(208,143,96,0.05)' : 'transparent'
+                              background: Math.abs(currentTime - (duration / arr.length) * (i + 0.5)) < (duration / arr.length / 2) && isPlaying ? 'rgba(255,102,0,0.05)' : 'transparent'
                             }}
                           >
                             <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.4)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                               {sect.section}
                             </span>
-                            <span style={{ fontSize: '9px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#d08f60' }}>
+                            <span style={{ fontSize: '9px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#ff6600' }}>
                               {sect.key} {sect.scale === 'minor' ? 'm' : ''}
                             </span>
                           </div>
@@ -306,7 +334,7 @@ const AuditDetail = () => {
         {/* Research Intelligence Log */}
         {song?.researchSummary?.summary && (
           <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em', marginBottom: '12px' }}>
+            <h2 style={{ color: '#ff6600', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em', marginBottom: '12px' }}>
               📡 Song Research Intelligence
             </h2>
             <div style={{
@@ -314,7 +342,7 @@ const AuditDetail = () => {
               padding: '15px',
               borderRadius: '2px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
-              borderLeft: '4px solid #d08f60',
+              borderLeft: '4px solid #ff6600',
               lineHeight: '1.6',
               color: 'rgba(255, 255, 255, 0.8)',
               fontSize: '12px',
@@ -338,8 +366,8 @@ const AuditDetail = () => {
                       className="badge"
                       style={{
                         fontSize: '9px',
-                        borderColor: 'rgba(208, 143, 96, 0.25)',
-                        color: '#d08f60',
+                        borderColor: 'rgba(255, 102, 0, 0.25)',
+                        color: '#ff6600',
                         textDecoration: 'none',
                         padding: '3px 8px'
                       }}
@@ -357,7 +385,7 @@ const AuditDetail = () => {
         {/* Audit responses */}
         {audit.responses && Object.keys(audit.responses).length > 0 && (
           <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
+            <h2 style={{ color: '#ff6600', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
               Signal Observations Matrix
             </h2>
             <div style={{ marginTop: '15px' }}>
@@ -370,7 +398,7 @@ const AuditDetail = () => {
 
                   return (
                     <div key={lens} style={{ marginBottom: '25px' }}>
-                      <h3 style={{ textTransform: 'capitalize', color: '#d08f60', fontSize: '12px', fontFamily: 'Roboto Mono', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '12px' }}>
+                      <h3 style={{ textTransform: 'capitalize', color: '#ff6600', fontSize: '12px', fontFamily: 'Roboto Mono', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '12px' }}>
                         {lens} Lens
                       </h3>
                       {lens === 'arrangement' ? (
@@ -386,16 +414,16 @@ const AuditDetail = () => {
                             <div style={{
                               marginBottom: '15px',
                               padding: '12px',
-                              background: 'rgba(208, 143, 96, 0.02)',
-                              border: '1px dashed rgba(208, 143, 96, 0.15)',
+                              background: 'rgba(255, 102, 0, 0.02)',
+                              border: '1px dashed rgba(255, 102, 0, 0.15)',
                               borderRadius: '2px',
                             }}>
-                              <strong style={{ display: 'block', fontSize: '10px', fontFamily: 'Roboto Mono', color: '#d08f60', marginBottom: '8px' }}>
+                              <strong style={{ display: 'block', fontSize: '10px', fontFamily: 'Roboto Mono', color: '#ff6600', marginBottom: '8px' }}>
                                 🔬 CONCRETE EXERCISES (TAILORED)
                               </strong>
                               <div style={{ display: 'grid', gap: '8px' }}>
                                 {lensData.exercises.map((ex, idx) => (
-                                  <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
+                                  <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
                                     <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)' }}>{ex.name}</div>
                                     <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{ex.description}</div>
                                   </div>
@@ -447,11 +475,11 @@ const AuditDetail = () => {
                         borderTop: '1px solid rgba(255,255,255,0.05)',
                         borderRight: '1px solid rgba(255,255,255,0.05)',
                         borderBottom: '1px solid rgba(255,255,255,0.05)',
-                        borderLeft: '4px solid #d08f60'
+                        borderLeft: '4px solid #ff6600'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <strong style={{ color: '#d08f60', textTransform: 'uppercase', fontSize: '11px', fontFamily: 'Roboto Mono' }}>
+                        <strong style={{ color: '#ff6600', textTransform: 'uppercase', fontSize: '11px', fontFamily: 'Roboto Mono' }}>
                           {lens} Lens // {qRef?.toUpperCase() || ''}
                         </strong>
                       </div>
@@ -492,7 +520,7 @@ const AuditDetail = () => {
         {/* Bookmarks */}
         {audit.bookmarks && audit.bookmarks.length > 0 && (
           <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
+            <h2 style={{ color: '#ff6600', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em' }}>
               Session Bookmarks ({audit.bookmarks.length})
             </h2>
             <div style={{ marginTop: '15px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
@@ -510,7 +538,7 @@ const AuditDetail = () => {
                     <strong 
                       onClick={() => seekTo(bookmark.timestampSeconds || bookmark.timestamp)}
                       style={{ 
-                        color: '#d08f60', 
+                        color: '#ff6600', 
                         cursor: 'pointer',
                         textDecoration: 'underline',
                         fontFamily: 'Roboto Mono',
@@ -534,7 +562,7 @@ const AuditDetail = () => {
         {audit.techniques && audit.techniques.length > 0 && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <h2 style={{ color: '#d08f60', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em', margin: 0 }}>
+              <h2 style={{ color: '#ff6600', fontSize: '13px', fontFamily: 'Roboto Mono', letterSpacing: '0.05em', margin: 0 }}>
                 Portable Techniques Log ({audit.techniques.length})
               </h2>
               <Link to="/techniques">
@@ -554,7 +582,7 @@ const AuditDetail = () => {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
                     <div>
-                      <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#d08f60', fontFamily: 'Roboto Mono' }}>
+                      <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#ff6600', fontFamily: 'Roboto Mono' }}>
                         {tech.techniqueName || tech.description}
                       </div>
                       <span className="badge" style={{ marginTop: '5px', display: 'inline-block', textTransform: 'uppercase' }}>
@@ -565,7 +593,7 @@ const AuditDetail = () => {
                       <span 
                         onClick={() => seekTo(tech.exampleTimestamp)}
                         style={{ 
-                          color: '#d08f60', 
+                          color: '#ff6600', 
                           fontWeight: 'bold', 
                           fontSize: '11px',
                           fontFamily: 'Roboto Mono',

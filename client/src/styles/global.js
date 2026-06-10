@@ -1,7 +1,25 @@
 import React from 'react';
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --bg-app: #111111;
+    --bg-workspace: #1e1e1e;
+    --bg-panel: #222222;
+    --bg-header: #282828;
+    --accent-orange: #ff6600;
+    --accent-orange-hover: #e65c00;
+    --border-color: #2a2a2a;
+    --text-muted: #8a8a8a;
+    --text-active: #ffffff;
+    
+    /* Track/Category Multi-Colors */
+    --color-audio: #00e5ff;
+    --color-metadata: #ffd700;
+    --color-structure: #e0b0ff;
+    --color-error: #ff5252;
+  }
 
   * {
     margin: 0;
@@ -15,20 +33,20 @@ const styles = `
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0c0c0e;
+    background: var(--bg-app);
   }
   ::-webkit-scrollbar-thumb {
-    background: #25252b;
+    background: var(--border-color);
     border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #d08f60;
+    background: var(--accent-orange);
   }
 
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: #0c0c0e;
-    color: rgba(255, 255, 255, 0.85);
+    font-family: 'Barlow', 'Inter', -apple-system, sans-serif;
+    background: var(--bg-app);
+    color: var(--text-active);
     overflow: hidden; /* Main window doesn't scroll, panels do */
     height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -36,20 +54,26 @@ const styles = `
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Roboto Mono', monospace;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    letter-spacing: -0.02em;
+    font-family: 'Barlow', 'Roboto Mono', sans-serif;
+    font-weight: 600;
+    color: var(--text-active);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
-  h1 { font-size: 1.5rem; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; }
-  h2 { font-size: 1.15rem; margin-bottom: 10px; }
-  h3 { font-size: 0.95rem; margin-bottom: 8px; }
+  h1 { 
+    font-size: 1.35rem; 
+    margin-bottom: 12px; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 6px; 
+  }
+  h2 { font-size: 1.1rem; margin-bottom: 10px; }
+  h3 { font-size: 0.9rem; margin-bottom: 8px; }
 
   p {
     font-size: 13px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.65);
+    color: var(--text-muted);
   }
 
   /* Layout Base */
@@ -64,95 +88,104 @@ const styles = `
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
+    gap: 12px;
   }
 
   /* Hard-edged Panels (replacing Cards) */
   .card, .panel {
-    background: #151518;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-workspace);
+    border: 1px solid var(--border-color);
     border-radius: 2px;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 12px;
+    margin-bottom: 12px;
     transition: border-color 0.2s ease, background 0.2s ease;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
   }
 
   .card:hover, .panel:hover {
-    border-color: rgba(208, 143, 96, 0.2);
+    border-color: rgba(255, 102, 0, 0.3);
   }
 
   .song-card-thumbnail {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
   }
   .panel:hover .song-card-thumbnail {
-    transform: scale(1.04);
+    transform: scale(1.02);
     opacity: 0.85 !important;
   }
 
   .card-title {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
-    margin-bottom: 8px;
+    color: var(--text-active);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .card-subtitle {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.45);
-    margin-bottom: 12px;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
     font-family: 'Roboto Mono', monospace;
   }
 
   /* Buttons (Analog/Instrument theme) */
-  button {
+  button, .btn {
     font-family: 'Roboto Mono', monospace;
     font-size: 11px;
     font-weight: 500;
-    background: #1c1c22;
-    color: #d08f60;
-    border: 1px solid rgba(208, 143, 96, 0.3);
-    padding: 8px 16px;
+    background: linear-gradient(180deg, #333333 0%, #222222 100%);
+    color: var(--accent-orange);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
     border-radius: 2px;
     cursor: pointer;
     transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
-  button:hover:not(:disabled) {
-    background: #d08f60;
-    color: #0c0c0e;
-    border-color: #d08f60;
+  button:hover:not(:disabled), .btn:hover:not(:disabled) {
+    background: var(--accent-orange);
+    color: #ffffff;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 6px rgba(255, 102, 0, 0.4);
   }
 
-  button.secondary {
-    background: #151518;
-    color: rgba(255, 255, 255, 0.65);
-    border-color: rgba(255, 255, 255, 0.15);
+  button.secondary, button.btn-secondary {
+    background: linear-gradient(180deg, #282828 0%, #1e1e1e 100%);
+    color: var(--text-muted);
+    border-color: var(--border-color);
   }
 
-  button.secondary:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.3);
+  button.secondary:hover:not(:disabled), button.btn-secondary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #383838 0%, #2a2a2a 100%);
+    color: var(--text-active);
+    border-color: #444444;
+    box-shadow: none;
   }
 
   button.danger {
-    background: #251515;
-    color: #f87171;
-    border-color: rgba(248, 113, 113, 0.3);
+    background: linear-gradient(180deg, #442222 0%, #2c1616 100%);
+    color: var(--color-error);
+    border-color: #5a2a2a;
   }
 
   button.danger:hover:not(:disabled) {
-    background: #f87171;
-    color: #0c0c0e;
-    border-color: #f87171;
+    background: var(--color-error);
+    color: #ffffff;
+    border-color: var(--color-error);
+    box-shadow: 0 0 6px rgba(255, 82, 82, 0.4);
   }
 
-  button:disabled {
+  button:disabled, .btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    border-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.4);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    background: #1e1e1e;
+    box-shadow: none;
   }
 
   /* Forms & Inputs */
@@ -164,85 +197,87 @@ const styles = `
   }
 
   label {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 11px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 10px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   input, textarea, select {
-    background: #0a0a0c;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.85);
-    padding: 8px 12px;
+    background: #111111;
+    border: 1px solid var(--border-color);
+    color: var(--text-active);
+    padding: 6px 10px;
     border-radius: 2px;
     font-family: 'Roboto Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     width: 100%;
     transition: border-color 0.15s ease;
   }
 
   input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: #d08f60;
+    border-color: var(--accent-orange);
   }
 
   textarea {
-    min-height: 80px;
+    min-height: 70px;
     resize: vertical;
   }
 
   /* Badges */
   .badge {
     display: inline-block;
-    padding: 2px 6px;
-    background: #222226;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1px 5px;
+    background: var(--bg-workspace);
+    border: 1px solid var(--border-color);
     border-radius: 2px;
     font-family: 'Roboto Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-muted);
   }
 
   .badge.primary {
-    background: rgba(208, 143, 96, 0.1);
-    color: #d08f60;
-    border-color: rgba(208, 143, 96, 0.2);
+    background: rgba(255, 102, 0, 0.08);
+    color: var(--accent-orange);
+    border-color: rgba(255, 102, 0, 0.25);
   }
 
   .badge.success {
-    background: rgba(56, 142, 60, 0.1);
+    background: rgba(74, 222, 128, 0.08);
     color: #4ade80;
     border-color: rgba(74, 222, 128, 0.2);
   }
 
   .badge.warning {
-    background: rgba(178, 106, 0, 0.1);
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.2);
+    background: rgba(251, 191, 36, 0.08);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.2);
   }
 
   /* Info / Error boxes */
   .error {
-    background: rgba(220, 38, 38, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(220, 38, 38, 0.2);
-    border-left: 3px solid #dc2626;
-    padding: 10px 15px;
-    font-size: 12px;
+    background: rgba(255, 82, 82, 0.08);
+    color: var(--color-error);
+    border: 1px solid rgba(255, 82, 82, 0.2);
+    border-left: 3px solid var(--color-error);
+    padding: 8px 12px;
+    font-size: 11px;
     margin-bottom: 12px;
     border-radius: 2px;
     font-family: 'Roboto Mono', monospace;
   }
 
   .success {
-    background: rgba(16, 185, 129, 0.1);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    border-left: 3px solid #10b981;
-    padding: 10px 15px;
-    font-size: 12px;
+    background: rgba(74, 222, 128, 0.08);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    border-left: 3px solid #4ade80;
+    padding: 8px 12px;
+    font-size: 11px;
     margin-bottom: 12px;
     border-radius: 2px;
     font-family: 'Roboto Mono', monospace;
@@ -257,22 +292,22 @@ const styles = `
 
   /* Interactive Elements */
   a {
-    color: #d08f60;
+    color: var(--accent-orange);
     text-decoration: none;
     transition: color 0.15s ease;
   }
 
   a:hover {
-    color: #e5a374;
+    color: var(--accent-orange-hover);
   }
 
   /* Loading indicator */
   .loading {
     text-align: center;
-    padding: 30px 15px;
+    padding: 20px 10px;
     font-family: 'Roboto Mono', monospace;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    color: var(--text-muted);
     letter-spacing: 0.1em;
   }
 `;

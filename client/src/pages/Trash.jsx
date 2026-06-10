@@ -139,7 +139,7 @@ const Trash = () => {
       {/* Page Header */}
       <div className="panel" style={{ 
         background: '#151518', 
-        borderBottom: '2px solid #d08f60'
+        borderBottom: '2px solid #ff6600'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ margin: 0, border: 'none', padding: 0 }}>🗑️ Archives & Trash</h1>
@@ -185,7 +185,7 @@ const Trash = () => {
                 marginBottom: '10px'
               }}
             >
-              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#d08f60' }}>
+              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#ff6600' }}>
                 {songsOpen ? '▼' : '▶'} Deleted Songs ({songs.length})
               </span>
             </div>
@@ -288,7 +288,7 @@ const Trash = () => {
                 marginBottom: '10px'
               }}
             >
-              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#d08f60' }}>
+              <span style={{ fontFamily: 'Roboto Mono', fontSize: '12px', fontWeight: 'bold', color: '#ff6600' }}>
                 {auditsOpen ? '▼' : '▶'} Deleted Audits ({audits.length})
               </span>
             </div>
@@ -321,7 +321,7 @@ const Trash = () => {
                         <div style={{ flex: 1 }}>
                           <h3 style={{ margin: 0, fontSize: '12px' }}>{audit.title || 'Untitled Audit'}</h3>
                           <p style={{ margin: '2px 0 0', color: 'rgba(255, 255, 255, 0.65)', fontSize: '11px' }}>
-                            Song: <strong style={{ color: '#d08f60', fontFamily: 'Roboto Mono' }}>{audit.songId?.title || 'Unknown Song'}</strong> by {audit.songId?.artistName || audit.songId?.artist || 'Unknown Artist'}
+                            Song: <strong style={{ color: '#ff6600', fontFamily: 'Roboto Mono' }}>{audit.songId?.title || 'Unknown Song'}</strong> by {audit.songId?.artistName || audit.songId?.artist || 'Unknown Artist'}
                           </p>
                           
                           <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
@@ -397,7 +397,7 @@ const Trash = () => {
               borderRadius: '2px',
               fontFamily: 'Roboto Mono',
               fontSize: '12px',
-              color: '#d08f60'
+              color: '#ff6600'
             }}>
               {purgeTarget.type === 'song' ? purgeTarget.item.title : (purgeTarget.item.title || 'Untitled Audit')}
             </p>

@@ -51,7 +51,7 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, type, id, backend }) =
         {loading ? (
           <p style={{ margin: '20px 0', color: '#666' }}>Loading preview...</p>
         ) : (
-          <div style={{ margin: '20px 0', padding: '15px', backgroundColor: '#0a0a0c', borderRadius: '2px', border: '1px solid rgba(208, 143, 96, 0.25)', color: 'rgba(255, 255, 255, 0.75)' }}>
+          <div style={{ margin: '20px 0', padding: '15px', backgroundColor: '#0a0a0c', borderRadius: '2px', border: '1px solid rgba(255, 102, 0, 0.25)', color: 'rgba(255, 255, 255, 0.75)' }}>
             <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', fontFamily: 'Roboto Mono', lineHeight: '1.6' }}>
               <li>1 {type}</li>
               {preview?.auditCount > 0 && <li>{preview.auditCount} associated audits</li>}

@@ -374,7 +374,7 @@ const TechniqueNotebook = () => {
                   style={{
                     cursor: 'pointer',
                     fontSize: '13px',
-                    color: isFilled ? '#d08f60' : 'rgba(255,255,255,0.2)',
+                    color: isFilled ? '#ff6600' : 'rgba(255,255,255,0.2)',
                     marginRight: '2px',
                     userSelect: 'none'
                   }}
@@ -454,9 +454,9 @@ const TechniqueNotebook = () => {
                 style={{
                   padding: '2px 8px',
                   fontSize: '9px',
-                  background: 'rgba(208, 143, 96, 0.1)',
-                  borderColor: 'rgba(208, 143, 96, 0.3)',
-                  color: '#d08f60',
+                  background: 'rgba(255, 102, 0, 0.1)',
+                  borderColor: 'rgba(255, 102, 0, 0.3)',
+                  color: '#ff6600',
                   borderRadius: '2px',
                   whiteSpace: 'nowrap'
                 }}
@@ -512,7 +512,7 @@ const TechniqueNotebook = () => {
     <div style={{ maxWidth: activeTab === 'practice' ? '100%' : '1200px', margin: '0 auto', transition: 'max-width 0.2s ease' }}>
       
       {/* Header Panel */}
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <h1>📚 Technique Notebook</h1>
         <p className="card-subtitle" style={{ margin: 0 }}>
           Your personal collection of musical vocabulary, portable patterns, and structural discoveries.
@@ -554,10 +554,10 @@ const TechniqueNotebook = () => {
           title="View and search your full collection of discovered techniques"
           style={{
             background: activeTab === 'library' ? '#1c1c22' : 'transparent',
-            color: activeTab === 'library' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            color: activeTab === 'library' ? '#ff6600' : 'rgba(255,255,255,0.5)',
             border: '1px solid',
-            borderColor: activeTab === 'library' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
-            borderBottom: activeTab === 'library' ? '2px solid #d08f60' : '1px solid transparent',
+            borderColor: activeTab === 'library' ? 'rgba(255, 102, 0, 0.3) rgba(255, 102, 0, 0.3) transparent rgba(255, 102, 0, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'library' ? '2px solid #ff6600' : '1px solid transparent',
             borderRadius: '2px 2px 0 0',
             padding: '10px 20px',
             fontWeight: 'bold',
@@ -570,10 +570,10 @@ const TechniqueNotebook = () => {
           title="Organize your discoveries into a step-by-step practice pipeline (Kanban board)"
           style={{
             background: activeTab === 'practice' ? '#1c1c22' : 'transparent',
-            color: activeTab === 'practice' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            color: activeTab === 'practice' ? '#ff6600' : 'rgba(255,255,255,0.5)',
             border: '1px solid',
-            borderColor: activeTab === 'practice' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
-            borderBottom: activeTab === 'practice' ? '2px solid #d08f60' : '1px solid transparent',
+            borderColor: activeTab === 'practice' ? 'rgba(255, 102, 0, 0.3) rgba(255, 102, 0, 0.3) transparent rgba(255, 102, 0, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'practice' ? '2px solid #ff6600' : '1px solid transparent',
             borderRadius: '2px 2px 0 0',
             padding: '10px 20px',
             fontWeight: 'bold',
@@ -586,10 +586,10 @@ const TechniqueNotebook = () => {
           title="Log a new standalone technique or musical discovery manually"
           style={{
             background: activeTab === 'quicklog' ? '#1c1c22' : 'transparent',
-            color: activeTab === 'quicklog' ? '#d08f60' : 'rgba(255,255,255,0.5)',
+            color: activeTab === 'quicklog' ? '#ff6600' : 'rgba(255,255,255,0.5)',
             border: '1px solid',
-            borderColor: activeTab === 'quicklog' ? 'rgba(208, 143, 96, 0.3) rgba(208, 143, 96, 0.3) transparent rgba(208, 143, 96, 0.3)' : 'transparent',
-            borderBottom: activeTab === 'quicklog' ? '2px solid #d08f60' : '1px solid transparent',
+            borderColor: activeTab === 'quicklog' ? 'rgba(255, 102, 0, 0.3) rgba(255, 102, 0, 0.3) transparent rgba(255, 102, 0, 0.3)' : 'transparent',
+            borderBottom: activeTab === 'quicklog' ? '2px solid #ff6600' : '1px solid transparent',
             borderRadius: '2px 2px 0 0',
             padding: '10px 20px',
             fontWeight: 'bold',
@@ -671,8 +671,8 @@ const TechniqueNotebook = () => {
         <div>
           {/* Practice Room explanation banner */}
           <div style={{
-            background: 'rgba(208, 143, 96, 0.05)',
-            border: '1px solid rgba(208, 143, 96, 0.15)',
+            background: 'rgba(255, 102, 0, 0.05)',
+            border: '1px solid rgba(255, 102, 0, 0.15)',
             borderRadius: '2px',
             padding: '12px 15px',
             marginBottom: '20px',
@@ -715,7 +715,7 @@ const TechniqueNotebook = () => {
                   borderBottom: '1px solid rgba(255,255,255,0.1)',
                   paddingBottom: '6px'
                 }}>
-                  <h4 style={{ margin: 0, fontSize: '11px', color: '#d08f60', letterSpacing: '0.05em' }}>
+                  <h4 style={{ margin: 0, fontSize: '11px', color: '#ff6600', letterSpacing: '0.05em' }}>
                     {lane.title}
                   </h4>
                   <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}>
@@ -809,7 +809,7 @@ const TechniqueNotebook = () => {
                     style={{
                       cursor: 'pointer',
                       fontSize: '18px',
-                      color: i <= newConfidence ? '#d08f60' : 'rgba(255,255,255,0.2)',
+                      color: i <= newConfidence ? '#ff6600' : 'rgba(255,255,255,0.2)',
                       userSelect: 'none'
                     }}
                   >
@@ -904,7 +904,7 @@ const TechniqueNotebook = () => {
             >
               Reset Form
             </button>
-            <button type="submit" style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold' }}>
+            <button type="submit" style={{ background: '#ff6600', color: '#0c0c0e', fontWeight: 'bold' }}>
               Log to Notebook
             </button>
           </div>

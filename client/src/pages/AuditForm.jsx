@@ -59,7 +59,7 @@ const SAVE_LABEL = {
 const SAVE_COLOR = {
   saved:  '#4ade80',
   saving: 'rgba(255, 255, 255, 0.45)',
-  dirty:  '#d08f60',
+  dirty:  '#ff6600',
   error:  '#f87171',
 };
 
@@ -330,7 +330,7 @@ const AuditForm = () => {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
 
         {/* Save status indicator */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
@@ -349,8 +349,8 @@ const AuditForm = () => {
         {researchSources.length > 0 && (
           <div style={{
             marginTop: '20px',
-            background: 'rgba(208, 143, 96, 0.04)',
-            border: '1px solid rgba(208, 143, 96, 0.15)',
+            background: 'rgba(255, 102, 0, 0.04)',
+            border: '1px solid rgba(255, 102, 0, 0.15)',
             borderRadius: '2px',
           }}>
             <button
@@ -364,7 +364,7 @@ const AuditForm = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 cursor: 'pointer',
-                color: '#d08f60',
+                color: '#ff6600',
                 fontFamily: 'Roboto Mono',
                 fontSize: '11px',
                 fontWeight: 'bold',
@@ -396,7 +396,7 @@ const AuditForm = () => {
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ fontSize: '10px', color: '#d08f60', whiteSpace: 'nowrap', fontFamily: 'Roboto Mono', flexShrink: 0 }}
+                          style={{ fontSize: '10px', color: '#ff6600', whiteSpace: 'nowrap', fontFamily: 'Roboto Mono', flexShrink: 0 }}
                         >
                           Open ↗
                         </a>
@@ -431,7 +431,7 @@ const AuditForm = () => {
                 const isComplete = step.status === 'complete';
                 let indicatorColor = 'rgba(255, 255, 255, 0.15)';
                 let textColor = 'rgba(255, 255, 255, 0.4)';
-                if (isActive) { indicatorColor = '#d08f60'; textColor = '#d08f60'; }
+                if (isActive) { indicatorColor = '#ff6600'; textColor = '#ff6600'; }
                 else if (isComplete) { indicatorColor = '#4ade80'; textColor = 'rgba(255,255,255,0.7)'; }
                 return (
                   <div
@@ -445,8 +445,8 @@ const AuditForm = () => {
                       color: textColor,
                       padding: '8px 4px',
                       margin: '0 4px',
-                      background: isActive ? 'rgba(208, 143, 96, 0.08)' : 'transparent',
-                      border: isActive ? '1px solid rgba(208, 143, 96, 0.3)' : '1px solid transparent',
+                      background: isActive ? 'rgba(255, 102, 0, 0.08)' : 'transparent',
+                      border: isActive ? '1px solid rgba(255, 102, 0, 0.3)' : '1px solid transparent',
                       borderRadius: '1px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -459,7 +459,7 @@ const AuditForm = () => {
                       height: '6px',
                       borderRadius: '50%',
                       background: indicatorColor,
-                      boxShadow: isActive ? '0 0 8px #d08f60' : isComplete ? '0 0 6px #4ade80' : 'none',
+                      boxShadow: isActive ? '0 0 8px #ff6600' : isComplete ? '0 0 6px #4ade80' : 'none',
                     }} />
                     {idx + 1} // {step.name.toUpperCase()}
                   </div>
@@ -471,10 +471,10 @@ const AuditForm = () => {
               <div style={{
                 background: '#1c1c22',
                 padding: '15px',
-                borderLeft: '3px solid #d08f60',
+                borderLeft: '3px solid #ff6600',
                 borderRadius: '2px',
               }}>
-                <h3 style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px', color: '#d08f60' }}>
+                <h3 style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px', color: '#ff6600' }}>
                   STEP 0{currentStep.stepNumber} // {currentStep.name.toUpperCase()}
                 </h3>
                 <p style={{ fontSize: '12px', lineHeight: '1.5', color: 'rgba(255, 255, 255, 0.8)', margin: 0 }}>
@@ -506,8 +506,8 @@ const AuditForm = () => {
           <div className="panel" style={{ background: '#141418', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '2px', padding: '20px', marginBottom: '25px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowAnalysis(!showAnalysis)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#d08f60', fontSize: '14px' }}>🧬</span>
-                <h3 style={{ margin: 0, fontFamily: 'Roboto Mono', fontSize: '13px', color: '#d08f60' }}>
+                <span style={{ color: '#ff6600', fontSize: '14px' }}>🧬</span>
+                <h3 style={{ margin: 0, fontFamily: 'Roboto Mono', fontSize: '13px', color: '#ff6600' }}>
                   SIGNAL ANALYSIS MATRIX // {song.audioAnalysisStatus?.toUpperCase()}
                 </h3>
               </div>
@@ -534,7 +534,7 @@ const AuditForm = () => {
                           setError('Failed to trigger analysis pipeline');
                         }
                       }}
-                      style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold', border: 'none', padding: '8px 16px', cursor: 'pointer', fontFamily: 'Roboto Mono', fontSize: '11px' }}
+                      style={{ background: '#ff6600', color: '#0c0c0e', fontWeight: 'bold', border: 'none', padding: '8px 16px', cursor: 'pointer', fontFamily: 'Roboto Mono', fontSize: '11px' }}
                     >
                       EXECUTE AUDIO SIGNAL EXTRACTION
                     </button>
@@ -543,14 +543,14 @@ const AuditForm = () => {
 
                 {song.audioAnalysisStatus === 'pending' && (
                   <div style={{ textAlign: 'center', padding: '25px 0' }}>
-                    <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '2.5px solid rgba(208, 143, 96, 0.2)', borderTopColor: '#d08f60', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '12px' }} />
-                    <p style={{ fontSize: '12px', fontFamily: 'Roboto Mono', color: '#d08f60', margin: '0 0 10px 0', letterSpacing: '0.05em' }}>
+                    <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '2.5px solid rgba(255, 102, 0, 0.2)', borderTopColor: '#ff6600', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '12px' }} />
+                    <p style={{ fontSize: '12px', fontFamily: 'Roboto Mono', color: '#ff6600', margin: '0 0 10px 0', letterSpacing: '0.05em' }}>
                       📡 EXTRACTING HARMONIC & RHYTHMIC CODES ({analysisProgress}%)
                     </p>
                     
                     {/* Simulated Progress Bar */}
                     <div style={{ width: '80%', maxWidth: '380px', height: '5px', background: 'rgba(255, 255, 255, 0.08)', margin: '0 auto 12px auto', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                      <div style={{ width: `${analysisProgress}%`, height: '100%', background: 'linear-gradient(90deg, #d08f60, #e2a87c)', transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)', borderRadius: '4px' }} />
+                      <div style={{ width: `${analysisProgress}%`, height: '100%', background: 'linear-gradient(90deg, #ff6600, #e2a87c)', transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)', borderRadius: '4px' }} />
                     </div>
                     
                     <p style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.45)', margin: 0, fontFamily: 'Roboto Mono', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
@@ -586,7 +586,16 @@ const AuditForm = () => {
                 {song.audioAnalysisStatus === 'success' && song.audioAnalysis && (
                   <div>
                     {/* Active Values Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                      background: '#2a2a2a',
+                      gap: '1px',
+                      border: '1px solid #2a2a2a',
+                      borderRadius: '2px',
+                      overflow: 'hidden',
+                      marginBottom: '20px'
+                    }}>
                       {[
                         {
                           label: 'TEMPO / BPM',
@@ -620,22 +629,33 @@ const AuditForm = () => {
                         const badgeText = isHigh ? 'CONFIDENT' : isMed ? 'PROBABLE' : 'REVIEW NEEDED';
 
                         return (
-                          <div key={idx} style={{ background: '#0a0a0c', border: '1px solid rgba(255, 255, 255, 0.05)', padding: '12px', borderRadius: '1px' }}>
-                            <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>
-                              {item.label}
+                          <div key={idx} style={{ background: '#1e1e1e', display: 'flex', flexDirection: 'column' }}>
+                            <div style={{ background: '#2D2D2D', padding: '6px 12px', borderBottom: '1px solid #2a2a2a' }}>
+                              <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', fontWeight: '600', color: '#8a8a8a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                {item.label}
+                              </div>
                             </div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#d08f60', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                              {item.value}
-                              {item.isOverridden && (
-                                <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)', fontWeight: 'normal' }}>(override)</span>
+                            <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                              <div style={{ fontSize: '20px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
+                                {item.value}
+                                {item.isOverridden && (
+                                  <span style={{ fontSize: '9px', color: '#ff6600', fontWeight: 'normal' }}>(override)</span>
+                                )}
+                              </div>
+                              {!item.isReadOnly && (
+                                <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: badgeColor, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                  <span style={{ 
+                                    width: '6px', 
+                                    height: '6px', 
+                                    borderRadius: '50%', 
+                                    background: badgeColor,
+                                    boxShadow: `0 0 4px ${badgeColor}`,
+                                    display: 'inline-block'
+                                  }} />
+                                  {badgeText} ({Math.round(item.conf * 100)}%)
+                                </div>
                               )}
                             </div>
-                            {!item.isReadOnly && (
-                              <div style={{ fontSize: '9px', fontFamily: 'Roboto Mono', color: badgeColor, marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: badgeColor }} />
-                                {badgeText} ({Math.round(item.conf * 100)}%)
-                              </div>
-                            )}
                           </div>
                         );
                       })}
@@ -683,7 +703,7 @@ const AuditForm = () => {
                                 top: '10px',
                                 width: '1.5px',
                                 height: '12px',
-                                background: 'rgba(208, 143, 96, 0.4)'
+                                background: 'rgba(255, 102, 0, 0.4)'
                               }}
                             />
                           ))}
@@ -694,14 +714,22 @@ const AuditForm = () => {
                               position: 'absolute',
                               left: `${(currentTime / duration) * 100}%`,
                               top: 0,
-                              width: '2px',
+                              width: '1px',
                               height: '100%',
-                              background: '#f87171',
-                              boxShadow: '0 0 8px #f87171',
+                              background: '#00e5ff',
+                              boxShadow: '0 0 4px #00e5ff',
                               zIndex: 10
                             }}
                           >
-                            <div style={{ position: 'absolute', top: '-3px', left: '-3px', width: '8px', height: '8px', borderRadius: '50%', background: '#f87171' }} />
+                            <div style={{ 
+                              position: 'absolute', 
+                              top: 0, 
+                              left: '-5px', 
+                              width: '11px', 
+                              height: '8px', 
+                              background: '#00e5ff',
+                              clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)'
+                            }} />
                           </div>
                         </div>
 
@@ -721,13 +749,13 @@ const AuditForm = () => {
                                   display: 'flex',
                                   flexDirection: 'column',
                                   justifyContent: 'center',
-                                  background: Math.abs(currentTime - (duration / arr.length) * (i + 0.5)) < (duration / arr.length / 2) && isPlaying ? 'rgba(208,143,96,0.05)' : 'transparent'
+                                  background: Math.abs(currentTime - (duration / arr.length) * (i + 0.5)) < (duration / arr.length / 2) && isPlaying ? 'rgba(255,102,0,0.05)' : 'transparent'
                                 }}
                               >
                                 <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.4)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                   {sect.section}
                                 </span>
-                                <span style={{ fontSize: '9px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#d08f60' }}>
+                                <span style={{ fontSize: '9px', fontWeight: 'bold', fontFamily: 'Roboto Mono', color: '#ff6600' }}>
                                   {sect.key} {sect.scale === 'minor' ? 'm' : ''}
                                 </span>
                               </div>
@@ -749,8 +777,8 @@ const AuditForm = () => {
                     </div>
 
                     {showOverrideControls && (
-                      <div style={{ marginTop: '20px', padding: '15px', background: '#0c0c0e', border: '1px dashed rgba(208, 143, 96, 0.25)', borderRadius: '2px' }}>
-                        <h4 style={{ margin: '0 0 15px 0', fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60' }}>
+                      <div style={{ marginTop: '20px', padding: '15px', background: '#0c0c0e', border: '1px dashed rgba(255, 102, 0, 0.25)', borderRadius: '2px' }}>
+                        <h4 style={{ margin: '0 0 15px 0', fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600' }}>
                           ✍️ AUDIO METADATA MANUAL CORRECTIONS
                         </h4>
 
@@ -771,8 +799,8 @@ const AuditForm = () => {
                                 onClick={handleTapTempo}
                                 style={{
                                   background: '#1c1c22',
-                                  color: '#d08f60',
-                                  border: '1px solid rgba(208, 143, 96, 0.4)',
+                                  color: '#ff6600',
+                                  border: '1px solid rgba(255, 102, 0, 0.4)',
                                   padding: '4px 10px',
                                   fontSize: '9px',
                                   fontFamily: 'Roboto Mono',
@@ -855,7 +883,7 @@ const AuditForm = () => {
                                 <td style={{ padding: '6px 8px' }}>--</td>
                                 <td style={{ padding: '6px 8px' }}>--</td>
                               </tr>
-                              <tr style={{ color: '#d08f60', background: 'rgba(208, 143, 96, 0.02)' }}>
+                              <tr style={{ color: '#ff6600', background: 'rgba(255, 102, 0, 0.02)' }}>
                                 <td style={{ padding: '6px 8px', fontWeight: 'bold' }}>ACTIVE VALUE (OVERRIDES EFFECTIVE)</td>
                                 <td style={{ padding: '6px 8px', fontWeight: 'bold' }}>{song.audioOverrides?.tempo_bpm || song.audioAnalysis.tempo_bpm}</td>
                                 <td style={{ padding: '6px 8px', fontWeight: 'bold' }}>
@@ -871,7 +899,7 @@ const AuditForm = () => {
                           <button
                             type="button"
                             onClick={handleSaveOverrides}
-                            style={{ background: '#d08f60', color: '#0c0c0e', fontWeight: 'bold', border: 'none', padding: '6px 12px', cursor: 'pointer', fontFamily: 'Roboto Mono', fontSize: '10px' }}
+                            style={{ background: '#ff6600', color: '#0c0c0e', fontWeight: 'bold', border: 'none', padding: '6px 12px', cursor: 'pointer', fontFamily: 'Roboto Mono', fontSize: '10px' }}
                           >
                             SAVE OVERRIDES
                           </button>
@@ -912,13 +940,13 @@ const AuditForm = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'rgba(208,143,96,0.1)',
-                border: '1px solid rgba(208,143,96,0.3)',
+                background: 'rgba(255,102,0,0.1)',
+                border: '1px solid rgba(255,102,0,0.3)',
                 padding: '10px 20px',
                 borderRadius: '2px',
                 fontSize: '12px',
                 fontFamily: 'Roboto Mono',
-                color: '#d08f60',
+                color: '#ff6600',
               }}>
                 <span style={{ animation: 'pulse 1.5s infinite', fontSize: '16px' }}>▶</span>
                 Press <strong>Play</strong> in the Tape Deck below or click the video monitor
@@ -944,13 +972,13 @@ const AuditForm = () => {
             <>
               {template?.workflow_guidance && !isGuided && (
                 <div style={{
-                  background: 'rgba(208, 143, 96, 0.05)',
-                  border: '1px solid rgba(208, 143, 96, 0.15)',
+                  background: 'rgba(255, 102, 0, 0.05)',
+                  border: '1px solid rgba(255, 102, 0, 0.15)',
                   padding: '15px',
                   borderRadius: '2px',
                   marginBottom: '30px',
                 }}>
-                  <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#d08f60' }}>
+                  <strong style={{ fontFamily: 'Roboto Mono', fontSize: '11px', color: '#ff6600' }}>
                     💡 WORKSPACE SIGNAL ANALYSIS MATRIX:
                   </strong>
                   <p style={{ marginTop: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
@@ -964,7 +992,7 @@ const AuditForm = () => {
                 const questions = lensData?.questions || [];
                 return (
                   <div key={lens} style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <h2 style={{ textTransform: 'uppercase', color: '#d08f60', marginBottom: '8px' }}>
+                    <h2 style={{ textTransform: 'uppercase', color: '#ff6600', marginBottom: '8px' }}>
                       {lens} Lens
                     </h2>
                     {lensData?.description && (
@@ -988,14 +1016,14 @@ const AuditForm = () => {
                             marginTop: '15px',
                             marginBottom: '25px',
                             padding: '15px',
-                            background: 'rgba(208, 143, 96, 0.03)',
-                            border: '1px dashed rgba(208, 143, 96, 0.25)',
+                            background: 'rgba(255, 102, 0, 0.03)',
+                            border: '1px dashed rgba(255, 102, 0, 0.25)',
                             borderRadius: '2px',
                           }}>
                             <h4 style={{
                               fontFamily: 'Roboto Mono',
                               fontSize: '11px',
-                              color: '#d08f60',
+                              color: '#ff6600',
                               marginTop: 0,
                               marginBottom: '10px',
                               display: 'flex',
@@ -1006,7 +1034,7 @@ const AuditForm = () => {
                             </h4>
                             <div style={{ display: 'grid', gap: '12px' }}>
                               {lensData.exercises.map((ex, idx) => (
-                                <div key={idx} style={{ background: '#0a0a0c', padding: '12px', borderLeft: '2px solid #d08f60', borderRadius: '1px' }}>
+                                <div key={idx} style={{ background: '#0a0a0c', padding: '12px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
                                   <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
                                     {ex.name}
                                   </strong>
@@ -1047,15 +1075,15 @@ const AuditForm = () => {
           {isGuided && currentStep?.name === 'Recreate' && (
             <div>
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ color: '#d08f60', fontSize: '12px', fontFamily: 'Roboto Mono', marginBottom: '12px' }}>
+                <h3 style={{ color: '#ff6600', fontSize: '12px', fontFamily: 'Roboto Mono', marginBottom: '12px' }}>
                   🎯 TAILORED RECREATION EXERCISES
                 </h3>
                 {lenses.map((lens) => {
                   const lensData = template?.lenses?.[lens];
                   if (!lensData?.exercises || lensData.exercises.length === 0) return null;
                   return (
-                    <div key={lens} style={{ marginBottom: '15px', padding: '12px', background: '#1c1c22', borderLeft: '3px solid #d08f60' }}>
-                      <strong style={{ textTransform: 'uppercase', fontSize: '11px', color: '#d08f60', fontFamily: 'Roboto Mono', display: 'block', marginBottom: '8px' }}>
+                    <div key={lens} style={{ marginBottom: '15px', padding: '12px', background: '#1c1c22', borderLeft: '3px solid #ff6600' }}>
+                      <strong style={{ textTransform: 'uppercase', fontSize: '11px', color: '#ff6600', fontFamily: 'Roboto Mono', display: 'block', marginBottom: '8px' }}>
                         {lens} Lens
                       </strong>
                       <div style={{ display: 'grid', gap: '8px' }}>
@@ -1152,7 +1180,7 @@ const AuditForm = () => {
                         }}
                       >
                         <div style={{ flex: 1 }}>
-                          <strong style={{ fontSize: '12px', color: '#d08f60', fontFamily: 'Roboto Mono' }}>
+                          <strong style={{ fontSize: '12px', color: '#ff6600', fontFamily: 'Roboto Mono' }}>
                             {tech.techniqueName || 'Untitled Technique'}
                           </strong>
                           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>
@@ -1191,8 +1219,8 @@ const AuditForm = () => {
                 onClick={() => seekTo(bm.timestampSeconds || bm.timestamp)}
                 style={{
                   background: '#1c1c22',
-                  border: '1px solid rgba(208, 143, 96, 0.3)',
-                  color: '#d08f60',
+                  border: '1px solid rgba(255, 102, 0, 0.3)',
+                  color: '#ff6600',
                   padding: '5px 12px',
                   borderRadius: '2px',
                   fontSize: '11px',
@@ -1201,8 +1229,8 @@ const AuditForm = () => {
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#d08f60'; e.currentTarget.style.color = '#0c0c0e'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#1c1c22'; e.currentTarget.style.color = '#d08f60'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#ff6600'; e.currentTarget.style.color = '#0c0c0e'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#1c1c22'; e.currentTarget.style.color = '#ff6600'; }}
               >
                 {formatTime(bm.timestampSeconds || bm.timestamp)} {bm.note ? `- ${bm.note}` : ''}
               </div>

@@ -56,7 +56,7 @@ const ImportSong = () => {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #d08f60' }}>
+      <div className="panel" style={{ background: '#151518', borderBottom: '2px solid #ff6600' }}>
         <h1>Import Song from YouTube</h1>
         <p className="card-subtitle">Paste a YouTube URL to import a song for analysis</p>
 
@@ -85,7 +85,7 @@ const ImportSong = () => {
         </form>
 
         <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <h3 style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#d08f60', marginBottom: '10px' }}>
+          <h3 style={{ fontSize: '11px', fontFamily: 'Roboto Mono', color: '#ff6600', marginBottom: '10px' }}>
             Signal Extraction Sequence
           </h3>
           <ul style={{ paddingLeft: '5px', lineHeight: '1.8', fontSize: '12px', color: 'rgba(255, 255, 255, 0.65)' }}>
@@ -106,7 +106,7 @@ const ImportSong = () => {
                 itemColor = '#4ade80';
                 marker = '✓ ';
               } else if (isActive) {
-                itemColor = '#d08f60';
+                itemColor = '#ff6600';
                 marker = '● ';
               } else if (isPending) {
                 itemColor = 'rgba(255, 255, 255, 0.25)';
