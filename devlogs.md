@@ -347,3 +347,23 @@ Post-rename `grep -rn DNA` (excluding venv, .git, node_modules, devlogs.md) retu
 
 #### Commit
 `8c35682` — ops: add PM2 ecosystem config and fix test symlink for arra
+
+---
+
+### 2026-06-10: YouTube Title and Artist Metadata Noise Cleaning for Tavily Research
+
+#### Goal
+Prevent Tavily search from returning 0 results due to YouTube video title noise like `(Official Music Video)` or `[Official Video]`.
+
+#### Implementation
+- **Tavily Query Sanitization**:
+  - Added a `cleanQueryTerm` helper function in [TavilyAdapter.js](file:///home/jackc/projects/arra/server/adapters/TavilyAdapter.js) that strips common YouTube video suffixes (e.g., `(Official Music Video)`, `[Official Audio]`, `(Lyrics)`, `[4K Visualizer]`, etc.).
+  - Applied the helper to both `title` and `artist` in `searchSongInfo` before constructing the Tavily search query.
+- **Verification**:
+  - Cleaned up the previously imported song for "Four Tet - Baby (Official Music Video)" from the database to allow fresh verification.
+  - Restarted the PM2 `arra-server` microservice to load the new changes.
+  - All Jest unit and integration tests successfully verified as passing.
+
+#### Commit
+`6ed42a3` — fix(research): clean YouTube metadata noise from search query for song imports
+

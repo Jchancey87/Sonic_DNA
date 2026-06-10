@@ -28,3 +28,5 @@
 | 2026-06-07 | Scaffold CLAP GPU analysis pipeline & fallback simulation | `7151075` |
 | 2026-06-10 | Rebrand: all Sonic DNA → Arra references in source, docs, deploy scripts | `66249ec` |
 | 2026-06-10 | Full redeployment: PM2 ecosystem config, MongoDB 7.0.35 upgrade, live at arra.homma.casa | `8c35682` |
+| 2026-06-10 | Clean YouTube metadata noise (e.g. Official Music Video) from Tavily research queries | `6ed42a3` |
+
