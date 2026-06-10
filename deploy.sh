@@ -44,7 +44,7 @@ fi
 # 5. Clean up any dangling raw node processes (not managed by PM2) that might block ports
 echo -e "${YELLOW}🧹 Cleaning up port conflicts...${NC}"
 # Stop PM2 instances if they are running, so they don't get forcefully killed
-pm2 stop arra-server arra-client &> /dev/null
+pm2 stop arra-server arra-client arra-analysis &> /dev/null
 
 # Kill any other non-PM2 node processes
 pkill -9 -f "concurrently" &> /dev/null
@@ -75,6 +75,17 @@ else
   echo -e "${YELLOW}Launching frontend service...${NC}"
   cd "$REPO_DIR/client" && pm2 start npm --name "arra-client" -- run dev
 fi
+
+# Manage Analysis Service
+pm2 describe arra-analysis &> /dev/null
+if [ $? -eq 0 ]; then
+  echo -e "${YELLOW}Restarting existing analysis service...${NC}"
+  pm2 restart arra-analysis
+else
+  echo -e "${YELLOW}Launching analysis service...${NC}"
+  cd "$REPO_DIR/analysis_service" && pm2 start "$REPO_DIR/venv/bin/python" --name "arra-analysis" -- app.py
+fi
+
 
 cd "$REPO_DIR"
 

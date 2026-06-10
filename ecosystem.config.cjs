@@ -20,5 +20,15 @@ module.exports = {
         NODE_ENV: 'development',
       },
     },
+    {
+      name: 'arra-analysis',
+      script: '/home/jackc/projects/arra/venv/bin/python',
+      args: 'app.py',
+      cwd: '/home/jackc/projects/arra/analysis_service',
+      watch: false,
+      env: {
+        PORT: 8080,
+      },
+    },
   ],
 };
