@@ -425,7 +425,9 @@ const AuditDetail = () => {
                                 {lensData.exercises.map((ex, idx) => (
                                   <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
                                     <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)' }}>{ex.name}</div>
-                                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{ex.description}</div>
+                                    <p className="text-sm leading-relaxed text-zinc-300 max-w-prose mt-1">
+                                      {ex.description}
+                                    </p>
                                   </div>
                                 ))}
                               </div>

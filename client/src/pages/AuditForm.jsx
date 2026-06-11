@@ -1038,7 +1038,7 @@ const AuditForm = () => {
                                   <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
                                     {ex.name}
                                   </strong>
-                                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.4' }}>
+                                  <p className="text-sm leading-relaxed text-zinc-300 max-w-prose mt-1">
                                     {ex.description}
                                   </p>
                                 </div>
