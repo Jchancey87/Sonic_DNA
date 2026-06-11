@@ -515,3 +515,21 @@ Unify active feed box spacing using two Tailwind flex rows.
 
 #### Commit
 `d3d52c1` — refactor(ui): unify active feed boxes into Tailwind flex rows
+
+---
+
+### 2026-06-11: Concrete exercises typography upgrade
+
+#### Goal
+Improve readability of Concrete Exercises description text.
+
+#### Implementation
+- **AuditDetail.jsx & AuditForm.jsx**:
+  - Replace description style with Tailwind classes `text-sm leading-relaxed text-zinc-300 max-w-prose mt-1`.
+
+#### Verification
+- Client build succeeds. Skip backend tests (pure style change).
+
+#### Commit
+`49da561` — style(ui): upgrade concrete exercises description typography
+

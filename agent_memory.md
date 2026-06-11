@@ -39,6 +39,7 @@
 | 2026-06-10 | Resolve workspace black hole theme issue by aligning card/panel backgrounds with perfect dark grey (#282828) | `97fa1a7` |
 | 2026-06-10 | Research teach/caveman. Add token/lens rules. | `-` |
 | 2026-06-11 | Refactor active feed song card badges/actions to Tailwind flex rows | `d3d52c1` |
+| 2026-06-11 | Refactor concrete exercises description typography to improve readability | `49da561` |
 
 
 
