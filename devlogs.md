@@ -571,5 +571,25 @@ Expand concrete exercise card text to use full card width.
 #### Commit
 `ef92b3d` — style(ui): remove max-width constraints on exercise description text
 
+---
+
+### 2026-06-11: Noto Sans global font configuration
+
+#### Goal
+Apply Noto Sans size 18 weight 400 globally.
+
+#### Implementation
+- **global.js**:
+  - Import Noto Sans from Google Fonts.
+  - Configure body with `font-family: 'Noto Sans', sans-serif`, `font-size: 18px`, `font-weight: 400`.
+  - Configure headings (`h1`-`h6`) and paragraph elements (`p`) to scale up and use Noto Sans.
+
+#### Verification
+- Client build succeeds. Skip backend tests.
+
+#### Commit
+`da5cd7e` — style: set Noto Sans 18px 400 as the global default typography
+
+
 
 

@@ -42,6 +42,7 @@
 | 2026-06-11 | Refactor concrete exercises description typography to improve readability | `49da561` |
 | 2026-06-11 | Refactor concrete exercises card layout, padding, spacing, and lists | `e81824b` |
 | 2026-06-11 | Remove max-width constraints on concrete exercises to allow full-width text | `ef92b3d` |
+| 2026-06-11 | Set Noto Sans 18px 400 as default global typography style | `da5cd7e` |
 
 
 
