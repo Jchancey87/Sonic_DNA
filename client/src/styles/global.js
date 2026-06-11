@@ -1,7 +1,7 @@
 import React from 'react';
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap');
 
   :root {
     --bg-app: #141414;
@@ -44,7 +44,9 @@ const styles = `
   }
 
   body {
-    font-family: 'Barlow', 'Inter', -apple-system, sans-serif;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
     background: var(--bg-app);
     color: var(--text-active);
     overflow: hidden; /* Main window doesn't scroll, panels do */
@@ -54,24 +56,24 @@ const styles = `
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Barlow', 'Roboto Mono', sans-serif;
-    font-weight: 600;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 700;
     color: var(--text-active);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
 
   h1 { 
-    font-size: 1.35rem; 
+    font-size: 1.6rem; 
     margin-bottom: 12px; 
     border-bottom: 1px solid var(--border-color); 
     padding-bottom: 6px; 
   }
-  h2 { font-size: 1.1rem; margin-bottom: 10px; }
-  h3 { font-size: 0.9rem; margin-bottom: 8px; }
+  h2 { font-size: 1.3rem; margin-bottom: 10px; }
+  h3 { font-size: 1.1rem; margin-bottom: 8px; }
 
   p {
-    font-size: 13px;
+    font-size: 18px;
     line-height: 1.6;
     color: var(--text-muted);
   }
