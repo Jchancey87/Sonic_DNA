@@ -1,8 +1,8 @@
 # 🧠 Active Agent Memory — Arra
 
 ## 🎯 Active Session Focus (Intent)
-- **Goal**: Full redeployment after rebrand — tests, PM2, MongoDB, and live verification.
-- **Status**: ✅ Complete — all 29 tests passing, PM2 restarted as arra-server/arra-client, MongoDB 7.0.35 healthy, app live at arra.homma.casa.
+- **Goal**: GTX 1050 Ti GPU setup for CLAP semantic audio analysis.
+- **Status**: ✅ Complete — torch 2.6.0+cu126 (sm_61 compatible), transformers 5.11.0, CLAP model loaded on cuda, inference verified at 4.23GB VRAM.
 
 ## ⚠️ Critical Architectural Constraints (Red Lines)
 - **YouTube Embedding**: Always set `controls: 1` and pass `origin` in `playerVars`. Removing `pointer-events: none` from iframe containers is mandatory to allow browser autoplay unlock gestures.
@@ -44,6 +44,7 @@
 | 2026-06-11 | Remove max-width constraints on concrete exercises to allow full-width text | `ef92b3d` |
 | 2026-06-11 | Set Noto Sans 18px 400 as default global typography style | `da5cd7e` |
 | 2026-06-11 | Set size 18 on audit questions labels in AuditForm (Phase 3) | `f9a1a6a` |
+| 2026-06-11 | GTX 1050 Ti GPU CLAP setup: torch 2.6.0+cu126, transformers 5.x API fix (audios→audio), 4.23GB VRAM confirmed | `15e025e` |
 
 
 

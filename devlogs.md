@@ -610,3 +610,19 @@ Increase audit questions label font size to 18px.
 
 
 
+### 2026-06-11: GTX 1050 Ti GPU setup for CLAP semantic audio analysis
+
+**Commit:** `15e025e`
+
+**Problem:** CLAP analyzer running in CPU simulation fallback. GTX 1050 Ti present but torch not installed and CUDA libs missing.
+
+**Work done:**
+- Disk space increased to 40GB (user), cleared 1.1GB pip cache mid-session
+- Tried torch 2.12.0 first — incompatible (built for sm_75+, 1050 Ti is sm_61/Pascal)
+- Installed correct stack: `torch==2.6.0+cu126` (supports sm_50–sm_89), all nvidia cu12 runtime libs (cudnn, cublas, cufft, cusolver, nccl, triton etc.)
+- `transformers 5.11.0` breaking change: `audios=` → `audio=` in CLAP processor — fixed in `analyzer.py`
+- FP16 casting now handles all tensor dtypes (not hardcoded `input_features` key)
+- Model `laion/clap-htsat-fused` (614MB) downloaded and cached, loads on `cuda` in FP16
+- GPU verified: `cuda.is_available()=True`, 4.23GB VRAM, 4.8x speedup over CPU on matmul benchmark
+- `arra-analysis` PM2 service restarted and online
+- `requirements.txt` updated with pinned GPU deps + cu126 install note
