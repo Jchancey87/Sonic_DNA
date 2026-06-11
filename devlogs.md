@@ -497,3 +497,21 @@ Integrate learning framework concepts. Save tokens.
 
 
 
+
+---
+
+### 2026-06-11: Active feed card UI unification
+
+#### Goal
+Unify active feed box spacing using two Tailwind flex rows.
+
+#### Implementation
+- **index.html**: Add Tailwind CDN.
+- **Dashboard.jsx**: Refactor song card action/status rows into matched Tailwind flex rows.
+
+#### Verification
+- Client build succeeds.
+- Jest unit/integration tests pass.
+
+#### Commit
+`d3d52c1` — refactor(ui): unify active feed boxes into Tailwind flex rows
