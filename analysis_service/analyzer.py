@@ -78,7 +78,7 @@ class ClapAnalyzer:
             batch = segments[i:i + batch_size]
             
             inputs = self.processor(
-                audios=batch,
+                audio=batch,
                 sampling_rate=48000,
                 text=tags,
                 return_tensors="pt",
@@ -87,7 +87,11 @@ class ClapAnalyzer:
             
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
             if self.device == "cuda":
-                inputs["input_features"] = inputs["input_features"].half()
+                # Cast float audio tensors to half precision; skip non-float tensors (e.g. input_ids)
+                inputs = {
+                    k: v.half() if v.dtype in (torch.float32, torch.float64) else v
+                    for k, v in inputs.items()
+                }
                 
             with torch.no_grad():
                 outputs = self.model(**inputs)
