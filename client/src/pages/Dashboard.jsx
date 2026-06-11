@@ -186,33 +186,36 @@ const Dashboard = () => {
                     {song.artistName || song.artist}
                   </p>
 
-                  {/* Badges */}
-                  <div style={{ marginBottom: 'auto', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    <span className="badge primary">{songAuditList.length} {songAuditList.length === 1 ? 'Audit' : 'Audits'}</span>
-                    {song.researchStatus === 'success' && <span className="badge success">Researched</span>}
+                  {/* Status Row */}
+                  <div className="flex w-full gap-2 mb-2 mt-auto">
+                    <span className="badge primary flex-1 flex items-center justify-center h-10 border rounded text-xs">
+                      {songAuditList.length} {songAuditList.length === 1 ? 'Audit' : 'Audits'}
+                    </span>
+                    <span className={`badge flex-1 flex items-center justify-center h-10 border rounded text-xs ${song.researchStatus === 'success' ? 'success' : ''}`}>
+                      {song.researchStatus === 'success' ? 'Researched' : 'No Research'}
+                    </span>
                   </div>
 
-                  {/* Action row */}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
+                  {/* Actions Row */}
+                  <div className="flex w-full gap-2">
                     <button
                       onClick={() => { loadSong(song); play(); }}
-                      style={{
-                        flex: 1,
-                        fontSize: '10px',
-                        background: isActive ? '#ff6600' : '#1c1c22',
-                        color: isActive ? '#0c0c0e' : '#ff6600',
-                        fontWeight: isActive ? 'bold' : 'normal',
-                      }}
+                      className={`flex-1 flex items-center justify-center h-10 rounded text-xs ${
+                        isActive 
+                          ? 'bg-[#ff6600] text-[#0c0c0e] font-bold' 
+                          : 'bg-[#1c1c22] text-[#ff6600] border border-[#ff6600]/20'
+                      }`}
                     >
                       {isActive ? '■ Active' : '▲ Load'}
                     </button>
-                    <Link to={`/audit/create/${song._id}`} style={{ flex: 1.2 }}>
-                      <button style={{ width: '100%', fontSize: '10px' }}>Audit</button>
+                    <Link to={`/audit/create/${song._id}`} className="flex-1">
+                      <button className="w-full flex items-center justify-center h-10 rounded text-xs">
+                        Audit
+                      </button>
                     </Link>
                     <button
-                      className="danger"
+                      className="danger w-12 h-10 flex items-center justify-center rounded"
                       onClick={() => openDeleteModal(song)}
-                      style={{ flex: 'none', padding: '8px 10px' }}
                       title="Delete Song"
                     >
                       🗑️
