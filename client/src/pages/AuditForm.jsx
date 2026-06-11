@@ -1045,13 +1045,13 @@ const AuditForm = () => {
                                       const cleanText = isBullet ? trimmed.substring(1).trim() : para;
                                       if (isBullet) {
                                         return (
-                                          <ul key={pIdx} className="list-disc list-inside text-sm leading-7 text-zinc-300 max-w-prose pl-1">
+                                          <ul key={pIdx} className="list-disc list-inside text-sm leading-7 text-zinc-300 w-full pl-1">
                                             <li>{cleanText}</li>
                                           </ul>
                                         );
                                       }
                                       return (
-                                        <p key={pIdx} className="text-sm leading-7 text-zinc-300 max-w-prose">
+                                        <p key={pIdx} className="text-sm leading-7 text-zinc-300 w-full">
                                           {para}
                                         </p>
                                       );
