@@ -17,4 +17,4 @@
 ## Execution & Quality Assurance
 - Use `&&` for short related command chains when it reduces turn count; split commands when intermediate inspection is useful.
 - Use quiet flags like `-q` or `-s` when verbose output is unnecessary, but do not hide useful failure diagnostics.
-- After modifying code, run the relevant local tests and lint checks before finalizing.
+- After modifying code, run relevant local tests and lint checks before finalizing (skip backend tests for frontend-only/styling changes to conserve tokens).

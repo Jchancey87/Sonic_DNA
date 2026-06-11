@@ -14,7 +14,7 @@
 - **Jest test paths**: Tests live in root `tests/` but import `../../services/`. Run from `server/` via symlink `server/tests -> ../tests`. Always run as `npm test` from `server/` dir.
 - **Audit Lenses**: Keep auditing templates and questions strictly structured under the four core lenses: rhythm, texture, harmony, and arrangement.
 - **Export Formats**: Prefer beautiful HTML files over markdown for generated reference documents, lessons, and exportable handoff sheets.
-- **Token Optimization (Caveman Style)**: Write devlogs, session summaries, and agent logs in highly terse, compressed "caveman" style (omit articles, pleasantries, fluff) to maximize token efficiency.
+- **Token Optimization (Caveman Style)**: Write devlogs, session summaries, and agent logs in highly terse, compressed "caveman" style (omit articles, pleasantries, fluff) to maximize token efficiency. Skip backend testing on pure frontend/style changes to conserve context window tokens.
 
 ## 🛠️ Open Priority TODOs
 - [x] Time signature selector (3/4, 6/8) in ArrangementTimelineWidget.
