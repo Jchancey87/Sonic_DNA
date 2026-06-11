@@ -590,6 +590,23 @@ Apply Noto Sans size 18 weight 400 globally.
 #### Commit
 `da5cd7e` — style: set Noto Sans 18px 400 as the global default typography
 
+---
+
+### 2026-06-11: Phase 3 audit questions font size upgrade
+
+#### Goal
+Increase audit questions label font size to 18px.
+
+#### Implementation
+- **AuditForm.jsx**: Set `fontSize: '18px'` on question labels.
+
+#### Verification
+- Client build succeeds. Skip backend tests.
+
+#### Commit
+`f9a1a6a` — style(ui): increase font size of audit questions in AuditForm to 18px
+
+
 
 
 
