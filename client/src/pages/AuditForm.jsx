@@ -1066,7 +1066,7 @@ const AuditForm = () => {
                           const key = `${lens}-q${idx}`;
                           return (
                             <div key={key} className="form-group" style={{ marginBottom: '20px' }}>
-                              <label style={{ fontWeight: '600', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                              <label style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
                                 {question}
                               </label>
                               <textarea
