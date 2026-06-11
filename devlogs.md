@@ -533,3 +533,24 @@ Improve readability of Concrete Exercises description text.
 #### Commit
 `49da561` — style(ui): upgrade concrete exercises description typography
 
+---
+
+### 2026-06-11: Concrete exercises card layout refactoring
+
+#### Goal
+Expand spacing, card padding, line height, and break text walls in Concrete Exercises cards.
+
+#### Implementation
+- **AuditDetail.jsx & AuditForm.jsx**:
+  - Replace grid layout with `flex flex-col gap-6` parent layout.
+  - Increase inner card padding to `p-6` with standard dark styling.
+  - Set description line height to `leading-7`.
+  - Parse description text by newline to render separate paragraphs and dynamic bullet lists (`space-y-3`).
+
+#### Verification
+- Client build succeeds. Skip backend tests (pure style change).
+
+#### Commit
+`e81824b` — style(ui): refactor concrete exercise cards layout and paragraph split
+
+
