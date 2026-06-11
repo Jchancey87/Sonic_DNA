@@ -421,13 +421,29 @@ const AuditDetail = () => {
                               <strong style={{ display: 'block', fontSize: '10px', fontFamily: 'Roboto Mono', color: '#ff6600', marginBottom: '8px' }}>
                                 🔬 CONCRETE EXERCISES (TAILORED)
                               </strong>
-                              <div style={{ display: 'grid', gap: '8px' }}>
+                              <div className="flex flex-col gap-6">
                                 {lensData.exercises.map((ex, idx) => (
-                                  <div key={idx} style={{ background: '#070709', padding: '10px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
-                                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)' }}>{ex.name}</div>
-                                    <p className="text-sm leading-relaxed text-zinc-300 max-w-prose mt-1">
-                                      {ex.description}
-                                    </p>
+                                  <div key={idx} className="p-6 border-l-2 border-[#ff6600] rounded-[1px] bg-[#070709]">
+                                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{ex.name}</div>
+                                    <div className="space-y-3 mt-3">
+                                      {(ex.description || '').split('\n').filter(line => line.trim()).map((para, pIdx) => {
+                                        const trimmed = para.trim();
+                                        const isBullet = trimmed.startsWith('-') || trimmed.startsWith('*');
+                                        const cleanText = isBullet ? trimmed.substring(1).trim() : para;
+                                        if (isBullet) {
+                                          return (
+                                            <ul key={pIdx} className="list-disc list-inside text-sm leading-7 text-zinc-300 max-w-prose pl-1">
+                                              <li>{cleanText}</li>
+                                            </ul>
+                                          );
+                                        }
+                                        return (
+                                          <p key={pIdx} className="text-sm leading-7 text-zinc-300 max-w-prose">
+                                            {para}
+                                          </p>
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 ))}
                               </div>

@@ -1032,15 +1032,31 @@ const AuditForm = () => {
                             }}>
                               🔬 CONCRETE EXERCISES (TAILORED)
                             </h4>
-                            <div style={{ display: 'grid', gap: '12px' }}>
+                            <div className="flex flex-col gap-6">
                               {lensData.exercises.map((ex, idx) => (
-                                <div key={idx} style={{ background: 'var(--bg-workspace)', padding: '12px', borderLeft: '2px solid #ff6600', borderRadius: '1px' }}>
-                                  <strong style={{ fontSize: '12px', color: 'rgba(255,255,255,0.95)', display: 'block', marginBottom: '4px' }}>
+                                <div key={idx} className="p-6 border-l-2 border-[#ff6600] rounded-[1px] bg-[var(--bg-workspace)]">
+                                  <strong style={{ fontSize: '13px', color: 'rgba(255,255,255,0.95)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     {ex.name}
                                   </strong>
-                                  <p className="text-sm leading-relaxed text-zinc-300 max-w-prose mt-1">
-                                    {ex.description}
-                                  </p>
+                                  <div className="space-y-3 mt-3">
+                                    {(ex.description || '').split('\n').filter(line => line.trim()).map((para, pIdx) => {
+                                      const trimmed = para.trim();
+                                      const isBullet = trimmed.startsWith('-') || trimmed.startsWith('*');
+                                      const cleanText = isBullet ? trimmed.substring(1).trim() : para;
+                                      if (isBullet) {
+                                        return (
+                                          <ul key={pIdx} className="list-disc list-inside text-sm leading-7 text-zinc-300 max-w-prose pl-1">
+                                            <li>{cleanText}</li>
+                                          </ul>
+                                        );
+                                      }
+                                      return (
+                                        <p key={pIdx} className="text-sm leading-7 text-zinc-300 max-w-prose">
+                                          {para}
+                                        </p>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               ))}
                             </div>
