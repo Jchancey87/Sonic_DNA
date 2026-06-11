@@ -41,6 +41,7 @@
 | 2026-06-11 | Refactor active feed song card badges/actions to Tailwind flex rows | `d3d52c1` |
 | 2026-06-11 | Refactor concrete exercises description typography to improve readability | `49da561` |
 | 2026-06-11 | Refactor concrete exercises card layout, padding, spacing, and lists | `e81824b` |
+| 2026-06-11 | Remove max-width constraints on concrete exercises to allow full-width text | `ef92b3d` |
 
 
 

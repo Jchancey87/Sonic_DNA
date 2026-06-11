@@ -553,4 +553,23 @@ Expand spacing, card padding, line height, and break text walls in Concrete Exer
 #### Commit
 `e81824b` — style(ui): refactor concrete exercise cards layout and paragraph split
 
+---
+
+### 2026-06-11: Full-width concrete exercises text expansion
+
+#### Goal
+Expand concrete exercise card text to use full card width.
+
+#### Implementation
+- **AuditDetail.jsx & AuditForm.jsx**:
+  - Remove `max-w-prose` styling constraints.
+  - Set container elements to `w-full`.
+
+#### Verification
+- Client build succeeds. Skip backend tests.
+
+#### Commit
+`ef92b3d` — style(ui): remove max-width constraints on exercise description text
+
+
 
