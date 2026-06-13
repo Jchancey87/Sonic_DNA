@@ -271,7 +271,7 @@ CRITICAL RULES:
         exampleTimestamp: 0,
         tags: ['study-planner'],
         notes: techniqueNotes || '',
-        confidence: 'medium',
+        confidence: 3,
         deletedAt: null,
         createdAt: new Date()
       };
